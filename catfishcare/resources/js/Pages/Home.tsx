@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import StatCard from "@/Components/StatCard";
 import StatusBadge from "@/Components/StatusBadge";
+import { Button } from "@/Components/ui";
 import type { SensorRow, TabName } from "@/Types";
 
 interface HomeTabProps {
@@ -205,9 +206,9 @@ const HomeTab = ({
                         {quickActions.map((action, index) => {
                             const Icon = action.icon;
                             return (
-                                <button
+                                <Button
                                     key={index}
-                                    className="action-row-btn"
+                                    variant="action-row"
                                     onClick={action.action}
                                     style={{
                                         animation:
@@ -220,7 +221,7 @@ const HomeTab = ({
                                         <span>{action.label}</span>
                                     </div>
                                     <span className="arrow">→</span>
-                                </button>
+                                </Button>
                             );
                         })}
                     </div>

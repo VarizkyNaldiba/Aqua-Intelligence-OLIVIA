@@ -7,7 +7,9 @@ import {
     Fish,
     Sun,
     Moon,
+    Cpu,
 } from "lucide-react";
+import { Link } from "@inertiajs/react";
 import type { TabName, Theme } from "../Types";
 
 interface SidebarProps {
@@ -49,6 +51,10 @@ const Sidebar = ({
                         </div>
                     );
                 })}
+
+                <Link href="/esp" className="sidebar-item" title="ESP" as="div">
+                    <Cpu size={22} />
+                </Link>
             </nav>
 
             <div
