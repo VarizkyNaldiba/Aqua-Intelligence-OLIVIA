@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { User, Lock, Eye, EyeOff, Fish, Info, Loader2 } from "lucide-react";
+import { User, Lock, Fish, Info } from "lucide-react";
+import { TextInput, PasswordInput, Button } from "@/Components/ui";
 import type { AppUser, Theme } from "@/Types";
 
 interface AuthProps {
@@ -10,7 +11,6 @@ interface AuthProps {
 const Auth = ({ onLoginSuccess }: AuthProps) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [alert, setAlert] = useState({ message: "", type: "" });
 
@@ -92,68 +92,34 @@ const Auth = ({ onLoginSuccess }: AuthProps) => {
                     </div>
                 )}
                 <form onSubmit={handleLoginSubmit}>
-                    <div className="auth-form-group">
-                        <label htmlFor="login-username">USERNAME</label>
-                        <div className="auth-input-wrapper">
-                            <User size={16} className="auth-input-icon" />
-                            <input
-                                id="login-username"
-                                type="text"
-                                className="auth-input"
-                                placeholder="Masukkan username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                autoComplete="username"
-                            />
-                        </div>
-                    </div>
-                    <div className="auth-form-group">
-                        <label htmlFor="login-pwd">KATA SANDI</label>
-                        <div className="auth-input-wrapper">
-                            <Lock size={16} className="auth-input-icon" />
-                            <input
-                                id="login-pwd"
-                                type={showPassword ? "text" : "password"}
-                                className="auth-input"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                autoComplete="current-password"
-                            />
-                            <button
-                                type="button"
-                                className="auth-toggle-pwd"
-                                onClick={() => setShowPassword(!showPassword)}
-                                title={
-                                    showPassword
-                                        ? "Sembunyikan sandi"
-                                        : "Tampilkan sandi"
-                                }
-                            >
-                                {showPassword ? (
-                                    <EyeOff size={16} />
-                                ) : (
-                                    <Eye size={16} />
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                    <button
+                    <TextInput
+                        id="login-username"
+                        label="USERNAME"
+                        icon={<User size={16} />}
+                        placeholder="Masukkan username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                        autoComplete="username"
+                        wrapperClassName="auth-form-group"
+                    />
+                    <PasswordInput
+                        id="login-pwd"
+                        label="KATA SANDI"
+                        icon={<Lock size={16} />}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <Button
                         type="submit"
-                        className="auth-submit-btn"
-                        disabled={isLoading}
+                        variant="primary"
+                        isLoading={isLoading}
+                        loadingText="Memproses..."
                     >
-                        {isLoading ? (
-                            <>
-                                <Loader2 size={16} className="animate-spin" />
-                                Memproses...
-                            </>
-                        ) : (
-                            "Masuk ke Dashboard"
-                        )}
-                    </button>
+                        <span>Masuk ke Dashboard</span>
+                    </Button>
                 </form>
             </div>
         </div>

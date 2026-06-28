@@ -1,5 +1,6 @@
 import { Activity } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import { Button } from "./ui";
 
 interface PondCardProps {
     pond: {
@@ -76,13 +77,13 @@ const PondCard = ({ pond, isSelected, index, onSelect }: PondCardProps) => (
         </div>
 
         <div className="pond-card-actions">
-            <button
-                className="pond-card-btn inline-btn"
+            <Button
+                variant="inline"
+                icon={<Activity size={12} />}
                 onClick={() => onSelect(pond.id)}
             >
-                <Activity size={12} />
                 Detail Sensor
-            </button>
+            </Button>
         </div>
     </div>
 );

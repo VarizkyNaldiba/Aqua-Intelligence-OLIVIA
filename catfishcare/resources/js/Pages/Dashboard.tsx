@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import MetricCharts from "@/Components/MetricCharts";
 import Timeline from "@/Components/Timeline";
 import MetricMiniCard from "@/Components/MetricMiniCard";
+import { Button } from "@/Components/ui";
 import HomeTab from "@/Pages/Home";
 import PondsTab from "@/Pages/Ponds";
 import AnalyticsTab from "@/Pages/Analytics";
@@ -137,13 +138,13 @@ export default function Dashboard() {
                                 <strong>{currentData.Weight} g</strong>.
                             </p>
                         </div>
-                        <button
-                            className="btn-action"
+                        <Button
+                            variant="action"
+                            icon={<TrendingUp size={14} />}
                             onClick={() => setActiveTab("analytics")}
                         >
-                            <TrendingUp size={14} />
                             <span>Lihat Proyeksi AI</span>
-                        </button>
+                        </Button>
                     </div>
 
                     {/* Card 2 & 3: Charts */}

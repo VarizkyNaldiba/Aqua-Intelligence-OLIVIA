@@ -6,8 +6,8 @@ import {
     Save,
     CheckCircle,
     LogOut,
-    Loader2,
 } from "lucide-react";
+import { TextInput, Button, RadioGroup, RangeSlider } from "@/Components/ui";
 import type { AppUser, Theme, ThemeSetting } from "@/Types";
 
 interface ProfileTabProps {
@@ -126,7 +126,7 @@ const ProfileTab = ({
         }
     };
 
-    const themeOptions: { value: ThemeSetting; label: string }[] = [
+    const themeOptions = [
         { value: "dark", label: "Tema Gelap" },
         { value: "light", label: "Tema Terang" },
         { value: "system", label: "Ikuti Sistem" },
@@ -194,64 +194,32 @@ const ProfileTab = ({
                         <h3>Identitas Peternak</h3>
                     </div>
                     <form onSubmit={handleSave} style={{ marginTop: "20px" }}>
-                        <div className="form-group">
-                            <label>Nama Lengkap</label>
-                            <input
-                                type="text"
-                                value={farmerName}
-                                onChange={(e) => setFarmerName(e.target.value)}
-                                disabled={isLoadingProfile}
-                                placeholder={
-                                    isLoadingProfile ? "Memuat..." : ""
-                                }
-                            />
-                        </div>
-                        <div
-                            className="form-group"
-                            style={{ marginTop: "15px" }}
-                        >
-                            <label>Peran / Jabatan</label>
-                            <input
-                                type="text"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                disabled={isLoadingProfile}
-                                placeholder={
-                                    isLoadingProfile ? "Memuat..." : ""
-                                }
-                            />
-                        </div>
-                        <div
-                            className="form-group"
-                            style={{ marginTop: "15px" }}
-                        >
-                            <label>Mode Tampilan</label>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    gap: "15px",
-                                    marginTop: "8px",
-                                    flexWrap: "wrap",
-                                }}
-                            >
-                                {themeOptions.map((opt) => (
-                                    <label
-                                        key={opt.value}
-                                        className="radio-label"
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="themeSetting"
-                                            checked={themeSetting === opt.value}
-                                            onChange={() =>
-                                                onChangeThemeSetting(opt.value)
-                                            }
-                                        />
-                                        <span>{opt.label}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                        <TextInput
+                            label="Nama Lengkap"
+                            value={farmerName}
+                            onChange={(e) => setFarmerName(e.target.value)}
+                            disabled={isLoadingProfile}
+                            placeholder={isLoadingProfile ? "Memuat..." : ""}
+                            wrapperClassName={""}
+                        />
+                        <TextInput
+                            label="Peran / Jabatan"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            disabled={isLoadingProfile}
+                            placeholder={isLoadingProfile ? "Memuat..." : ""}
+                            wrapperClassName={""}
+                        />
+                        <RadioGroup
+                            label="Mode Tampilan"
+                            name="themeSetting"
+                            options={themeOptions}
+                            value={themeSetting}
+                            onChange={(val) =>
+                                onChangeThemeSetting(val as ThemeSetting)
+                            }
+                            wrapperClassName={""}
+                        />
                         <div
                             style={{
                                 display: "flex",
@@ -260,10 +228,12 @@ const ProfileTab = ({
                                 alignItems: "center",
                             }}
                         >
-                            <button
+                            <Button
                                 type="submit"
-                                className="btn-action"
-                                disabled={isSaving || isLoadingProfile}
+                                variant="action"
+                                icon={<Save size={14} />}
+                                isLoading={isSaving || isLoadingProfile}
+                                loadingText="Menyimpan..."
                                 style={{
                                     display: "flex",
                                     gap: "8px",
@@ -271,25 +241,14 @@ const ProfileTab = ({
                                     margin: 0,
                                 }}
                             >
-                                {isSaving ? (
-                                    <Loader2
-                                        size={14}
-                                        className="animate-spin"
-                                    />
-                                ) : (
-                                    <Save size={14} />
-                                )}
-                                <span>
-                                    {isSaving
-                                        ? "Menyimpan..."
-                                        : "Simpan Profil"}
-                                </span>
-                            </button>
-                            <button
-                                type="button"
-                                className="btn-logout"
+                                <span>Simpan Profil</span>
+                            </Button>
+                            <Button
+                                variant="logout"
+                                icon={<LogOut size={14} />}
+                                isLoading={isLoggingOut}
+                                loadingText="Memproses..."
                                 onClick={handleLogout}
-                                disabled={isLoggingOut}
                                 style={{
                                     display: "flex",
                                     gap: "8px",
@@ -297,20 +256,8 @@ const ProfileTab = ({
                                     margin: 0,
                                 }}
                             >
-                                {isLoggingOut ? (
-                                    <Loader2
-                                        size={14}
-                                        className="animate-spin"
-                                    />
-                                ) : (
-                                    <LogOut size={14} />
-                                )}
-                                <span>
-                                    {isLoggingOut
-                                        ? "Memproses..."
-                                        : "Keluar (Logout)"}
-                                </span>
-                            </button>
+                                <span>Keluar (Logout)</span>
+                            </Button>
                         </div>
                     </form>
                 </div>
@@ -325,31 +272,18 @@ const ProfileTab = ({
                         style={{ marginTop: "20px" }}
                     >
                         {sliders.map((s, i) => (
-                            <div
+                            <RangeSlider
                                 key={i}
-                                className="slider-item-wrapper"
-                                style={{
-                                    marginTop: i > 0 ? "20px" : undefined,
-                                }}
-                            >
-                                <div className="slider-labels">
-                                    <span className="lbl">{s.label}</span>
-                                    <span className={`val ${s.cls}`}>
-                                        {s.fmt(s.value)}
-                                    </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min={s.min}
-                                    max={s.max}
-                                    step={s.step}
-                                    value={s.value}
-                                    onChange={(e) =>
-                                        s.set(parseFloat(e.target.value))
-                                    }
-                                    className="slider-input"
-                                />
-                            </div>
+                                label={s.label}
+                                value={s.value}
+                                onChange={s.set}
+                                min={s.min}
+                                max={s.max}
+                                step={s.step}
+                                displayValue={s.fmt(s.value)}
+                                valueClassName={s.cls}
+                                wrapperClassName={i > 0 ? "" : ""}
+                            />
                         ))}
                     </div>
                 </div>
@@ -397,16 +331,16 @@ const ProfileTab = ({
                             </span>
                         </div>
                     </div>
-                    <button
-                        className="sim-btn"
+                    <Button
+                        variant="ghost"
                         onClick={() =>
                             alert(
                                 "Mengambil data sensor terbaru dari Laravel endpoint...",
                             )
                         }
                     >
-                        Uji Koneksi API
-                    </button>
+                        <span>Uji Koneksi API</span>
+                    </Button>
                 </div>
             </div>
 
