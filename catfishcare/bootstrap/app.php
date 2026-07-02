@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/login',
             'api/logout',
         ]);
+
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
