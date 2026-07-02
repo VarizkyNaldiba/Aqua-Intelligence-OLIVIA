@@ -1,40 +1,16 @@
-# Dependencies
-node_modules/
-vendor/
-
-# Build artifacts
-public/build/
-
-# Development files
-.git/
-.github/
-.vscode/
-.idea/
-.cursor/
-.zed/
-.nova/
-.kiro/
-.phpactor.json
-.phpunit.result.cache
-.phpunit.cache/
-
-# Environment files
+/vendor
+/node_modules
+/storage/*.key
+/storage/framework
+/storage/logs
 .env
 .env.backup
 .env.production
-
-# Logs
-*.log
-storage/logs/*.log
-storage/pail/
-
-# IDE files
-.DS_Store
-Thumbs.db
-
-# Test files
-tests/
-phpunit.xml
-
-# Documentation
-*.md
+.git
+.github
+.idea
+.vscode
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.phpintel
