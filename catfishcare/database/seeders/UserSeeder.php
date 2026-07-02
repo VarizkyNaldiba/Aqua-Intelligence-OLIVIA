@@ -19,18 +19,21 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'username' => 'admin',
+                'jabatan' => 'admin',
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'username' => 'pakfii',
+                'jabatan' => 'admin',
                 'password' => Hash::make('password123'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'username' => 'olivia_user',
+                'jabatan' => 'user',
                 'password' => Hash::make('olivia2024'),
                 'created_at' => now(),
                 'updated_at' => now(),

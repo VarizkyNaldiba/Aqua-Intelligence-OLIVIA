@@ -9,7 +9,7 @@ import {
     Moon,
     Cpu,
 } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import type { TabName, Theme } from "../Types";
 
 interface SidebarProps {
@@ -32,6 +32,14 @@ const Sidebar = ({
         { id: "analytics", icon: LineChart, label: "Analytics" },
     ];
 
+    const handleItemClick = (id: TabName) => {
+        if (window.location.pathname.startsWith("/esp")) {
+            router.visit(`/dashboard?tab=${id}`);
+        } else {
+            setActiveTab(id);
+        }
+    };
+
     return (
         <aside className="sidebar">
             <div className="sidebar-logo">
@@ -44,7 +52,7 @@ const Sidebar = ({
                         <div
                             key={item.id}
                             className={`sidebar-item ${activeTab === item.id ? "active" : ""}`}
-                            onClick={() => setActiveTab(item.id)}
+                            onClick={() => handleItemClick(item.id)}
                             title={item.label}
                         >
                             <IconComponent size={22} />
@@ -52,7 +60,7 @@ const Sidebar = ({
                     );
                 })}
 
-                <Link href="/esp" className="sidebar-item" title="ESP" as="div">
+                <Link href="/esp" className={`sidebar-item ${window.location.pathname.startsWith("/esp") ? "active" : ""}`} title="ESP" as="div">
                     <Cpu size={22} />
                 </Link>
             </nav>
@@ -66,7 +74,7 @@ const Sidebar = ({
             </div>
 
             <div className="sidebar-profile" title="Profile">
-                <User size={22} onClick={() => setActiveTab("profile")} />
+                <User size={22} onClick={() => handleItemClick("profile")} />
             </div>
         </aside>
     );

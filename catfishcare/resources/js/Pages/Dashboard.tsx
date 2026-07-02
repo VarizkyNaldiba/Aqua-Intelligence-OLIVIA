@@ -37,7 +37,16 @@ export default function Dashboard() {
         setActiveTab("dashboard");
     };
 
-    const [activeTab, setActiveTab] = useState<TabName>("dashboard");
+    const [activeTab, setActiveTab] = useState<TabName>(() => {
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get("tab") as TabName;
+            if (tab && ["dashboard", "home", "ponds", "analytics", "profile"].includes(tab)) {
+                return tab;
+            }
+        }
+        return "dashboard";
+    });
     const [selectedPondId, setSelectedPondId] = useState(12);
     const [currentMetricType, setCurrentMetricType] =
         useState<MetricType>("TEMPERATURE");

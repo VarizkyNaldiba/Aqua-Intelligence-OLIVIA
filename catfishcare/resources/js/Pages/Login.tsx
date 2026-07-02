@@ -4,11 +4,11 @@ import { TextInput, PasswordInput, Button } from "@/Components/ui";
 import type { AppUser, Theme } from "@/Types";
 
 interface AuthProps {
-    onLoginSuccess: (user: AppUser) => void;
+    onLoginSuccess?: (user: AppUser) => void;
     theme: Theme;
 }
 
-const Auth = ({ onLoginSuccess }: AuthProps) => {
+const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +62,15 @@ const Auth = ({ onLoginSuccess }: AuthProps) => {
                 id: data.user.id,
             };
 
-            setTimeout(() => onLoginSuccess(user), 800);
+            localStorage.setItem("aqua_current_user", JSON.stringify(user));
+
+            setTimeout(() => {
+                if (onLoginSuccess) {
+                    onLoginSuccess(user);
+                } else {
+                    window.location.href = "/";
+                }
+            }, 800);
         } catch {
             showAlert(
                 "Gagal terhubung ke server. Pastikan server Laravel berjalan.",
