@@ -13,7 +13,7 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
-    "APP_KEY": "base64:BqaA92kiBZti2VJm8md/oD5IPuBOAYgmNmXRcphHvmg=",
+    "APP_KEY": "base64:mfzXLl6JKw9EsknlKBiZWsCiq2bUKjLgAU25zmOQukw=",
     "APP_URL": "https://catfishcare-kmipn.vercel.app",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
@@ -23,8 +23,6 @@
     "VIEW_COMPILED_PATH": "/tmp",
     "CACHE_DRIVER": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": "/tmp/database.sqlite"
+    "LOG_CHANNEL": "stderr"
   }
 }
