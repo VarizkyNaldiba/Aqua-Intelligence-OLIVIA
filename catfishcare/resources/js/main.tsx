@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 const appName = import.meta.env.VITE_APP_NAME || "CatfishCare";
 
 createInertiaApp({
-    title: (title) => title ? `${title} - ${appName}` : appName,
+    title: (title) => "CatfishCare",
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.tsx`,
@@ -23,3 +23,4 @@ createInertiaApp({
         showSpinner: true,
     },
 });
+
