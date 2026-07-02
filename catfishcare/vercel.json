@@ -2,13 +2,13 @@
   "version": 2,
   "outputDirectory": "public",
   "functions": {
-    "api/index.php": {
+    "vercel-api/index.php": {
       "runtime": "vercel-php@0.7.1"
     }
   },
   "routes": [
     { "src": "/build/(.*)", "dest": "/public/build/$1" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+    { "src": "/(.*)", "dest": "/vercel-api/index.php" }
   ],
   "env": {
     "APP_ENV": "production",
