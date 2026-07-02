@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'api/login',
             'api/logout',
+            'api/*',
+            '*api/login*',
+            '*api/logout*',
         ]);
 
         $middleware->trustProxies(at: '*');
