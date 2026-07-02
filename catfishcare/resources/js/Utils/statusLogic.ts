@@ -12,22 +12,20 @@ export const getPondStatus = (
             title: "SEDANG MEMUAT",
         };
 
-    const doVal = currentData.DO;
-    const ammoniaVal = currentData.AMMONIA;
     const tempVal = currentData.TEMPERATURE;
     const nitrateVal = currentData.NITRATE;
     const pHVal = currentData.pH;
 
-    // Skenario A: DO rendah (hypoxia) ATAU Ammonia kritis
-    if (doVal <= 2 || ammoniaVal > 0.0005) {
+    // Skenario A: Suhu kritis atau pH ekstrem atau Nitrate tinggi
+    if (tempVal < 26 || pHVal < 5.5 || nitrateVal > 300) {
         return {
             type: "danger",
             title: "🔴 BAHAYA KRITIS",
-            text: "Oksigen (DO) drop atau tingkat Ammonia/Nitrat beracun! Nyalakan aerator darurat segera.",
+            text: "Suhu terlalu rendah, pH terlalu asam, atau Nitrate beracun terdeteksi! Segera lakukan tindakan.",
             actionList: [
                 {
                     id: 1,
-                    text: `Segera hidupkan aerator maksimal di Kolam ${selectedPondId}.`,
+                    text: `Segera periksa kondisi air di Kolam ${selectedPondId}.`,
                     checked: false,
                 },
                 {
@@ -37,7 +35,7 @@ export const getPondStatus = (
                 },
                 {
                     id: 3,
-                    text: "Puasakan ikan (jangan beri pakan) selama 24 jam untuk menekan amonia.",
+                    text: "Taburkan kapur Dolomit untuk menstabilkan pH air.",
                     checked: false,
                 },
             ],

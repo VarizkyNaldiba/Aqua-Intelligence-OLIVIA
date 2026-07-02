@@ -31,7 +31,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.2°C",
             ph: "7.1",
-            do: "4.5 mg/L",
+            turbidity: "35 NTU",
             fcr: "1.15",
         },
         {
@@ -44,7 +44,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.5°C",
             ph: "7.2",
-            do: "4.8 mg/L",
+            turbidity: "42 NTU",
             fcr: "1.22",
         },
         {
@@ -57,7 +57,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "29.0°C",
             ph: "7.4",
-            do: "5.1 mg/L",
+            turbidity: "30 NTU",
             fcr: "1.18",
         },
         {
@@ -70,7 +70,7 @@ const PondsTab = ({
             status: "WARNING",
             temp: "26.9°C",
             ph: "6.4",
-            do: "4.2 mg/L",
+            turbidity: "55 NTU",
             fcr: "1.28",
         },
         {
@@ -83,7 +83,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.2°C",
             ph: "7.1",
-            do: "4.9 mg/L",
+            turbidity: "38 NTU",
             fcr: "1.16",
         },
         {
@@ -96,7 +96,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.0°C",
             ph: "7.0",
-            do: "4.6 mg/L",
+            turbidity: "40 NTU",
             fcr: "1.20",
         },
         {
@@ -109,7 +109,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "27.8°C",
             ph: "6.9",
-            do: "4.4 mg/L",
+            turbidity: "45 NTU",
             fcr: "1.25",
         },
         {
@@ -122,7 +122,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.4°C",
             ph: "7.3",
-            do: "5.0 mg/L",
+            turbidity: "33 NTU",
             fcr: "1.13",
         },
         {
@@ -135,7 +135,7 @@ const PondsTab = ({
             status: "WARNING",
             temp: "26.8°C",
             ph: "6.3",
-            do: "4.1 mg/L",
+            turbidity: "58 NTU",
             fcr: "1.30",
         },
         {
@@ -148,7 +148,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.7°C",
             ph: "7.1",
-            do: "4.7 mg/L",
+            turbidity: "36 NTU",
             fcr: "1.19",
         },
         {
@@ -161,7 +161,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.1°C",
             ph: "7.2",
-            do: "4.8 mg/L",
+            turbidity: "37 NTU",
             fcr: "1.14",
         },
         {
@@ -174,7 +174,7 @@ const PondsTab = ({
             status: "SAFE",
             temp: "28.3°C",
             ph: "7.2",
-            do: "4.9 mg/L",
+            turbidity: "34 NTU",
             fcr: "1.15",
         },
     ];
@@ -182,7 +182,7 @@ const PondsTab = ({
     const pondsWithData = initialPonds.map((pond) => {
         if (pond.id === selectedPondId && currentData) {
             const isCritical =
-                currentData.DO <= 2.0 || currentData.AMMONIA > 0.0005;
+                currentData.TEMPERATURE < 26 || currentData.pH < 5.5;
             const isWarning =
                 currentData.TEMPERATURE < 27.05 || currentData.pH < 6.05;
             return {
@@ -190,7 +190,7 @@ const PondsTab = ({
                 status: isCritical ? "DANGER" : isWarning ? "WARNING" : "SAFE",
                 temp: `${currentData.TEMPERATURE.toFixed(1)}°C`,
                 ph: currentData.pH.toFixed(1),
-                do: `${currentData.DO.toFixed(1)} mg/L`,
+                turbidity: `${currentData.TURBIDITY.toFixed(1)} NTU`,
             };
         }
         return pond;

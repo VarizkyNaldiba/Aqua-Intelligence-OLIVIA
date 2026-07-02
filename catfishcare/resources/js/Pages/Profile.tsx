@@ -29,10 +29,9 @@ const ProfileTab = ({
 }: ProfileTabProps) => {
     const [farmerName, setFarmerName] = useState("");
     const [role, setRole] = useState("");
-    const [doThreshold, setDoThreshold] = useState(2.0);
-    const [ammoniaThreshold, setAmmoniaThreshold] = useState(0.0005);
     const [tempThreshold, setTempThreshold] = useState(27.0);
     const [phThreshold, setPhThreshold] = useState(6.0);
+    const [turbidityThreshold, setTurbidityThreshold] = useState(50.0);
     const [saved, setSaved] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -134,26 +133,6 @@ const ProfileTab = ({
 
     const sliders = [
         {
-            label: "Oksigen Terlarut (DO) Minimum",
-            value: doThreshold,
-            set: setDoThreshold,
-            min: "1.0",
-            max: "4.0",
-            step: "0.1",
-            cls: "text-danger",
-            fmt: (v: number) => `${v.toFixed(1)} mg/L`,
-        },
-        {
-            label: "Kadar Ammonia Maksimum",
-            value: ammoniaThreshold,
-            set: setAmmoniaThreshold,
-            min: "0.0001",
-            max: "0.002",
-            step: "0.0001",
-            cls: "text-danger",
-            fmt: (v: number) => v.toFixed(5),
-        },
-        {
             label: "Suhu Air Pemicu Upwelling",
             value: tempThreshold,
             set: setTempThreshold,
@@ -172,6 +151,16 @@ const ProfileTab = ({
             step: "0.1",
             cls: "text-warning",
             fmt: (v: number) => v.toFixed(1),
+        },
+        {
+            label: "Kekeruhan Maksimum (Turbidity)",
+            value: turbidityThreshold,
+            set: setTurbidityThreshold,
+            min: "20",
+            max: "100",
+            step: "1",
+            cls: "text-danger",
+            fmt: (v: number) => `${v.toFixed(0)} NTU`,
         },
     ];
 

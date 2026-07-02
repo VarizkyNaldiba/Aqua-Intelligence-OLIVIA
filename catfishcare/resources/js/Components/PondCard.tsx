@@ -12,7 +12,7 @@ interface PondCardProps {
         status: string;
         temp: string;
         ph: string;
-        do: string;
+        turbidity: string;
         fcr: string;
     };
     isSelected: boolean;
@@ -71,8 +71,8 @@ const PondCard = ({ pond, isSelected, index, onSelect }: PondCardProps) => (
                 <span className="val">{pond.ph || "7.0"}</span>
             </div>
             <div className="sensor-read-item">
-                <span className="lbl">DO</span>
-                <span className="val">{pond.do}</span>
+                <span className="lbl">Turbidity</span>
+                <span className="val">{pond.turbidity}</span>
             </div>
         </div>
 

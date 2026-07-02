@@ -38,29 +38,11 @@ const Timeline = () => {
                     ))}
                 </div>
 
-                {/* Row 1: Oksigen Terlarut (DO) Alert */}
+                {/* Row 1: Suhu/PH Alert */}
                 <div className="timeline-row">
                     <div
-                        className="timeline-bar do"
+                        className="timeline-bar warning"
                         style={{ gridColumnStart: 1, gridColumnEnd: 5 }}
-                    >
-                        <div className="timeline-bar-content">
-                            <div className="timeline-icon-wrapper icon-danger">
-                                <AlertCircle
-                                    size={12}
-                                    color="var(--color-danger)"
-                                />
-                            </div>
-                            <span>DO Drop (Kritis aerator mati)</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Row 2: Ammonia Alert */}
-                <div className="timeline-row">
-                    <div
-                        className="timeline-bar ammonia"
-                        style={{ gridColumnStart: 5, gridColumnEnd: 9 }}
                     >
                         <div className="timeline-bar-content">
                             <div className="timeline-icon-wrapper icon-warning">
@@ -69,7 +51,25 @@ const Timeline = () => {
                                     color="var(--color-warning)"
                                 />
                             </div>
-                            <span>Ammonia Puncak (Sisa Pakan)</span>
+                            <span>Suhu/PH Fluktuatif (Upwelling)</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Row 2: Nitrate Alert */}
+                <div className="timeline-row">
+                    <div
+                        className="timeline-bar danger"
+                        style={{ gridColumnStart: 5, gridColumnEnd: 9 }}
+                    >
+                        <div className="timeline-bar-content">
+                            <div className="timeline-icon-wrapper icon-danger">
+                                <AlertCircle
+                                    size={12}
+                                    color="var(--color-danger)"
+                                />
+                            </div>
+                            <span>Nitrate Puncak (Sisa Pakan)</span>
                         </div>
                     </div>
                 </div>

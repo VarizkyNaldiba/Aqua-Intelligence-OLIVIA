@@ -31,13 +31,7 @@ export const normalizeSensorRow = (row: CsvRow): SensorRow => ({
     entry_id: String(row.entry_id || ""),
     TEMPERATURE: parseValueFromRow(row, ["TEMPERATURE", "Temperature (C)"]),
     TURBIDITY: parseValueFromRow(row, ["TURBIDITY", "Turbidity (NTU)"]),
-    DO: parseValueFromRow(row, [
-        "DISOLVED OXYGEN",
-        "Dissolved Oxygen(g/ml)",
-        "DO",
-    ]),
     pH: parseValueFromRow(row, ["pH", "PH"]),
-    AMMONIA: parseValueFromRow(row, ["AMMONIA", "Ammonia(g/ml)"]),
     NITRATE: parseValueFromRow(row, ["NITRATE", "Nitrate(g/ml)"]),
     Population: parseIntValueFromRow(row, ["Population"]),
     Length: parseValueFromRow(row, ["Length", "Fish_Length (cm)"]),

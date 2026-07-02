@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build artifacts
+public/build/
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+.cursor/
+.zed/
+.nova/
+.kiro/
+.phpactor.json
+.phpunit.result.cache
+.phpunit.cache/
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# Logs
+*.log
+storage/logs/*.log
+storage/pail/
+
+# IDE files
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+phpunit.xml
+
+# Documentation
+*.md

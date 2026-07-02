@@ -32,10 +32,10 @@ const RightPanel = ({
             type: statusInfo.type,
             text:
                 statusInfo.type === "danger"
-                    ? `Sistem mendeteksi Oksigen Terlarut (DO) rendah (${currentData?.DO} mg/L). Golden time berjalan!`
+                    ? `Sistem mendeteksi kondisi kritis pada Kolam! Suhu ${currentData?.TEMPERATURE}°C, pH ${currentData?.pH}. Segera tindaklanjuti!`
                     : statusInfo.type === "warning"
                       ? `Suhu terdeteksi turun (${currentData?.TEMPERATURE}°C) dan Nitrat tinggi. Waspada upwelling!`
-                      : `Kondisi kolam terpantau optimal. Suhu ${currentData?.TEMPERATURE}°C, DO ${currentData?.DO} mg/L.`,
+                      : `Kondisi kolam terpantau optimal. Suhu ${currentData?.TEMPERATURE}°C, pH ${currentData?.pH}.`,
             time: "Baru saja",
         },
         {

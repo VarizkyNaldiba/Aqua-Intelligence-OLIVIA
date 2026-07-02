@@ -28,8 +28,8 @@ const HomeTab = ({
     setSelectedPondId,
 }: HomeTabProps) => {
     const isPondCritical =
-        (currentData?.DO ?? Infinity) <= 2.0 ||
-        (currentData?.AMMONIA ?? 0) > 0.0005;
+        (currentData?.TEMPERATURE ?? Infinity) < 26 ||
+        (currentData?.pH ?? Infinity) < 5.5;
     const isPondWarning =
         (currentData?.TEMPERATURE ?? Infinity) < 27.05 ||
         (currentData?.pH ?? Infinity) < 6.05;
@@ -92,7 +92,7 @@ const HomeTab = ({
             population: "10.000 Ekor",
             defaultTemp: 28.2,
             defaultPh: 7.1,
-            defaultDo: 4.5,
+            defaultTurbidity: 35,
         },
         {
             id: 11,
@@ -101,7 +101,7 @@ const HomeTab = ({
             population: "15.000 Ekor",
             defaultTemp: 28.5,
             defaultPh: 7.2,
-            defaultDo: 4.8,
+            defaultTurbidity: 42,
         },
         {
             id: 10,
@@ -110,7 +110,7 @@ const HomeTab = ({
             population: "8.000 Ekor",
             defaultTemp: 29.0,
             defaultPh: 7.4,
-            defaultDo: 5.1,
+            defaultTurbidity: 30,
         },
         {
             id: 9,
@@ -119,7 +119,7 @@ const HomeTab = ({
             population: "10.000 Ekor",
             defaultTemp: 26.9,
             defaultPh: 6.4,
-            defaultDo: 4.2,
+            defaultTurbidity: 55,
         },
     ];
 
@@ -132,8 +132,7 @@ const HomeTab = ({
                         <p>
                             Kondisi pertanian Anda stabil, namun{" "}
                             <strong>Kolam {selectedPondId}</strong> memerlukan
-                            tindakan segera terkait kadar oksigen
-                            terlarut/amonia!
+                            tindakan segera terkait kualitas air!
                         </p>
                     ) : isPondWarning ? (
                         <p>
@@ -262,7 +261,7 @@ const HomeTab = ({
                                 <th>Kepadatan</th>
                                 <th>Suhu</th>
                                 <th>pH</th>
-                                <th>DO</th>
+                                <th>Turbidity</th>
                                 <th>Status AI</th>
                             </tr>
                         </thead>
@@ -277,14 +276,12 @@ const HomeTab = ({
                                     isSelected && currentData
                                         ? currentData.pH
                                         : pond.defaultPh;
-                                const doVal =
+                                const turbidity =
                                     isSelected && currentData
-                                        ? currentData.DO
-                                        : pond.defaultDo;
+                                        ? currentData.TURBIDITY
+                                        : pond.defaultTurbidity;
                                 const isCritical =
-                                    doVal <= 2.0 ||
-                                    (isSelected &&
-                                        (currentData?.AMMONIA ?? 0) > 0.0005);
+                                    temp < 26 || ph < 5.5;
                                 const isWarning = temp < 27.05 || ph < 6.05;
                                 const badgeClass = isCritical
                                     ? "danger"
@@ -325,7 +322,7 @@ const HomeTab = ({
                                                       : "text-success"
                                             }
                                         >
-                                            {doVal.toFixed(1)} mg/L
+                                            {turbidity.toFixed(1)} NTU
                                         </td>
                                         <td>
                                             <StatusBadge

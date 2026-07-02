@@ -22,16 +22,14 @@ import {
 
 type ThemeSetting = "system" | "light" | "dark";
 type TabName = "dashboard" | "home" | "ponds" | "analytics" | "profile";
-type MetricType = "DO" | "TEMPERATURE" | "AMMONIA" | "pH";
+type MetricType = "TEMPERATURE" | "pH" | "TURBIDITY";
 
 type SensorRow = {
     created_at: string;
     entry_id: string;
     TEMPERATURE: number;
     TURBIDITY: number;
-    DO: number;
     pH: number;
-    AMMONIA: number;
     NITRATE: number;
     Population: number;
     Length: number;
@@ -91,13 +89,7 @@ const normalizeSensorRow = (row: CsvRow): SensorRow => ({
     entry_id: String(row.entry_id || ""),
     TEMPERATURE: parseValueFromRow(row, ["TEMPERATURE", "Temperature (C)"]),
     TURBIDITY: parseValueFromRow(row, ["TURBIDITY", "Turbidity (NTU)"]),
-    DO: parseValueFromRow(row, [
-        "DISOLVED OXYGEN",
-        "Dissolved Oxygen(g/ml)",
-        "DO",
-    ]),
     pH: parseValueFromRow(row, ["pH", "PH"]),
-    AMMONIA: parseValueFromRow(row, ["AMMONIA", "Ammonia(g/ml)"]),
     NITRATE: parseValueFromRow(row, ["NITRATE", "Nitrate(g/ml)"]),
     Population: parseIntValueFromRow(row, ["Population"]),
     Length: parseValueFromRow(row, ["Length", "Fish_Length (cm)"]),
@@ -154,7 +146,7 @@ function App() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentMetricType, setCurrentMetricType] =
-        useState<MetricType>("DO");
+        useState<MetricType>("TEMPERATURE");
     const [todos, setTodos] = useState<TodoItem[]>([]);
     const [themeSetting, setThemeSetting] = useState<ThemeSetting>(
         getInitialThemeSetting,
@@ -234,22 +226,20 @@ function App() {
                 title: "SEDANG MEMUAT",
             };
 
-        const doVal = currentData.DO;
-        const ammoniaVal = currentData.AMMONIA;
         const tempVal = currentData.TEMPERATURE;
         const nitrateVal = currentData.NITRATE;
         const pHVal = currentData.pH;
 
-        // Skenario A: DO rendah (hypoxia) ATAU Ammonia kritis
-        if (doVal <= 2 || ammoniaVal > 0.0005) {
+        // Skenario A: Suhu kritis atau pH ekstrem atau Nitrate tinggi
+        if (tempVal < 26 || pHVal < 5.5 || nitrateVal > 300) {
             return {
                 type: "danger",
                 title: "🔴 BAHAYA KRITIS",
-                text: "Oksigen (DO) drop atau tingkat Ammonia/Nitrat beracun! Nyalakan aerator darurat segera.",
+                text: "Suhu terlalu rendah, pH terlalu asam, atau Nitrate beracun terdeteksi! Segera lakukan tindakan.",
                 actionList: [
                     {
                         id: 1,
-                        text: `Segera hidupkan aerator maksimal di Kolam ${selectedPondId}.`,
+                        text: `Segera periksa kondisi air di Kolam ${selectedPondId}.`,
                         checked: false,
                     },
                     {
@@ -259,7 +249,7 @@ function App() {
                     },
                     {
                         id: 3,
-                        text: "Puasakan ikan (jangan beri pakan) selama 24 jam untuk menekan amonia.",
+                        text: "Taburkan kapur Dolomit untuk menstabilkan pH air.",
                         checked: false,
                     },
                 ],
@@ -438,22 +428,6 @@ function App() {
                         {/* Quick Metrics Bar */}
                         <div className="metrics-summary">
                             <div className="metric-mini-card">
-                                <span className="label">DO (Oxygen)</span>
-                                <span
-                                    className={`value ${currentData.DO <= 2 ? "danger" : "success"}`}
-                                >
-                                    {currentData.DO.toFixed(2)} mg/L
-                                </span>
-                            </div>
-                            <div className="metric-mini-card">
-                                <span className="label">Ammonia (NH3)</span>
-                                <span
-                                    className={`value ${currentData.AMMONIA > 0.0005 ? "danger" : "success"}`}
-                                >
-                                    {currentData.AMMONIA.toFixed(5)}
-                                </span>
-                            </div>
-                            <div className="metric-mini-card">
                                 <span className="label">Suhu Air</span>
                                 <span
                                     className={`value ${currentData.TEMPERATURE < 27.05 ? "warning" : "success"}`}
@@ -467,6 +441,14 @@ function App() {
                                     className={`value ${currentData.pH < 6.05 ? "warning" : "success"}`}
                                 >
                                     {currentData.pH.toFixed(2)}
+                                </span>
+                            </div>
+                            <div className="metric-mini-card">
+                                <span className="label">Kekeruhan (Turbidity)</span>
+                                <span
+                                    className={`value ${currentData.TURBIDITY > 50 ? "warning" : "success"}`}
+                                >
+                                    {currentData.TURBIDITY.toFixed(2)} NTU
                                 </span>
                             </div>
                         </div>

@@ -31,8 +31,6 @@ const MetricCharts = ({
             String(row.created_at ?? ""),
         value: parseFloat(String(row[currentMetricType] ?? "0")),
         temperature: parseFloat(String(row.TEMPERATURE ?? "0")),
-        DO: parseFloat(String(row.DO ?? "0")),
-        ammonia: parseFloat(String(row.AMMONIA ?? "0")),
         pH: parseFloat(String(row.pH ?? "0")),
     }));
 
@@ -61,8 +59,8 @@ const MetricCharts = ({
     // Donut chart data - e.g. safe vs warning/danger data point distribution in history
     const safeCount = latestRows.filter(
         (r) =>
-            parseFloat(String(r.DO ?? "0")) > 4.0 &&
-            parseFloat(String(r.AMMONIA ?? "0")) < 0.1,
+            parseFloat(String(r.TEMPERATURE ?? "0")) >= 27.05 &&
+            parseFloat(String(r.pH ?? "0")) >= 6.05,
     ).length;
     const safePercentage =
         Math.round((safeCount / latestRows.length) * 100) || 100;
@@ -164,10 +162,9 @@ const MetricCharts = ({
                             cursor: "pointer",
                         }}
                     >
-                        <option value="DO">DO (Oksigen)</option>
                         <option value="TEMPERATURE">Temperature (Suhu)</option>
-                        <option value="AMMONIA">Ammonia</option>
                         <option value="pH">pH</option>
+                        <option value="TURBIDITY">Turbidity (Kekeruhan)</option>
                     </select>
                 </div>
 

@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build && php artisan migrate --force",
+  "outputDirectory": "public",
+  "installCommand": "npm install && composer install --no-dev --optimize-autoloader",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.php"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": "/tmp/database.sqlite"
+  }
+}

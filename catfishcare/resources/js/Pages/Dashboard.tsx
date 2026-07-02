@@ -40,7 +40,7 @@ export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<TabName>("dashboard");
     const [selectedPondId, setSelectedPondId] = useState(12);
     const [currentMetricType, setCurrentMetricType] =
-        useState<MetricType>("DO");
+        useState<MetricType>("TEMPERATURE");
 
     const { theme } = useTheme();
 
@@ -95,18 +95,6 @@ export default function Dashboard() {
                 {/* Quick Metrics Bar */}
                 <div className="metrics-summary">
                     <MetricMiniCard
-                        label="DO (Oxygen)"
-                        value={`${currentData.DO.toFixed(2)} mg/L`}
-                        status={currentData.DO <= 2 ? "danger" : "success"}
-                    />
-                    <MetricMiniCard
-                        label="Ammonia (NH3)"
-                        value={currentData.AMMONIA.toFixed(5)}
-                        status={
-                            currentData.AMMONIA > 0.0005 ? "danger" : "success"
-                        }
-                    />
-                    <MetricMiniCard
                         label="Suhu Air"
                         value={`${currentData.TEMPERATURE.toFixed(2)}°C`}
                         status={
@@ -119,6 +107,13 @@ export default function Dashboard() {
                         label="Keasaman (pH)"
                         value={currentData.pH.toFixed(2)}
                         status={currentData.pH < 6.05 ? "warning" : "success"}
+                    />
+                    <MetricMiniCard
+                        label="Kekeruhan (Turbidity)"
+                        value={`${currentData.TURBIDITY.toFixed(2)} NTU`}
+                        status={
+                            currentData.TURBIDITY > 50 ? "warning" : "success"
+                        }
                     />
                 </div>
 
