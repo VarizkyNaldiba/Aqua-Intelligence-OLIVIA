@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Head } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import MetricCharts from "@/Components/MetricCharts";
 import Timeline from "@/Components/Timeline";
@@ -253,6 +254,24 @@ export default function Dashboard() {
         }
     };
 
+    const getTabTitle = () => {
+        switch (activeTab) {
+            case "home":
+                return "Beranda";
+            case "ponds":
+                return "Kolam Lele";
+            case "analytics":
+                return "Analisis AI";
+            case "profile":
+                return "Profil Pengguna";
+            case "notifications":
+                return "Notifikasi";
+            case "dashboard":
+            default:
+                return "Dashboard Utama";
+        }
+    };
+
     if (!currentUser) {
         return <Auth onLoginSuccess={handleLoginSuccess} theme={theme} />;
     }
@@ -272,6 +291,7 @@ export default function Dashboard() {
             todos={todos}
             toggleTodo={toggleTodo}
         >
+            <Head title={getTabTitle()} />
             {renderTabContent()}
         </DashboardLayout>
     );

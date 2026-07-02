@@ -1,4 +1,4 @@
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
 import { Fish, Cpu, TrendingUp, Droplets, ShieldCheck, ArrowRight, Activity, Brain } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -16,6 +16,7 @@ export default function LandingPage() {
 
     return (
         <div className="landing-layout" style={{ backgroundColor: "#ffffff", color: "#1d1d1f", minHeight: "100vh", fontFamily: "var(--font-body)" }}>
+            <Head title="Pencegahan Gagal Panen Lele" />
             
             {/* Main Header (Frosted Glass, Single unified menu bar) */}
             <header style={{

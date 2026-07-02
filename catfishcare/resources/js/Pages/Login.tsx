@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { User, Lock, Fish, Info, ArrowLeft } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, Head } from "@inertiajs/react";
 import { TextInput, PasswordInput, Button } from "@/Components/ui";
 import type { AppUser, Theme } from "@/Types";
 
@@ -45,8 +45,8 @@ const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
 
             if (!response.ok) {
                 const errorMsg =
-                    data.errors?.username?.[0] ||
                     data.message ||
+                    data.error ||
                     "Username atau kata sandi salah.";
                 showAlert(errorMsg, "error");
                 return;
@@ -84,6 +84,7 @@ const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
 
     return (
         <div className="auth-container">
+            <Head title="Masuk" />
             <div className="auth-bg-glow" />
             <div className="auth-bg-glow-right" />
             <div className="auth-card">
