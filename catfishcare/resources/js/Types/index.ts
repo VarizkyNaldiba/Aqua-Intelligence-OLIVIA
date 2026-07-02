@@ -2,7 +2,7 @@
 
 export type ThemeSetting = "system" | "light" | "dark";
 export type Theme = "light" | "dark";
-export type TabName = "dashboard" | "home" | "ponds" | "analytics" | "profile";
+export type TabName = "dashboard" | "home" | "ponds" | "analytics" | "profile" | "notifications";
 export type MetricType = "TEMPERATURE" | "pH" | "TURBIDITY";
 
 export type SensorRow = {

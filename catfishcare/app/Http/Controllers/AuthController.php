@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -28,6 +29,9 @@ class AuthController extends Controller
             ]);
         }
 
+        // Log the user into the Laravel session (for Web/Inertia auth middleware)
+        Auth::login($user);
+
         // Revoke previous tokens for security (one active token per user)
         $user->tokens()->delete();
 
@@ -48,6 +52,9 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
+        
+        // Also log out from web session guard
+        Auth::guard('web')->logout();
 
         return response()->json([
             'message' => 'Berhasil keluar.',

@@ -1,22 +1,23 @@
 <?php
 
 use App\Models\Esp;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('LandingPage');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::get('/esp', function () {
-    return Inertia::render('EspPage', [
-        'espList' => Esp::orderBy('id')->get(),
-    ]);
-})->name('esp');
+    Route::get('/esp', function () {
+        return Inertia::render('EspPage', [
+            'espList' => Esp::orderBy('id')->get(),
+        ]);
+    })->name('esp');
+});
 
 require __DIR__ . '/auth.php';

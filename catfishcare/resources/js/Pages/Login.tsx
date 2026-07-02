@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { User, Lock, Fish, Info } from "lucide-react";
+import { User, Lock, Fish, Info, ArrowLeft } from "lucide-react";
+import { Link } from "@inertiajs/react";
 import { TextInput, PasswordInput, Button } from "@/Components/ui";
 import type { AppUser, Theme } from "@/Types";
 
@@ -68,7 +69,7 @@ const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
                 if (onLoginSuccess) {
                     onLoginSuccess(user);
                 } else {
-                    window.location.href = "/";
+                    window.location.href = "/dashboard";
                 }
             }, 800);
         } catch {
@@ -90,8 +91,8 @@ const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
                     <div className="auth-logo">
                         <Fish size={32} />
                     </div>
-                    <h2>OLIVIA System</h2>
-                    <p>Aqua-Intelligence & Harvest Failure Prevention</p>
+                    <h2>CATFISHCARE System</h2>
+                    <p>CatfishCare & Harvest Failure Prevention</p>
                 </div>
                 {alert.message && (
                     <div className={`auth-alert ${alert.type}`}>
@@ -129,6 +130,27 @@ const Auth = ({ onLoginSuccess, theme }: AuthProps) => {
                         <span>Masuk ke Dashboard</span>
                     </Button>
                 </form>
+                
+                <div style={{ marginTop: "20px", textAlign: "center" }}>
+                    <Link 
+                        href="/" 
+                        style={{ 
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            fontSize: "14px", 
+                            color: "var(--text-muted)", 
+                            textDecoration: "none",
+                            transition: "color 0.2s",
+                            fontWeight: 500
+                        }}
+                        onMouseOver={e=>e.currentTarget.style.color="var(--color-primary)"}
+                        onMouseOut={e=>e.currentTarget.style.color="var(--text-muted)"}
+                    >
+                        <ArrowLeft size={16} />
+                        <span>Kembali ke Beranda</span>
+                    </Link>
+                </div>
             </div>
         </div>
     );

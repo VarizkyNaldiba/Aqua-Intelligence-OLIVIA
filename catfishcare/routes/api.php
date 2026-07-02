@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public API routes (no authentication required)
-Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+Route::middleware(['web'])->group(function () {
+    Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+});
 
 // ESP management API routes
 Route::get('/esp', [EspController::class, 'index'])->name('api.esp.index');
@@ -26,7 +28,7 @@ Route::put('/esp/{id}', [EspController::class, 'update'])->name('api.esp.update'
 Route::delete('/esp/{id}', [EspController::class, 'destroy'])->name('api.esp.destroy');
 
 // Protected API routes (require valid Sanctum token)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
     Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');
     Route::put('/profile', [ProfileController::class, 'updateApi'])->name('api.profile.update');

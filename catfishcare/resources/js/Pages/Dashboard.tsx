@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import MetricCharts from "@/Components/MetricCharts";
 import Timeline from "@/Components/Timeline";
@@ -8,6 +8,7 @@ import HomeTab from "@/Pages/Home";
 import PondsTab from "@/Pages/Ponds";
 import AnalyticsTab from "@/Pages/Analytics";
 import ProfileTab from "@/Pages/Profile";
+import NotificationsTab from "@/Pages/Notifications";
 import Auth from "@/Pages/Login";
 import {
     AlertTriangle,
@@ -35,6 +36,7 @@ export default function Dashboard() {
         setCurrentUser(null);
         localStorage.removeItem("aqua_current_user");
         setActiveTab("dashboard");
+        window.location.href = "/login";
     };
 
     const [activeTab, setActiveTab] = useState<TabName>(() => {
@@ -64,6 +66,22 @@ export default function Dashboard() {
     } = useSensorData(selectedPondId);
 
     const statusInfo = getPondStatus(currentData, selectedPondId);
+
+    const [todos, setTodos] = useState<TodoItem[]>([]);
+
+    useEffect(() => {
+        if (statusInfo.actionList) {
+            setTodos(statusInfo.actionList);
+        }
+    }, [currentIndex, statusInfo.type]);
+
+    const toggleTodo = (id: number) => {
+        setTodos((prevTodos) =>
+            prevTodos.map((todo) =>
+                todo.id === id ? { ...todo, checked: !todo.checked } : todo,
+            ),
+        );
+    };
 
     const getStatusIcon = (type: StatusInfo["type"]) => {
         switch (type) {
@@ -220,6 +238,15 @@ export default function Dashboard() {
                         }}
                     />
                 );
+            case "notifications":
+                return (
+                    <NotificationsTab
+                        currentData={currentData}
+                        statusInfo={statusInfo}
+                        todos={todos}
+                        toggleTodo={toggleTodo}
+                    />
+                );
             case "dashboard":
             default:
                 return renderDashboardContent();
@@ -242,6 +269,8 @@ export default function Dashboard() {
             setCurrentIndex={setCurrentIndex}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
+            todos={todos}
+            toggleTodo={toggleTodo}
         >
             {renderTabContent()}
         </DashboardLayout>

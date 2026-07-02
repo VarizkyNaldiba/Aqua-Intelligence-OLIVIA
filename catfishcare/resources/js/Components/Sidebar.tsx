@@ -8,6 +8,7 @@ import {
     Sun,
     Moon,
     Cpu,
+    Bell,
 } from "lucide-react";
 import { Link, router } from "@inertiajs/react";
 import type { TabName, Theme } from "../Types";
@@ -30,6 +31,7 @@ const Sidebar = ({
         { id: "dashboard", icon: LayoutGrid, label: "Dashboard" },
         { id: "ponds", icon: Folder, label: "Ponds" },
         { id: "analytics", icon: LineChart, label: "Analytics" },
+        { id: "notifications", icon: Bell, label: "Notifications" },
     ];
 
     const handleItemClick = (id: TabName) => {

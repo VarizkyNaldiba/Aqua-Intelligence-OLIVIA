@@ -18,6 +18,8 @@ interface DashboardLayoutProps {
     setCurrentIndex: (index: number) => void;
     isPlaying: boolean;
     setIsPlaying: (playing: boolean) => void;
+    todos: TodoItem[];
+    toggleTodo: (id: number) => void;
 }
 
 export default function DashboardLayout({
@@ -32,26 +34,11 @@ export default function DashboardLayout({
     setCurrentIndex,
     isPlaying,
     setIsPlaying,
+    todos,
+    toggleTodo,
 }: DashboardLayoutProps) {
     const { theme, toggleTheme } = useTheme();
-    const [todos, setTodos] = useState<TodoItem[]>([]);
-
     const statusInfo = getPondStatus(currentData, selectedPondId);
-
-    // Reset or initialize to-do items whenever the active data point status changes
-    useEffect(() => {
-        if (statusInfo.actionList) {
-            setTodos(statusInfo.actionList);
-        }
-    }, [currentIndex, statusInfo.type]);
-
-    const toggleTodo = (id: number) => {
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) =>
-                todo.id === id ? { ...todo, checked: !todo.checked } : todo,
-            ),
-        );
-    };
 
     return (
         <div className="app-container">
@@ -68,7 +55,7 @@ export default function DashboardLayout({
                 {activeTab === "dashboard" && (
                     <header className="dashboard-header">
                         <div className="dashboard-title">
-                            <h1>Aqua-Intelligence OLIVIA</h1>
+                            <h1>CATFISHCARE</h1>
                             <p>
                                 Sistem Deteksi Pencegahan Gagal Panen Lele -
                                 Kolam {selectedPondId}

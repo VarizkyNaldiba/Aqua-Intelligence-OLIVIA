@@ -55,43 +55,6 @@ const RightPanel = ({
     return (
         <aside className="right-panel">
             <div className="panel-section">
-                <h3>Notifikasi Sistem</h3>
-                <div className="notification-list">
-                    {notifications.map((notif, index) => (
-                        <div
-                            key={`${statusInfo.type}-${notif.id}`}
-                            className="notification-item"
-                            style={{
-                                animation:
-                                    "todoFadeIn 0.4s var(--transition-ease) both",
-                                animationDelay: `${index * 0.05}s`,
-                            }}
-                        >
-                            <div
-                                className={`notification-avatar ${notif.type}`}
-                            >
-                                {getAvatarIcon(notif.type)}
-                            </div>
-                            <div className="notification-info">
-                                <p>{notif.text}</p>
-                                <span>
-                                    <Clock
-                                        size={10}
-                                        style={{
-                                            display: "inline",
-                                            marginRight: "4px",
-                                            verticalAlign: "middle",
-                                        }}
-                                    />
-                                    {notif.time}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="panel-section">
                 <h3>AI Actionable Insights</h3>
                 <div className="todo-list">
                     {todos.length === 0 ? (
