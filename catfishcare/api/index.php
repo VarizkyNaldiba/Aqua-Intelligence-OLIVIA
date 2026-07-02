@@ -1,4 +1,8 @@
 <?php
+// Override SCRIPT_NAME and PHP_SELF to prevent Symfony/Laravel from stripping /api prefix on Vercel requests
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+
 // Copy initial SQLite database to /tmp so it is writable on Vercel
 $dbSource = __DIR__ . '/../database/database.sqlite';
 $dbTarget = '/tmp/database.sqlite';
