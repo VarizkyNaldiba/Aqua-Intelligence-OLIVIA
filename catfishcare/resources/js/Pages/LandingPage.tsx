@@ -1,294 +1,283 @@
 import { Link, Head } from "@inertiajs/react";
-import { Fish, Cpu, TrendingUp, Droplets, ShieldCheck, ArrowRight, Activity, Brain } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowRight, Activity, Zap, Wifi, Fish } from "lucide-react";
+import { useEffect } from "react";
 
 export default function LandingPage() {
-    const [theme, setTheme] = useState("light");
-
-    // Enforce light theme on the landing page for that crisp premium Apple vibe
+    // Ensure body background is light for the landing page theme
     useEffect(() => {
         document.body.classList.add("light-theme");
         return () => {
-            // Restore dark mode default if user navigates away
             document.body.classList.remove("light-theme");
         };
     }, []);
 
     return (
-        <div className="landing-layout" style={{ backgroundColor: "#ffffff", color: "#1d1d1f", minHeight: "100vh", fontFamily: "var(--font-body)" }}>
-            <Head title="Pencegahan Gagal Panen Lele" />
-            
-            {/* Main Header (Frosted Glass, Single unified menu bar) */}
-            <header style={{
-                height: "60px",
-                backgroundColor: "rgba(255, 255, 255, 0.8)",
-                backdropFilter: "blur(20px)",
-                borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0 24px",
-                position: "sticky",
-                top: 0,
-                zIndex: 100
-            }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-                    <Link href="/" style={{ color: "#1d1d1f", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", fontSize: "18px", fontWeight: 600, letterSpacing: "-0.015em" }}>
-                        <Fish size={20} style={{ color: "#0066cc" }} />
-                        <span>CATFISHCARE</span>
-                    </Link>
-                    <nav className="hidden-mobile" style={{ display: "flex", gap: "24px" }}>
-                        <a href="#fitur" style={{ color: "#6e6e73", fontSize: "14px", textDecoration: "none", transition: "color 0.2s" }} onMouseOver={e=>e.currentTarget.style.color="#0066cc"} onMouseOut={e=>e.currentTarget.style.color="#6e6e73"}>Fitur</a>
-                        <a href="#sensor" style={{ color: "#6e6e73", fontSize: "14px", textDecoration: "none", transition: "color 0.2s" }} onMouseOver={e=>e.currentTarget.style.color="#0066cc"} onMouseOut={e=>e.currentTarget.style.color="#6e6e73"}>Teknologi</a>
-                        <a href="#solusi" style={{ color: "#6e6e73", fontSize: "14px", textDecoration: "none", transition: "color 0.2s" }} onMouseOver={e=>e.currentTarget.style.color="#0066cc"} onMouseOut={e=>e.currentTarget.style.color="#6e6e73"}>Solusi IoT</a>
-                    </nav>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                    <Link 
-                        href="/login" 
-                        style={{ 
-                            fontSize: "14px", 
-                            color: "#1d1d1f", 
-                            textDecoration: "none",
-                            fontWeight: 500,
-                            padding: "6px 14px",
-                            transition: "color 0.2s"
-                        }}
-                        onMouseOver={e=>e.currentTarget.style.color="#0066cc"}
-                        onMouseOut={e=>e.currentTarget.style.color="#1d1d1f"}
-                    >
-                        Masuk
-                    </Link>
-                    <Link 
-                        href="/dashboard" 
-                        style={{ 
-                            fontSize: "13px", 
-                            fontWeight: 500, 
-                            color: "#ffffff", 
-                            backgroundColor: "#0066cc", 
-                            padding: "8px 18px", 
-                            borderRadius: "9999px", 
-                            textDecoration: "none",
-                            transition: "transform 0.1s ease"
-                        }}
-                        onClick={e => {
-                            e.currentTarget.style.transform = "scale(0.95)";
-                            setTimeout(() => { if(e.currentTarget) e.currentTarget.style.transform = "scale(1)"; }, 100);
-                        }}
-                    >
-                        Buka Dashboard
+        <div className="lp-layout">
+            <Head title="Smarter Catfish Ponds, Better Harvests" />
+
+            {/* Header Navigation */}
+            <header className="lp-header">
+                <Link href="/" className="lp-logo-container">
+                    <div className="lp-logo-circle">
+                        <Fish size={20} color="#ffffff" style={{ transform: "rotate(-30deg)" }} />
+                    </div>
+                    <span className="lp-logo-text">CatfishCare</span>
+                </Link>
+
+                <nav className="lp-nav">
+                    <a href="#features" className="lp-nav-link">Features</a>
+                    <a href="#pricing" className="lp-nav-link">Pricing</a>
+                    <a href="#about" className="lp-nav-link">About</a>
+                </nav>
+
+                <div className="lp-header-actions">
+                    <Link href="/login" className="lp-login-btn">
+                        Log In
                     </Link>
                 </div>
             </header>
 
-            {/* SECTION 1: White Hero Canvas (Apple-style bold title, minimal layout) */}
-            <section style={{ padding: "80px 24px", textAlign: "center", backgroundColor: "#ffffff" }}>
-                <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "2px", color: "#0066cc" }}>
-                        Teknologi IoT Pintar
-                    </span>
-                    <h1 style={{ 
-                        fontSize: "56px", 
-                        fontWeight: 600, 
-                        letterSpacing: "-0.025em", 
-                        lineHeight: 1.07, 
-                        marginTop: "16px",
-                        color: "#1d1d1f"
-                    }}>
-                        Masa depan budidaya lele.<br />Dipandu oleh kecerdasan.
+            {/* Hero Section */}
+            <section className="lp-hero-section">
+                {/* Hero Left Column */}
+                <div className="lp-hero-left">
+                    <div className="lp-hero-badge">
+                        <span style={{ width: "6px", height: "6px", backgroundColor: "#0ea5e9", borderRadius: "50%" }}></span>
+                        AI-Powered Aquaculture Platform
+                    </div>
+                    <h1 className="lp-hero-heading">
+                        Smarter Catfish<br />
+                        <span className="lp-ponds-highlight">Ponds</span>,<br />
+                        Better Harvests.
                     </h1>
-                    <p style={{ 
-                        fontSize: "24px", 
-                        fontWeight: 300, 
-                        lineHeight: 1.4, 
-                        color: "#86868b", 
-                        marginTop: "24px", 
-                        maxWidth: "600px", 
-                        margin: "24px auto 0" 
-                    }}>
-                        Pantau kualitas air kolam lele Anda secara real-time. Deteksi dini risiko penyakit dan gagal panen dengan analisis prediktif AI.
+                    <p className="lp-hero-subtext">
+                        CatfishCare combines AI-driven water monitoring, automated feeding schedules, and real-time ESP32 sensor data to help aquaculture farmers reduce losses and maximize yield — with zero guesswork.
                     </p>
-                    <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "32px" }}>
-                        <Link 
-                            href="/dashboard" 
-                            style={{ 
-                                backgroundColor: "#0066cc", 
-                                color: "#ffffff", 
-                                fontSize: "17px", 
-                                padding: "12px 24px", 
-                                borderRadius: "9999px", 
-                                textDecoration: "none", 
-                                fontWeight: 500,
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px"
-                            }}
-                        >
-                            Coba Demo Sekarang <ArrowRight size={18} />
+                    <div className="lp-hero-actions">
+                        <Link href="/login" className="lp-btn-gradient">
+                            Get Started <ArrowRight size={18} />
                         </Link>
+                        <a href="#demo" className="lp-btn-outline">
+                            Watch Demo
+                        </a>
+                    </div>
+                    <div className="lp-hero-footnotes">
+                        <div className="lp-footnote-item">
+                            <span className="lp-footnote-icon">✓</span>
+                            <span>Free 14-day trial</span>
+                        </div>
+                        <div className="lp-footnote-item">
+                            <span className="lp-footnote-icon">✓</span>
+                            <span>No credit card required</span>
+                        </div>
+                        <div className="lp-footnote-item">
+                            <span className="lp-footnote-icon">✓</span>
+                            <span>Cancel anytime</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Hero Illustration */}
-                <div style={{ marginTop: "60px", maxWidth: "980px", margin: "60px auto 0", padding: "0 20px" }}>
-                    <div style={{
-                        background: "linear-gradient(135deg, #1d1d1f 0%, #000000 100%)",
-                        borderRadius: "18px",
-                        padding: "48px",
-                        color: "#ffffff",
-                        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)",
-                        textAlign: "left"
-                    }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "24px" }}>
-                            <div>
-                                <h3 style={{ fontSize: "14px", fontWeight: 600, color: "#2997ff", textTransform: "uppercase" }}>Tampilan Konsol Utama</h3>
-                                <h2 style={{ fontSize: "32px", fontWeight: 600, marginTop: "8px", letterSpacing: "-0.015em" }}>CATFISHCARE Dashboard</h2>
+                {/* Hero Right Column (Live Dashboard Widget) */}
+                <div className="lp-hero-right">
+                    {/* Floating badge */}
+                    <div className="lp-widget-live-badge">
+                        <span className="lp-live-dot"></span>
+                        4 ponds live
+                    </div>
+
+                    <div className="lp-dashboard-widget">
+                        {/* Widget Header */}
+                        <div className="lp-widget-header">
+                            <div className="lp-widget-header-title">
+                                <span style={{ width: "8px", height: "8px", backgroundColor: "#34d399", borderRadius: "50%" }}></span>
+                                CatfishCare • Live
                             </div>
-                            <span style={{ fontSize: "12px", padding: "4px 10px", background: "rgba(255, 255, 255, 0.15)", borderRadius: "9999px" }}>v1.0 Live</span>
-                        </div>
-
-                        {/* Fake Dashboard UI */}
-                        <div style={{ display: "flex", gap: "16px", marginTop: "32px", flexWrap: "wrap" }}>
-                            <div style={{ flex: 1, minWidth: "200px", padding: "20px", background: "rgba(255, 255, 255, 0.05)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                <span style={{ fontSize: "12px", color: "#86868b" }}>SUHU AIR</span>
-                                <div style={{ fontSize: "28px", fontWeight: 600, marginTop: "8px", color: "#30d158" }}>28.4 °C</div>
-                                <span style={{ fontSize: "11px", color: "#30d158" }}>Optimal</span>
-                            </div>
-                            <div style={{ flex: 1, minWidth: "200px", padding: "20px", background: "rgba(255, 255, 255, 0.05)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                <span style={{ fontSize: "12px", color: "#86868b" }}>KADAR pH</span>
-                                <div style={{ fontSize: "28px", fontWeight: 600, marginTop: "8px", color: "#ff9f0a" }}>6.4</div>
-                                <span style={{ fontSize: "11px", color: "#ff9f0a" }}>Waspada Asam</span>
-                            </div>
-                            <div style={{ flex: 1, minWidth: "200px", padding: "20px", background: "rgba(255, 255, 255, 0.05)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                <span style={{ fontSize: "12px", color: "#86868b" }}>KEKERUHAN (TURBIDITY)</span>
-                                <div style={{ fontSize: "28px", fontWeight: 600, marginTop: "8px", color: "#ff453a" }}>182 NTU</div>
-                                <span style={{ fontSize: "11px", color: "#ff453a" }}>Kritis - Segera Kuras</span>
+                            <div className="lp-widget-header-status">
+                                <span style={{ width: "6px", height: "6px", backgroundColor: "#34d399", borderRadius: "50%" }}></span>
+                                All systems online
                             </div>
                         </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* SECTION 2: Near-Black Dark Tile (Feature presentation) */}
-            <section id="fitur" style={{ padding: "80px 24px", backgroundColor: "#1d1d1f", color: "#ffffff", textAlign: "center" }}>
-                <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "2px", color: "#2997ff" }}>
-                        Kekuatan Analitik AI
-                    </span>
-                    <h2 style={{ 
-                        fontSize: "40px", 
-                        fontWeight: 600, 
-                        letterSpacing: "-0.02em", 
-                        lineHeight: 1.1, 
-                        marginTop: "16px"
-                    }}>
-                        Mencegah kematian massal lele<br />sebelum bahaya melanda.
-                    </h2>
-                    <p style={{ 
-                        fontSize: "18px", 
-                        color: "#cccccc", 
-                        lineHeight: 1.5, 
-                        marginTop: "20px", 
-                        maxWidth: "600px", 
-                        margin: "20px auto 0" 
-                    }}>
-                        Menggunakan data time-series dari sensor suhu, pH, dan kekeruhan untuk mendeteksi bahaya *upwelling* (pembalikan air dasar kolam) secara akurat.
-                    </p>
-                </div>
+                        {/* Widget Body */}
+                        <div className="lp-widget-body">
+                            {/* Sensors Grid */}
+                            <div className="lp-sensor-grid">
+                                {/* Card 1: pH Air */}
+                                <div className="lp-sensor-card">
+                                    <div className="lp-sensor-label">pH Air</div>
+                                    <div className="lp-sensor-value">7.2 pH</div>
+                                    <div className="lp-capsule-bar">
+                                        <span className="lp-capsule-pill lp-pill-blue filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-blue filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-blue filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-blue filled"></span>
+                                        <span className="lp-capsule-pill"></span>
+                                    </div>
+                                </div>
 
-                <div style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap", marginTop: "48px", maxWidth: "1100px", margin: "48px auto 0" }}>
-                    {/* Dark Feature Card 1 */}
-                    <div style={{ flex: 1, minWidth: "300px", padding: "40px", backgroundColor: "#272729", borderRadius: "18px", textAlign: "left", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <Brain size={32} style={{ color: "#2997ff", marginBottom: "20px" }} />
-                        <h3 style={{ fontSize: "21px", fontWeight: 600, marginBottom: "12px", letterSpacing: "-0.015em" }}>AI Recommendation Engine</h3>
-                        <p style={{ color: "#cccccc", fontSize: "14px", lineHeight: 1.6 }}>
-                            Sistem memberikan rekomendasi aksi praktis instan yang disesuaikan dengan kondisi kolam Anda, seperti panduan kurasi air, pengaturan debit aerator, dan penetralan pH.
-                        </p>
-                    </div>
-                    {/* Dark Feature Card 2 */}
-                    <div style={{ flex: 1, minWidth: "300px", padding: "40px", backgroundColor: "#272729", borderRadius: "18px", textAlign: "left", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <Activity size={32} style={{ color: "#2997ff", marginBottom: "20px" }} />
-                        <h3 style={{ fontSize: "21px", fontWeight: 600, marginBottom: "12px", letterSpacing: "-0.015em" }}>Real-time Telemetry Graph</h3>
-                        <p style={{ color: "#cccccc", fontSize: "14px", lineHeight: 1.6 }}>
-                            Visualisasikan parameter vital lele Anda melalui grafik interaktif yang bersih dan akurat. Pantau tren peningkatan pH dan kekeruhan air tanpa hambatan.
-                        </p>
-                    </div>
-                </div>
-            </section>
+                                {/* Card 2: Turbidity */}
+                                <div className="lp-sensor-card">
+                                    <div className="lp-sensor-label">Turbidity</div>
+                                    <div className="lp-sensor-value">18 NTU</div>
+                                    <div className="lp-capsule-bar">
+                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
+                                        <span className="lp-capsule-pill"></span>
+                                    </div>
+                                </div>
 
-            {/* SECTION 3: Parchment Canvas (Interactive tech features grid) */}
-            <section id="sensor" style={{ padding: "80px 24px", backgroundColor: "#f5f5f7", color: "#1d1d1f" }}>
-                <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center", marginBottom: "48px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "2px", color: "#0066cc" }}>
-                        Infrastruktur Perangkat Keras
-                    </span>
-                    <h2 style={{ fontSize: "40px", fontWeight: 600, letterSpacing: "-0.02em", marginTop: "12px" }}>
-                        Integrasi Sensor Fleksibel
-                    </h2>
-                </div>
+                                {/* Card 3: TDS */}
+                                <div className="lp-sensor-card">
+                                    <div className="lp-sensor-label">TDS</div>
+                                    <div className="lp-sensor-value">910 PPM</div>
+                                    <div className="lp-capsule-bar">
+                                        <span className="lp-capsule-pill lp-pill-purple filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-purple filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-purple filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-purple filled"></span>
+                                        <span className="lp-capsule-pill"></span>
+                                    </div>
+                                </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "24px", maxWidth: "1100px", margin: "0 auto" }}>
-                    {/* Tech Card 1 */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e0e0e0", borderRadius: "18px", padding: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        <div>
-                            <Droplets size={28} style={{ color: "#0066cc", marginBottom: "16px" }} />
-                            <h3 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>Sensor Kualitas Air</h3>
-                            <p style={{ color: "#86868b", fontSize: "14px", lineHeight: 1.5 }}>
-                                Kompatibel dengan probe pH industri dan sensor kekeruhan optik untuk pembacaan parameter fisik-kimia air yang presisi.
-                            </p>
-                        </div>
-                    </div>
-                    {/* Tech Card 2 */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e0e0e0", borderRadius: "18px", padding: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        <div>
-                            <Cpu size={28} style={{ color: "#0066cc", marginBottom: "16px" }} />
-                            <h3 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>Arsitektur ESP Platform</h3>
-                            <p style={{ color: "#86868b", fontSize: "14px", lineHeight: 1.5 }}>
-                                Mendukung manajemen multi-perangkat ESP32 / ESP8266 secara modular, memudahkan skalabilitas kolam tanpa batas.
-                            </p>
-                        </div>
-                    </div>
-                    {/* Tech Card 3 */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e0e0e0", borderRadius: "18px", padding: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        <div>
-                            <ShieldCheck size={28} style={{ color: "#0066cc", marginBottom: "16px" }} />
-                            <h3 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>Pencegahan Gagal Panen</h3>
-                            <p style={{ color: "#86868b", fontSize: "14px", lineHeight: 1.5 }}>
-                                Menurunkan risiko kegagalan tebar bibit dan memaksimalkan rasio FCR (Food Conversion Ratio) melalui optimalisasi ekosistem kolam.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* FOOTER: Slate Parchment footer */}
-            <footer style={{ backgroundColor: "#f5f5f7", borderTop: "1px solid #e0e0e0", padding: "64px 24px", color: "#86868b", fontSize: "12px" }}>
-                <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "32px", marginBottom: "32px" }}>
-                        <div>
-                            <h4 style={{ color: "#1d1d1f", fontWeight: 600, marginBottom: "12px", fontSize: "14px" }}>CATFISHCARE Budidaya</h4>
-                            <p style={{ maxWidth: "250px", lineHeight: 1.5 }}>Sistem pengawasan cerdas air kolam ikan lele dengan telemetri IoT dan mesin analisis AI.</p>
-                        </div>
-                        <div style={{ display: "flex", gap: "60px" }}>
-                            <div>
-                                <h5 style={{ color: "#1d1d1f", fontWeight: 600, marginBottom: "12px" }}>Tautan</h5>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                    <Link href="/login" style={{ color: "#86868b", textDecoration: "none" }}>Masuk Aplikasi</Link>
-                                    <Link href="/dashboard" style={{ color: "#86868b", textDecoration: "none" }}>Dashboard</Link>
+                                {/* Card 4: Tinggi Air */}
+                                <div className="lp-sensor-card">
+                                    <div className="lp-sensor-label">Tinggi Air</div>
+                                    <div className="lp-sensor-value">105 cm</div>
+                                    <div className="lp-capsule-bar">
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill"></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <h5 style={{ color: "#1d1d1f", fontWeight: 600, marginBottom: "12px" }}>Hukum</h5>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                    <span style={{ cursor: "pointer" }}>Syarat Layanan</span>
-                                    <span style={{ cursor: "pointer" }}>Kebijakan Privasi</span>
+
+                            {/* Forecast Section */}
+                            <div className="lp-forecast-section">
+                                <div className="lp-forecast-header">
+                                    <div className="lp-forecast-title">24-Hour Forecast</div>
+                                    <div className="lp-forecast-badge">ML Active</div>
                                 </div>
+                                <div className="lp-forecast-graph">
+                                    <svg viewBox="0 0 400 100" style={{ width: "100%", height: "100%" }}>
+                                        {/* Horizontal grid lines */}
+                                        <line x1="0" y1="20" x2="400" y2="20" stroke="#f1f5f9" strokeDasharray="3,3" />
+                                        <line x1="0" y1="50" x2="400" y2="50" stroke="#f1f5f9" strokeDasharray="3,3" />
+                                        <line x1="0" y1="80" x2="400" y2="80" stroke="#f1f5f9" strokeDasharray="3,3" />
+                                        
+                                        {/* Blue/Cyan forecast path */}
+                                        <path 
+                                            d="M 10,75 C 60,75 100,30 160,35 C 220,40 260,85 320,65 C 360,50 380,25 390,25" 
+                                            fill="none" 
+                                            stroke="#0ea5e9" 
+                                            strokeWidth="3" 
+                                            strokeLinecap="round"
+                                        />
+                                        
+                                        {/* Teal forecast path */}
+                                        <path 
+                                            d="M 10,85 C 60,85 100,42 160,47 C 220,52 260,95 320,75 C 360,60 380,35 390,35" 
+                                            fill="none" 
+                                            stroke="#14b8a6" 
+                                            strokeWidth="3" 
+                                            strokeLinecap="round"
+                                            opacity="0.85"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            {/* Warning Alert Banner */}
+                            <div className="lp-alert-banner">
+                                <span>⚡</span>
+                                <span>AI suggests water change in Pond A — high TDS detected</span>
                             </div>
                         </div>
                     </div>
-                    <hr style={{ border: "none", borderTop: "1px solid #e0e0e0", margin: "24px 0" }} />
-                    <p>© 2026 CATFISHCARE. Seluruh hak cipta dilindungi undang-undang.</p>
                 </div>
+            </section>
+
+            {/* Statistics Section */}
+            <section className="lp-stats-section">
+                <div className="lp-stats-grid">
+                    <div className="lp-stats-card">
+                        <div className="lp-stats-value">4,200+</div>
+                        <div className="lp-stats-label">Ponds Monitored</div>
+                    </div>
+                    <div className="lp-stats-card">
+                        <div className="lp-stats-value">98.7%</div>
+                        <div className="lp-stats-label">Sensor Uptime</div>
+                    </div>
+                    <div className="lp-stats-card">
+                        <div className="lp-stats-value">31%</div>
+                        <div className="lp-stats-label">Avg. Yield Increase</div>
+                    </div>
+                    <div className="lp-stats-card">
+                        <div className="lp-stats-value">{"<2s"}</div>
+                        <div className="lp-stats-label">Alert Latency</div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section id="features" className="lp-features-section">
+                <div className="lp-features-header">
+                    <span className="lp-features-subtitle">Platform Features</span>
+                    <h2 className="lp-features-heading">Everything your farm needs, in one platform</h2>
+                </div>
+                <div className="lp-features-grid">
+                    {/* Feature 1 */}
+                    <div className="lp-feature-card">
+                        <div className="lp-feature-icon-container">
+                            <Activity size={24} />
+                        </div>
+                        <h3 className="lp-feature-card-title">Real-Time Monitoring</h3>
+                        <p className="lp-feature-card-text">
+                            Track pH, turbidity, TDS, and water level across all ponds from a single dashboard.
+                        </p>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="lp-feature-card">
+                        <div className="lp-feature-icon-container">
+                            <Zap size={24} />
+                        </div>
+                        <h3 className="lp-feature-card-title">AI-Driven Predictions</h3>
+                        <p className="lp-feature-card-text">
+                            Our ML models forecast water quality shifts 24 hours in advance to prevent fish loss.
+                        </p>
+                    </div>
+
+                    {/* Feature 3 */}
+                    <div className="lp-feature-card">
+                        <div className="lp-feature-icon-container">
+                            <Wifi size={24} />
+                        </div>
+                        <h3 className="lp-feature-card-title">ESP32 Integration</h3>
+                        <p className="lp-feature-card-text">
+                            Plug-and-play hardware sensors sync automatically over Wi-Fi — no manual uploads needed.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Call to Action Section */}
+            <section className="lp-cta-section">
+                <h2 className="lp-cta-heading">Ready to transform your pond farm?</h2>
+                <p className="lp-cta-subtext">
+                    Join hundreds of aquaculture farmers already using CatfishCare to grow smarter.
+                </p>
+                <Link href="/login" className="lp-btn-gradient" style={{ padding: "16px 36px" }}>
+                    Get Started Free <ArrowRight size={18} />
+                </Link>
+            </section>
+
+            {/* Footer Section */}
+            <footer className="lp-footer">
+                <p>© 2028 CatfishCare. All rights reserved.</p>
             </footer>
         </div>
     );

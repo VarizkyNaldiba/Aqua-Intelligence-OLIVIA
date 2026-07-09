@@ -1,10 +1,7 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Sidebar from "@/Components/Sidebar";
-import RightPanel from "@/Components/RightPanel";
 import type { TabName, TodoItem, SensorRow } from "@/Types";
-import { useTheme } from "@/Hooks/useTheme";
-import { getPondStatus } from "@/Utils/statusLogic";
-import { Play, Pause, SkipForward, RotateCcw } from "lucide-react";
+import { Bell, Menu, RotateCcw, Play, Pause, SkipForward } from "lucide-react";
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -34,126 +31,80 @@ export default function DashboardLayout({
     setCurrentIndex,
     isPlaying,
     setIsPlaying,
-    todos,
-    toggleTodo,
 }: DashboardLayoutProps) {
-    const { theme, toggleTheme } = useTheme();
-    const statusInfo = getPondStatus(currentData, selectedPondId);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+    const getTabBreadcrumbs = () => {
+        switch (activeTab) {
+            case "home":
+                return "Home > Overview";
+            case "ponds":
+                return "Pond Management > List";
+            case "analytics":
+                return "Predictions > 24-Hour Forecast";
+            case "profile":
+                return "Settings > Notifications & Hardware";
+            case "notifications":
+                return "History > Data Reports";
+            case "dashboard":
+            default:
+                return "Dashboard > Real-Time";
+        }
+    };
 
     return (
-        <div className="app-container">
-            <Sidebar
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                theme={theme}
-                toggleTheme={toggleTheme}
+        <div className="db-layout">
+            {/* Sidebar Navigation */}
+            <Sidebar 
+                activeTab={activeTab} 
+                setActiveTab={setActiveTab} 
+                isCollapsed={sidebarCollapsed} 
+                toggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
             />
 
-            <main
-                className={`main-content ${activeTab === "dashboard" ? "" : "full-width"}`}
-            >
-                {activeTab === "dashboard" && (
-                    <header className="dashboard-header">
-                        <div className="dashboard-title">
-                            <h1>CATFISHCARE</h1>
-                            <p>
-                                Sistem Deteksi Pencegahan Gagal Panen Lele -
-                                Kolam {selectedPondId}
-                            </p>
+            {/* Main Content Workspace */}
+            <main className={`db-main ${sidebarCollapsed ? "collapsed" : ""}`}>
+                {/* Top Header Bar */}
+                <header className="db-topbar">
+                    {/* Left: Breadcrumbs */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                        <div className="db-breadcrumbs">
+                            <span>{getTabBreadcrumbs()}</span>
                         </div>
+                    </div>
 
-                        <div className="header-controls">
-                            {/* Pond Selector */}
-                            <div className="pond-select-bar">
-                                <span>Pilih Kolam:</span>
-                                <select
-                                    value={selectedPondId}
-                                    onChange={(e) =>
-                                        setSelectedPondId(
-                                            Number.parseInt(e.target.value, 10),
-                                        )
-                                    }
-                                    className="pond-select-dropdown"
-                                >
-                                    {Array.from(
-                                        { length: 12 },
-                                        (_, i) => i + 1,
-                                    ).map((id) => (
-                                        <option key={id} value={id}>
-                                            Kolam {id < 10 ? `0${id}` : id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                    {/* Center/Right: Top Actions & Profile block */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
 
-                            {/* Simulation Controls */}
-                            {rawData.length > 0 && (
-                                <div className="simulation-bar">
-                                    <span>Simulasi IoT:</span>
-                                    <button
-                                        className="sim-btn"
-                                        onClick={() => {
-                                            setCurrentIndex(0);
-                                            setIsPlaying(false);
-                                        }}
-                                        title="Reset ke awal"
-                                    >
-                                        <RotateCcw size={14} />
-                                    </button>
-                                    <button
-                                        className={`sim-btn ${isPlaying ? "active" : ""}`}
-                                        onClick={() => setIsPlaying(!isPlaying)}
-                                    >
-                                        {isPlaying ? (
-                                            <Pause size={14} />
-                                        ) : (
-                                            <Play size={14} />
-                                        )}
-                                    </button>
-                                    <button
-                                        className="sim-btn"
-                                        onClick={() => {
-                                            if (
-                                                currentIndex <
-                                                rawData.length - 1
-                                            ) {
-                                                setCurrentIndex(
-                                                    currentIndex + 1,
-                                                );
-                                            }
-                                        }}
-                                        disabled={
-                                            currentIndex >= rawData.length - 1
-                                        }
-                                    >
-                                        <SkipForward size={14} />
-                                    </button>
-                                    <span
-                                        style={{
-                                            fontSize: "11px",
-                                            fontFamily: "monospace",
-                                        }}
-                                    >
-                                        Row: {currentIndex + 1} /{" "}
-                                        {rawData.length}
-                                    </span>
+                        {/* Top Right: Actions & User profile */}
+                        <div className="db-topbar-actions">
+                            {/* Notification bell */}
+                            <button className="db-notif-btn">
+                                <Bell size={20} />
+                                <span className="db-notif-badge"></span>
+                            </button>
+
+                            {/* Profile Info */}
+                            <div className="db-profile-block">
+                                <img
+                                    src="/avatar_ade_bassey.png"
+                                    alt="Adé Bassey avatar"
+                                    className="db-avatar"
+                                />
+                                <div className="db-profile-info">
+                                    <div className="db-profile-name">Adé Bassey</div>
+                                    <div className="db-profile-role">Farm Manager</div>
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </header>
-                )}
+                    </div>
+                </header>
 
-                {children}
+                {/* Main Content Pane */}
+                <div key={activeTab} className="tab-entry-fade" style={{ width: "100%" }}>
+                    {children}
+                </div>
             </main>
-
-            {activeTab === "dashboard" && (
-                <RightPanel
-                    currentData={currentData}
-                    statusInfo={statusInfo}
-                    todos={todos}
-                    toggleTodo={toggleTodo}
-                />
-            )}
         </div>
     );
 }
