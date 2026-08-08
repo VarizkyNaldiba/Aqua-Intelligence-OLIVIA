@@ -1,0 +1,57 @@
+/* ============================================================
+   base/variables.css — CSS Custom Properties
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap");
+
+:root {
+    /* Brand & Accent Colors */
+    --color-primary: #0066cc;
+    --color-primary-focus: #0071e3;
+    --color-primary-on-dark: #2997ff;
+
+    /* Surface Colors (Dark Theme default) */
+    --bg-primary: #000000;
+    --bg-card: rgba(29, 29, 31, 0.7);
+    --bg-card-solid: #1d1d1f;
+    --bg-sidebar: #161617;
+    --color-accent-soft: #2997ff;
+    --color-accent-bright: #0066cc;
+    --color-text-primary: #ffffff;
+    --color-text-muted: #86868b;
+
+    --color-danger: #ff453a;
+    --color-warning: #ff9f0a;
+    --color-success: #30d158;
+
+    --border-color: rgba(255, 255, 255, 0.08);
+    --card-border-hover: rgba(41, 151, 255, 0.35);
+    --welcome-bg: linear-gradient(135deg, #1d1d1f 0%, #000000 100%);
+
+    --font-title: "SF Pro Display", "Outfit", "Inter", sans-serif;
+    --font-body: "SF Pro Text", "Inter", sans-serif;
+
+    --border-radius: 18px;
+    --transition-speed: 0.4s;
+    --transition-ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --transition-all: all var(--transition-speed) var(--transition-ease);
+}
+
+body.light-theme {
+    --bg-primary: #f5f5f7;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-solid: #ffffff;
+    --bg-sidebar: #ffffff;
+    --color-accent-soft: #0066cc;
+    --color-accent-bright: #0066cc;
+    --color-text-primary: #1d1d1f;
+    --color-text-muted: #6e6e73;
+
+    --color-danger: #d01c1c;
+    --color-warning: #c26a00;
+    --color-success: #1d823b;
+
+    --border-color: rgba(0, 0, 0, 0.08);
+    --card-border-hover: rgba(0, 102, 204, 0.3);
+    --welcome-bg: linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%);
+}

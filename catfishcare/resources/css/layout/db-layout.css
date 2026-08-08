@@ -1,0 +1,80 @@
+/* ============================================================
+   layout/db-layout.css — Main layout & content area
+   ============================================================ */
+
+.db-layout {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #0f172a;
+}
+
+.db-main {
+    margin-left: 260px;
+    padding: 32px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.db-main.collapsed {
+    margin-left: 80px;
+}
+
+/* Legacy layout support */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 80px;
+    margin-right: 320px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.main-content.full-width {
+    margin-right: 0;
+}
+
+/* Hide legacy right panel when new db layout is active */
+.app-container:has(.db-main) .right-panel {
+    display: none !important;
+}
+
+.app-container:has(.db-main) .main-content {
+    margin-right: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+@media (max-width: 1200px) {
+    .main-content { margin-right: 0; }
+    .right-panel {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        border-left: none !important;
+        border-top: 1px solid var(--border-color);
+    }
+    .app-container { flex-direction: column; }
+    .main-content {
+        margin-left: 0;
+        margin-top: 60px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .db-main {
+        margin-left: 0 !important;
+        padding: 16px !important;
+    }
+}

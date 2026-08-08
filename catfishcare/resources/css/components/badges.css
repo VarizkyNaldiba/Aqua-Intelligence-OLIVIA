@@ -1,0 +1,161 @@
+/* ============================================================
+   components/badges.css — Status badges and tags
+   ============================================================ */
+
+/* Redesigned status pills for Warning (merah kuning hijau) */
+.pm-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.pm-status-pill.safe {
+    background-color: #e2fbf0;
+    color: #065f46;
+}
+
+.pm-status-pill.warning {
+    background-color: #fffbeb;
+    color: #b45309;
+}
+
+.pm-status-pill.danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+.pm-status-pill.active {
+    background-color: #e2fbf0;
+    color: #065f46;
+}
+
+.pm-status-pill.inactive {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+/* IoT Status pills */
+.pm-iot-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.pm-iot-pill.active {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.pm-iot-pill.inactive {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+/* Inline badges */
+.status-badge-inline {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.status-badge-inline.success {
+    background-color: rgba(93, 248, 216, 0.1);
+    color: var(--color-success);
+}
+
+.status-badge-inline.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.status-badge-inline.danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.status-dot-badge {
+    font-size: 9px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.status-dot-badge.safe {
+    background-color: rgba(93, 248, 216, 0.1);
+    color: var(--color-success);
+}
+
+.status-dot-badge.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.status-dot-badge.danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.status-indicator-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    background-color: var(--bg-sidebar);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.status-indicator-tag.active {
+    color: var(--color-success);
+    border-color: rgba(93, 248, 216, 0.2);
+    background-color: rgba(93, 248, 216, 0.05);
+}
+
+.active-tag-inline {
+    background-color: rgba(93, 248, 216, 0.15);
+    color: var(--color-accent-bright);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+body.light-theme .active-tag-inline {
+    background-color: rgba(15, 118, 110, 0.1);
+    color: var(--color-accent-bright);
+}
+
+.active-tag-card {
+    background-color: rgba(93, 248, 216, 0.15);
+    color: var(--color-accent-bright);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    vertical-align: middle;
+}
+
+body.light-theme .active-tag-card {
+    background-color: rgba(15, 118, 110, 0.1);
+    color: var(--color-accent-bright);
+}

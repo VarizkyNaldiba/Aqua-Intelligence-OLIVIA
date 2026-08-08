@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "frontend-react-best-practices": {
+      "source": "sergiodxa/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-react-best-practices/SKILL.md",
+      "computedHash": "d79af29866e2c8cac7285743a3b049a92124bb0e466a43f71a136a614b78085f"
+    }
+  }
+}
