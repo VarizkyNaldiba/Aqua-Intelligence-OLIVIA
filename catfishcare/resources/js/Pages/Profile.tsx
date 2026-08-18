@@ -86,6 +86,15 @@ export default function ProfileTab({
             sensors: ["Turbidity", "TDS Meter"],
             lastSeen: "Just now",
         },
+        {
+            id: 5,
+            name: "IP Camera — Live Video Stream",
+            status: "Connected",
+            ip: "192.168.137.210:5000/video_feed",
+            type: "AI Vision & Video Streamer",
+            sensors: ["1080p MJPEG Feed", "Fish Activity Monitor"],
+            lastSeen: "Just now",
+        },
     ]);
 
     const showSaveAlert = (message: string) => {
@@ -584,7 +593,7 @@ export default function ProfileTab({
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", borderBottom: "1px solid #f1f5f9", paddingBottom: "16px" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: 700, color: "#10b981" }}>
                                     <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981" }}></span>
-                                    <span>3 of 4 devices online</span>
+                                    <span>{devices.filter((d) => d.status === "Connected").length} of {devices.length} devices online</span>
                                 </div>
                                 <button
                                     onClick={() => alert("Scanning WiFi network for devices...")}

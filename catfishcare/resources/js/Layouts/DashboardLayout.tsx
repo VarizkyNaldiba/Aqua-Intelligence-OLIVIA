@@ -46,6 +46,8 @@ export default function DashboardLayout({
                 return "Settings > Notifications & Hardware";
             case "notifications":
                 return "History > Data Reports";
+            case "dataset":
+                return "AI Studio > Pengumpulan Data Training Lele";
             case "dashboard":
             default:
                 return "Dashboard > Real-Time";

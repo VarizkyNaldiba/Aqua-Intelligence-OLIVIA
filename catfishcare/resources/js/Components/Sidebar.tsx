@@ -1,4 +1,4 @@
-import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight, Database } from "lucide-react";
 import { router } from "@inertiajs/react";
 import type { TabName } from "../Types";
 
@@ -21,6 +21,7 @@ const Sidebar = ({
         { id: "dashboard", icon: LayoutGrid, label: "Dashboard" },
         { id: "analytics", icon: TrendingUp, label: "Predictions" },
         { id: "ponds", icon: Fish, label: "Pond Management" },
+        { id: "dataset", icon: Database, label: "Studio Dataset" },
         { id: "notifications", icon: History, label: "History" },
         { id: "profile", icon: Settings, label: "Settings" },
     ] as const;
