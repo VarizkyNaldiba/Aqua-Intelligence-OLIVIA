@@ -2,40 +2,57 @@
    components/badges.css — Status badges and tags
    ============================================================ */
 
-/* Redesigned status pills for Warning (merah kuning hijau) */
+/* Redesigned contained status pills for Warning (merah kuning hijau) */
 .pm-status-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 6px;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
 }
 
-.pm-status-pill.safe {
-    background-color: #e2fbf0;
-    color: #065f46;
+.pm-status-pill.safe,
+.pm-status-pill.active {
+    background-color: rgba(16, 185, 129, 0.16);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.25);
 }
 
 .pm-status-pill.warning {
-    background-color: #fffbeb;
-    color: #b45309;
+    background-color: rgba(245, 158, 11, 0.16);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.25);
 }
 
-.pm-status-pill.danger {
-    background-color: #fef2f2;
-    color: #991b1b;
+.pm-status-pill.danger,
+.pm-status-pill.inactive {
+    background-color: rgba(239, 68, 68, 0.16);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.25);
 }
 
-.pm-status-pill.active {
+body.light-theme .pm-status-pill.safe,
+body.light-theme .pm-status-pill.active {
     background-color: #e2fbf0;
     color: #065f46;
+    border-color: #a7f3d0;
 }
 
-.pm-status-pill.inactive {
+body.light-theme .pm-status-pill.warning {
+    background-color: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+body.light-theme .pm-status-pill.danger,
+body.light-theme .pm-status-pill.inactive {
     background-color: #fef2f2;
     color: #991b1b;
+    border-color: #fecaca;
 }
 
 /* IoT Status pills */
@@ -43,20 +60,35 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 6px;
+    border: 1px solid transparent;
 }
 
 .pm-iot-pill.active {
-    background-color: #e0f2fe;
-    color: #0369a1;
+    background-color: rgba(14, 165, 233, 0.16);
+    color: #38bdf8;
+    border-color: rgba(14, 165, 233, 0.25);
 }
 
 .pm-iot-pill.inactive {
+    background-color: rgba(148, 163, 184, 0.12);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+body.light-theme .pm-iot-pill.active {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border-color: #bae6fd;
+}
+
+body.light-theme .pm-iot-pill.inactive {
     background-color: #f1f5f9;
     color: #475569;
+    border-color: #cbd5e1;
 }
 
 /* Inline badges */
