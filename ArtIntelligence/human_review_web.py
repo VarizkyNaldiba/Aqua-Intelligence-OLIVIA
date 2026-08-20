@@ -89,9 +89,6 @@ def init_dataset_cache():
 
     ALL_DATASET_ITEMS = items
 
-# Populate RAM cache on startup
-init_dataset_cache()
-
 class HumanReviewHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -335,7 +332,6 @@ APP_HTML = """<!DOCTYPE html>
         <button class="btn" id="btn-status-approved" onclick="setFilter('all', 'approved')">🟢 Approved Only</button>
         <button class="btn" id="btn-status-rejected" onclick="setFilter('all', 'rejected')">🔴 Rejected Only</button>
         <button class="btn" id="btn-status-all" onclick="setFilter('all', 'all')">🌐 All Samples</button>
-        <button class="btn btn-reset" onclick="resetAll()">🔄 Reset All Progress</button>
     </div>
 </header>
 
@@ -655,6 +651,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
 def run(port=5055):
+    init_dataset_cache()
     server = ThreadedHTTPServer(('0.0.0.0', port), HumanReviewHandler)
     print(f"==================================================")
     print(f"CatfishCare Review Studio Running at http://127.0.0.1:{port}")

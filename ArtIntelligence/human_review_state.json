@@ -1,0 +1,4569 @@
+{
+  "reviews": {
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194920_a21912.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194921_191f4f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.276562,
+          "yc": 0.569444,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8317
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787190206_3dae48.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194764_56b443.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7885
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194765_717364.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.398611,
+          "bw": 0.014063,
+          "bh": 0.025,
+          "conf": 0.7856
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194765_a4e09c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.398611,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.783
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194766_34360b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.398611,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.8032
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194766_a8eaed.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.397222,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.8209
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194767_40c916.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.394444,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.7787
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194767_fd7dae.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.391667,
+          "bw": 0.015625,
+          "bh": 0.027778,
+          "conf": 0.7695
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194768_6ecf98.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.43125,
+          "yc": 0.395833,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7815
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194769_d20b40.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.391667,
+          "bw": 0.01875,
+          "bh": 0.033333,
+          "conf": 0.7358
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194769_ea736a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.4,
+          "bw": 0.01875,
+          "bh": 0.033333,
+          "conf": 0.7311
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194770_08eaa3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194770_208ac6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.435937,
+          "yc": 0.375,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7292
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194771_5f47dc.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194771_9e9ae3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194772_2a6070.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194772_e7629b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432031,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7341
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194773_51f970.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194773_eac4fc.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.395833,
+          "bw": 0.01875,
+          "bh": 0.036111,
+          "conf": 0.7276
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194774_4556fd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.390278,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7721
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194774_670616.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194775_7dbe93.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.599219,
+          "yc": 0.173611,
+          "bw": 0.010937,
+          "bh": 0.025,
+          "conf": 0.8537
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194776_2f320e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.602344,
+          "yc": 0.170833,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8329
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194776_801894.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.407031,
+          "yc": 0.918056,
+          "bw": 0.010937,
+          "bh": 0.030556,
+          "conf": 0.8259
+        },
+        {
+          "xc": 0.603906,
+          "yc": 0.166667,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7876
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194777_7448cf.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194777_be8ea0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194778_0d73ba.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194778_c4e052.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194779_70ee2d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194779_78965a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194780_46dbe6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194780_759be2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194781_4c8fc1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.196094,
+          "yc": 0.2,
+          "bw": 0.010937,
+          "bh": 0.044444,
+          "conf": 0.7027
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194781_d2a940.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432812,
+          "yc": 0.397222,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.7565
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194782_3316b0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.433594,
+          "yc": 0.961111,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.8498
+        },
+        {
+          "xc": 0.411719,
+          "yc": 0.955556,
+          "bw": 0.026562,
+          "bh": 0.022222,
+          "conf": 0.7112
+        },
+        {
+          "xc": 0.528906,
+          "yc": 0.931944,
+          "bw": 0.020313,
+          "bh": 0.019444,
+          "conf": 0.7697
+        },
+        {
+          "xc": 0.516406,
+          "yc": 0.804167,
+          "bw": 0.020313,
+          "bh": 0.019444,
+          "conf": 0.7725
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194783_2ab837.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194783_5a4621.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194784_0ccbd2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.278125,
+          "yc": 0.984722,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7129
+        },
+        {
+          "xc": 0.163281,
+          "yc": 0.968056,
+          "bw": 0.023438,
+          "bh": 0.019444,
+          "conf": 0.7327
+        },
+        {
+          "xc": 0.252344,
+          "yc": 0.945833,
+          "bw": 0.023438,
+          "bh": 0.036111,
+          "conf": 0.7555
+        },
+        {
+          "xc": 0.229687,
+          "yc": 0.933333,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.8628
+        },
+        {
+          "xc": 0.220312,
+          "yc": 0.9,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.746
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194784_eaa908.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194785_478a9f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194785_60edc2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.486719,
+          "yc": 0.594444,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8665
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194786_04af7d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.485156,
+          "yc": 0.608333,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8453
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194786_d862d6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.467187,
+          "yc": 0.697222,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8584
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194787_407956.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.474219,
+          "yc": 0.75,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8435
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194787_f8d247.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.480469,
+          "yc": 0.766667,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8353
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194788_33dc3d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.484375,
+          "yc": 0.765278,
+          "bw": 0.01875,
+          "bh": 0.019444,
+          "conf": 0.8323
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194789_16eef3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.485156,
+          "yc": 0.766667,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8253
+        },
+        {
+          "xc": 0.398438,
+          "yc": 0.3125,
+          "bw": 0.01875,
+          "bh": 0.013889,
+          "conf": 0.7418
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194789_234f76.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.488281,
+          "yc": 0.768056,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8306
+        },
+        {
+          "xc": 0.441406,
+          "yc": 0.383333,
+          "bw": 0.020313,
+          "bh": 0.033333,
+          "conf": 0.7159
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194790_00a90c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.472656,
+          "yc": 0.781944,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8015
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194790_d6cdf4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.48125,
+          "yc": 0.775,
+          "bw": 0.01875,
+          "bh": 0.016667,
+          "conf": 0.8345
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194791_cd3be3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.464844,
+          "yc": 0.7875,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8563
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194791_f969f4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.461719,
+          "yc": 0.798611,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8335
+        },
+        {
+          "xc": 0.432031,
+          "yc": 0.397222,
+          "bw": 0.014063,
+          "bh": 0.022222,
+          "conf": 0.7821
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194792_45065b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.458594,
+          "yc": 0.805556,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8305
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194793_212fad.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.450781,
+          "yc": 0.822222,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8547
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194793_342b1c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.453125,
+          "yc": 0.819444,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8374
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194794_c64549.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.460938,
+          "yc": 0.820833,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8202
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194794_d40356.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.453906,
+          "yc": 0.816667,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8466
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194795_e9ea72.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.463281,
+          "yc": 0.801389,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8411
+        },
+        {
+          "xc": 0.426563,
+          "yc": 0.388889,
+          "bw": 0.01875,
+          "bh": 0.033333,
+          "conf": 0.7169
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194795_fb81df.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.4625,
+          "yc": 0.813889,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8464
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194796_470765.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.464844,
+          "yc": 0.790278,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8411
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194796_9de333.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.466406,
+          "yc": 0.795833,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8378
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194797_04dd95.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.465625,
+          "yc": 0.7875,
+          "bw": 0.01875,
+          "bh": 0.019444,
+          "conf": 0.8213
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194798_9dd1fd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.464844,
+          "yc": 0.788889,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8499
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.386111,
+          "bw": 0.015625,
+          "bh": 0.038889,
+          "conf": 0.7264
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194798_e6651d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.465625,
+          "yc": 0.784722,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8386
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194799_17c2c5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.466406,
+          "yc": 0.781944,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8411
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194799_9597e8.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.469531,
+          "yc": 0.7875,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8523
+        },
+        {
+          "xc": 0.005469,
+          "yc": 0.769444,
+          "bw": 0.010937,
+          "bh": 0.022222,
+          "conf": 0.8691
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.393056,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.7351
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194800_2e896c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.459375,
+          "yc": 0.769444,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8554
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194800_b0d0e4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.455469,
+          "yc": 0.766667,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8499
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194801_ebaad0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.453125,
+          "yc": 0.761111,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8464
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194801_f00301.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.45,
+          "yc": 0.752778,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8301
+        },
+        {
+          "xc": 0.432031,
+          "yc": 0.397222,
+          "bw": 0.010937,
+          "bh": 0.027778,
+          "conf": 0.7821
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194802_9caefa.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.448437,
+          "yc": 0.75,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8584
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7705
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194803_829f8a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.446875,
+          "yc": 0.747222,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8396
+        },
+        {
+          "xc": 0.432031,
+          "yc": 0.398611,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7549
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194803_b9e720.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.44375,
+          "yc": 0.747222,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8113
+        },
+        {
+          "xc": 0.377344,
+          "yc": 0.379167,
+          "bw": 0.020313,
+          "bh": 0.019444,
+          "conf": 0.7039
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194804_31d2f6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.434375,
+          "yc": 0.744444,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8317
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194804_904ad9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.436719,
+          "yc": 0.744444,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8772
+        },
+        {
+          "xc": 0.376563,
+          "yc": 0.379167,
+          "bw": 0.01875,
+          "bh": 0.019444,
+          "conf": 0.7346
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194805_06f883.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.741667,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8614
+        },
+        {
+          "xc": 0.375,
+          "yc": 0.379167,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.7821
+        },
+        {
+          "xc": 0.433594,
+          "yc": 0.381944,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7669
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194805_b6d81d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.733333,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8641
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194806_43d5d1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.38125,
+          "yc": 0.697222,
+          "bw": 0.0125,
+          "bh": 0.016667,
+          "conf": 0.9043
+        },
+        {
+          "xc": 0.377344,
+          "yc": 0.373611,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.7565
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194806_561c13.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.425781,
+          "yc": 0.722222,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        },
+        {
+          "xc": 0.427344,
+          "yc": 0.397222,
+          "bw": 0.017188,
+          "bh": 0.033333,
+          "conf": 0.7762
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194807_d01bc8.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.358594,
+          "yc": 0.713889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194808_17f0ea.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.342187,
+          "yc": 0.722222,
+          "bw": 0.0125,
+          "bh": 0.016667,
+          "conf": 0.8858
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194808_c7a808.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.324219,
+          "yc": 0.729167,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8777
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.386111,
+          "bw": 0.017188,
+          "bh": 0.033333,
+          "conf": 0.7065
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194809_56af9a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.310156,
+          "yc": 0.727778,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194809_e39acb.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.300781,
+          "yc": 0.725,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8803
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194810_b7fa64.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.285156,
+          "yc": 0.719444,
+          "bw": 0.014063,
+          "bh": 0.022222,
+          "conf": 0.8687
+        },
+        {
+          "xc": 0.426563,
+          "yc": 0.391667,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7034
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194810_f995b4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.292969,
+          "yc": 0.723611,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8713
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194811_008ca2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.275781,
+          "yc": 0.718056,
+          "bw": 0.017188,
+          "bh": 0.019444,
+          "conf": 0.8127
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.390278,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.7224
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194811_a9af70.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.28125,
+          "yc": 0.720833,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8414
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194812_2d10b9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.270313,
+          "yc": 0.715278,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.856
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.395833,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7811
+        },
+        {
+          "xc": 0.405469,
+          "yc": 0.3875,
+          "bw": 0.010937,
+          "bh": 0.036111,
+          "conf": 0.7066
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194812_e78efc.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.270313,
+          "yc": 0.715278,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8353
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.386111,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.7527
+        },
+        {
+          "xc": 0.403906,
+          "yc": 0.377778,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8453
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194813_001a51.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.265625,
+          "yc": 0.708333,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.8593
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194813_116c13.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.261719,
+          "yc": 0.706944,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8911
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194814_151ef0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.259375,
+          "yc": 0.705556,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8812
+        },
+        {
+          "xc": 0.432031,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.036111,
+          "conf": 0.7339
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194815_5e9673.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.251563,
+          "yc": 0.698611,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8745
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194815_bf1343.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.254688,
+          "yc": 0.701389,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8706
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.393056,
+          "bw": 0.017188,
+          "bh": 0.041667,
+          "conf": 0.7071
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194816_686a7d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.244531,
+          "yc": 0.697222,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8915
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194816_b2d87b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.247656,
+          "yc": 0.698611,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8812
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194817_a91304.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.235156,
+          "yc": 0.702778,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.895
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194817_ff5905.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.241406,
+          "yc": 0.701389,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8849
+        },
+        {
+          "xc": 0.428125,
+          "yc": 0.386111,
+          "bw": 0.015625,
+          "bh": 0.027778,
+          "conf": 0.7632
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194818_4fda99.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.221875,
+          "yc": 0.709722,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8803
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194818_f51534.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.228125,
+          "yc": 0.706944,
+          "bw": 0.015625,
+          "bh": 0.019444,
+          "conf": 0.8283
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194819_aec638.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.209375,
+          "yc": 0.709722,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8691
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194819_d369f9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.215625,
+          "yc": 0.708333,
+          "bw": 0.0125,
+          "bh": 0.016667,
+          "conf": 0.9012
+        },
+        {
+          "xc": 0.428125,
+          "yc": 0.3875,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.7176
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194820_1ecc5a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432812,
+          "yc": 0.390278,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.7128
+        },
+        {
+          "xc": 0.198437,
+          "yc": 0.216667,
+          "bw": 0.009375,
+          "bh": 0.038889,
+          "conf": 0.7303
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194820_d2e01d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194821_f382a8.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.393056,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7757
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194822_3e3df0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.395833,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.7354
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194822_6f9f1d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194823_26ca3b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194823_7b174d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194824_2e340b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194824_4de29a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.383333,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.7648
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194825_85fae3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.200781,
+          "yc": 0.222222,
+          "bw": 0.014063,
+          "bh": 0.022222,
+          "conf": 0.7908
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194825_d5ed3e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.391667,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7507
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194826_1547c0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.3875,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7535
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194827_935c2e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.393056,
+          "bw": 0.017188,
+          "bh": 0.036111,
+          "conf": 0.7513
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194827_d318d1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194828_41c719.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.398611,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7561
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194828_49ba4e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.292969,
+          "yc": 0.281944,
+          "bw": 0.020313,
+          "bh": 0.019444,
+          "conf": 0.7306
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194829_8f3c94.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432031,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7436
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194829_b42344.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194830_7225fb.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.782813,
+          "yc": 0.158333,
+          "bw": 0.01875,
+          "bh": 0.022222,
+          "conf": 0.7169
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194830_e5d5b9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.395833,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7712
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194831_51aa73.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.391667,
+          "bw": 0.017188,
+          "bh": 0.033333,
+          "conf": 0.7772
+        },
+        {
+          "xc": 0.785156,
+          "yc": 0.158333,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7569
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194832_cd15d1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7615
+        },
+        {
+          "xc": 0.785156,
+          "yc": 0.161111,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7565
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194832_dd8d07.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.391667,
+          "bw": 0.017188,
+          "bh": 0.033333,
+          "conf": 0.7559
+        },
+        {
+          "xc": 0.788281,
+          "yc": 0.1625,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7632
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194833_308816.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.036111,
+          "conf": 0.7594
+        },
+        {
+          "xc": 0.788281,
+          "yc": 0.161111,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7569
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194833_4499c5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.789062,
+          "yc": 0.163889,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.781
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194834_0556f6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.788281,
+          "yc": 0.1625,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7562
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194834_2f5b58.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.788281,
+          "yc": 0.163889,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7495
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194835_65926e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.65,
+          "yc": 0.830556,
+          "bw": 0.01875,
+          "bh": 0.016667,
+          "conf": 0.7356
+        },
+        {
+          "xc": 0.540625,
+          "yc": 0.695833,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7346
+        },
+        {
+          "xc": 0.595313,
+          "yc": 0.633333,
+          "bw": 0.01875,
+          "bh": 0.016667,
+          "conf": 0.7731
+        },
+        {
+          "xc": 0.788281,
+          "yc": 0.166667,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7793
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194835_68c547.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.650781,
+          "yc": 0.747222,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8579
+        },
+        {
+          "xc": 0.788281,
+          "yc": 0.169444,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7718
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194836_6e8555.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7875,
+          "yc": 0.168056,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7876
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194837_43f525.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.190625,
+          "yc": 0.225,
+          "bw": 0.01875,
+          "bh": 0.016667,
+          "conf": 0.7426
+        },
+        {
+          "xc": 0.7875,
+          "yc": 0.173611,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7867
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194837_50575a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.788281,
+          "yc": 0.170833,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7707
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194838_0094b0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.203906,
+          "yc": 0.251389,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7078
+        },
+        {
+          "xc": 0.786719,
+          "yc": 0.175,
+          "bw": 0.014063,
+          "bh": 0.022222,
+          "conf": 0.8089
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194838_84af4c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7875,
+          "yc": 0.176389,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7942
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194839_4db277.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7875,
+          "yc": 0.179167,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7912
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194839_ecd465.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.061719,
+          "yc": 0.459722,
+          "bw": 0.023438,
+          "bh": 0.025,
+          "conf": 0.7151
+        },
+        {
+          "xc": 0.788281,
+          "yc": 0.184722,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7702
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194840_534c75.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194840_862807.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194841_4f30e7.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.426563,
+          "yc": 0.388889,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7341
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194841_c0cd0a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.539062,
+          "yc": 0.558333,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8218
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194842_451978.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.536719,
+          "yc": 0.558333,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.8283
+        },
+        {
+          "xc": 0.43125,
+          "yc": 0.397222,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.7573
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194843_5c6420.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194843_8f8c6b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.397222,
+          "bw": 0.015625,
+          "bh": 0.027778,
+          "conf": 0.8099
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194844_347f3b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.747656,
+          "yc": 0.270833,
+          "bw": 0.026562,
+          "bh": 0.030556,
+          "conf": 0.7032
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194844_5cdb49.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194845_e67178.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194845_fb8c2c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194846_6dfd73.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194846_7f142b.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194847_154f3e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.394444,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7351
+        },
+        {
+          "xc": 0.696875,
+          "yc": 0.290278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7169
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194848_128787.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.700781,
+          "yc": 0.288889,
+          "bw": 0.014063,
+          "bh": 0.033333,
+          "conf": 0.8379
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194848_f561c4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.135156,
+          "yc": 0.5125,
+          "bw": 0.026562,
+          "bh": 0.036111,
+          "conf": 0.7217
+        },
+        {
+          "xc": 0.703906,
+          "yc": 0.284722,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.8743
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194849_aa9625.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.707812,
+          "yc": 0.276389,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.8322
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194849_b57a69.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.707812,
+          "yc": 0.279167,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.8606
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194850_9949d0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.708594,
+          "yc": 0.273611,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.8454
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194850_cee800.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.032031,
+          "yc": 0.801389,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8641
+        },
+        {
+          "xc": 0.43125,
+          "yc": 0.395833,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7811
+        },
+        {
+          "xc": 0.708594,
+          "yc": 0.275,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.8537
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194851_9e8a2a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.708594,
+          "yc": 0.272222,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.8419
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194851_dbd9f3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.710156,
+          "yc": 0.275,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.8379
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194852_32d1d2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.377778,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.7565
+        },
+        {
+          "xc": 0.710156,
+          "yc": 0.273611,
+          "bw": 0.020313,
+          "bh": 0.030556,
+          "conf": 0.783
+        },
+        {
+          "xc": 0.250781,
+          "yc": 0.152778,
+          "bw": 0.020313,
+          "bh": 0.016667,
+          "conf": 0.7066
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194853_6d3d65.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7125,
+          "yc": 0.277778,
+          "bw": 0.021875,
+          "bh": 0.027778,
+          "conf": 0.7692
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194853_a4ce0d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.714063,
+          "yc": 0.277778,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7463
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194854_34d49a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432031,
+          "yc": 0.3875,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7615
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194854_a1e0e1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194855_5aae18.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.711719,
+          "yc": 0.9625,
+          "bw": 0.014063,
+          "bh": 0.025,
+          "conf": 0.8523
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.4,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.7844
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194855_84c915.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.442969,
+          "yc": 0.577778,
+          "bw": 0.017188,
+          "bh": 0.016667,
+          "conf": 0.7501
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194856_d7c664.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194857_18218f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.388889,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.7675
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194857_9028ab.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.43125,
+          "yc": 0.3875,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7228
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194858_6af61f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194858_bad74f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194859_25bf3d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432031,
+          "yc": 0.398611,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7757
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194859_b77e6f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.393056,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.764
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194860_1225b1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194860_e8dd66.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.545312,
+          "yc": 0.988889,
+          "bw": 0.0125,
+          "bh": 0.022222,
+          "conf": 0.8225
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194861_6d1217.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.738281,
+          "yc": 0.291667,
+          "bw": 0.026562,
+          "bh": 0.027778,
+          "conf": 0.7416
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194862_783a28.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.739062,
+          "yc": 0.288889,
+          "bw": 0.021875,
+          "bh": 0.027778,
+          "conf": 0.7841
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194862_dd50c6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.410156,
+          "yc": 0.297222,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.7495
+        },
+        {
+          "xc": 0.739844,
+          "yc": 0.2875,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.8586
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194863_561ee0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.745313,
+          "yc": 0.2875,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.8558
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194863_ab0bcf.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.752344,
+          "yc": 0.281944,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.8683
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194864_07637f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.760156,
+          "yc": 0.281944,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.8803
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194864_61d6db.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.761719,
+          "yc": 0.279167,
+          "bw": 0.014063,
+          "bh": 0.030556,
+          "conf": 0.8418
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194865_479b48.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.395833,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7771
+        },
+        {
+          "xc": 0.771875,
+          "yc": 0.273611,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.8284
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194865_5f2246.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.766406,
+          "yc": 0.277778,
+          "bw": 0.014063,
+          "bh": 0.033333,
+          "conf": 0.8492
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194866_1463dc.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.380556,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.742
+        },
+        {
+          "xc": 0.778125,
+          "yc": 0.268056,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7794
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194866_b8cbf8.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.775,
+          "yc": 0.270833,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.8187
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194867_22e498.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.394444,
+          "bw": 0.017188,
+          "bh": 0.038889,
+          "conf": 0.7389
+        },
+        {
+          "xc": 0.780469,
+          "yc": 0.2625,
+          "bw": 0.020313,
+          "bh": 0.030556,
+          "conf": 0.7577
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194867_dd85d3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7931
+        },
+        {
+          "xc": 0.778125,
+          "yc": 0.265278,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7723
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194868_356795.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.783594,
+          "yc": 0.259722,
+          "bw": 0.020313,
+          "bh": 0.030556,
+          "conf": 0.7531
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194869_6969a6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7875,
+          "yc": 0.265278,
+          "bw": 0.021875,
+          "bh": 0.030556,
+          "conf": 0.746
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194869_7bc7d8.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.789062,
+          "yc": 0.2625,
+          "bw": 0.021875,
+          "bh": 0.030556,
+          "conf": 0.7529
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194870_867fff.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.791406,
+          "yc": 0.263889,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.7389
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194870_b93963.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.790625,
+          "yc": 0.2625,
+          "bw": 0.021875,
+          "bh": 0.030556,
+          "conf": 0.7445
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194871_e4f35f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.258594,
+          "yc": 0.561111,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8579
+        },
+        {
+          "xc": 0.789062,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7107
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194871_ec7d26.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.264844,
+          "yc": 0.544444,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8596
+        },
+        {
+          "xc": 0.432031,
+          "yc": 0.388889,
+          "bw": 0.017188,
+          "bh": 0.027778,
+          "conf": 0.7535
+        },
+        {
+          "xc": 0.789844,
+          "yc": 0.2625,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7115
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194872_59deaf.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.253906,
+          "yc": 0.566667,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8596
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.3875,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7492
+        },
+        {
+          "xc": 0.782813,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.707
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194872_981c49.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.253906,
+          "yc": 0.566667,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8579
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.395833,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7535
+        },
+        {
+          "xc": 0.785937,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7034
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194873_1bf09f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.395833,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7965
+        },
+        {
+          "xc": 0.779687,
+          "yc": 0.259722,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7227
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194874_83bf5c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.4,
+          "bw": 0.017188,
+          "bh": 0.033333,
+          "conf": 0.7624
+        },
+        {
+          "xc": 0.776563,
+          "yc": 0.259722,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7143
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194874_99c116.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.252344,
+          "yc": 0.568056,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8225
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.394444,
+          "bw": 0.01875,
+          "bh": 0.033333,
+          "conf": 0.7303
+        },
+        {
+          "xc": 0.778906,
+          "yc": 0.261111,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.7185
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194875_867241.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.252344,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8355
+        },
+        {
+          "xc": 0.775,
+          "yc": 0.259722,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7107
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194875_f43bf4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.249219,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8596
+        },
+        {
+          "xc": 0.775,
+          "yc": 0.256944,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7107
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194876_37a669.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.249219,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8467
+        },
+        {
+          "xc": 0.776563,
+          "yc": 0.259722,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7028
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194876_3bc48a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.430469,
+          "yc": 0.4,
+          "bw": 0.017188,
+          "bh": 0.038889,
+          "conf": 0.7144
+        },
+        {
+          "xc": 0.776563,
+          "yc": 0.258333,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7041
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194877_dd76bd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.247656,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.397222,
+          "bw": 0.017188,
+          "bh": 0.038889,
+          "conf": 0.7177
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194878_5b4ce1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.247656,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8453
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.391667,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.7648
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194878_955e53.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.249219,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8714
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194879_02a8e3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.250781,
+          "yc": 0.563889,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8355
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194879_1502fa.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194880_1376ac.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194880_db3de9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.775,
+          "yc": 0.256944,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7107
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194881_2b9cde.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.777344,
+          "yc": 0.2625,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7208
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194881_ea23ac.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.264844,
+          "yc": 0.536111,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8734
+        },
+        {
+          "xc": 0.778906,
+          "yc": 0.259722,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7286
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194882_9cabd5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.271875,
+          "yc": 0.5125,
+          "bw": 0.0125,
+          "bh": 0.030556,
+          "conf": 0.7169
+        },
+        {
+          "xc": 0.427344,
+          "yc": 0.393056,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7772
+        },
+        {
+          "xc": 0.777344,
+          "yc": 0.265278,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7247
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194882_b99db1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.778906,
+          "yc": 0.2625,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7364
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194883_9dfba6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.777344,
+          "yc": 0.265278,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7378
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194884_86eb29.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.777344,
+          "yc": 0.266667,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.743
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194884_daf12e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.776563,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.704
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194885_2fc0aa.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.778125,
+          "yc": 0.268056,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7302
+        },
+        {
+          "xc": 0.207813,
+          "yc": 0.270833,
+          "bw": 0.009375,
+          "bh": 0.036111,
+          "conf": 0.7191
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194885_9e1435.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.778125,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.719
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194886_59c6ff.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.426563,
+          "yc": 0.380556,
+          "bw": 0.015625,
+          "bh": 0.027778,
+          "conf": 0.7426
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194886_cde7ab.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.3875,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7965
+        },
+        {
+          "xc": 0.779687,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7063
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194887_3b2efe.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.784375,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7179
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194887_f6769a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.429688,
+          "yc": 0.384722,
+          "bw": 0.015625,
+          "bh": 0.025,
+          "conf": 0.7793
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194888_8554a3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.789062,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7063
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194888_998d20.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.7875,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7028
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194889_eb55cd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.790625,
+          "yc": 0.265278,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7028
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194890_30d32c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428906,
+          "yc": 0.398611,
+          "bw": 0.017188,
+          "bh": 0.030556,
+          "conf": 0.7669
+        },
+        {
+          "xc": 0.792188,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7028
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194890_f5b1c2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.398611,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7771
+        },
+        {
+          "xc": 0.791406,
+          "yc": 0.2625,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7084
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194891_1b712d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.427344,
+          "yc": 0.380556,
+          "bw": 0.014063,
+          "bh": 0.027778,
+          "conf": 0.7565
+        },
+        {
+          "xc": 0.792188,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7099
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194891_46c0df.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.790625,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7063
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194892_0801c5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.43125,
+          "yc": 0.390278,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7993
+        },
+        {
+          "xc": 0.792188,
+          "yc": 0.2625,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.707
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194892_5e5bc5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.432812,
+          "yc": 0.386111,
+          "bw": 0.01875,
+          "bh": 0.027778,
+          "conf": 0.7292
+        },
+        {
+          "xc": 0.792969,
+          "yc": 0.2625,
+          "bw": 0.023438,
+          "bh": 0.030556,
+          "conf": 0.7247
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194893_15e731.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.79375,
+          "yc": 0.263889,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7047
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194894_59f518.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194894_c94a19.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.792188,
+          "yc": 0.261111,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7151
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194895_626fdd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.024219,
+          "yc": 0.768056,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8515
+        },
+        {
+          "xc": 0.43125,
+          "yc": 0.388889,
+          "bw": 0.015625,
+          "bh": 0.033333,
+          "conf": 0.7133
+        },
+        {
+          "xc": 0.790625,
+          "yc": 0.261111,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7078
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194895_da8fc3.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.657031,
+          "yc": 0.865278,
+          "bw": 0.014063,
+          "bh": 0.041667,
+          "conf": 0.7105
+        },
+        {
+          "xc": 0.789062,
+          "yc": 0.259722,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7107
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194896_25ac1a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.78125,
+          "yc": 0.255556,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7047
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194896_90701a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.785937,
+          "yc": 0.256944,
+          "bw": 0.025,
+          "bh": 0.030556,
+          "conf": 0.7134
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194897_b0475e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.380556,
+          "bw": 0.015625,
+          "bh": 0.038889,
+          "conf": 0.7075
+        },
+        {
+          "xc": 0.778125,
+          "yc": 0.252778,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.7047
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194897_c1bd7d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194898_5151b7.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.774219,
+          "yc": 0.25,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.7144
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194899_615dd9.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.76875,
+          "yc": 0.247222,
+          "bw": 0.025,
+          "bh": 0.027778,
+          "conf": 0.716
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194899_d443e4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.353125,
+          "yc": 0.361111,
+          "bw": 0.015625,
+          "bh": 0.022222,
+          "conf": 0.8032
+        },
+        {
+          "xc": 0.761719,
+          "yc": 0.244444,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.7225
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194900_2ee1f1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.2125,
+          "yc": 0.233333,
+          "bw": 0.0125,
+          "bh": 0.027778,
+          "conf": 0.7727
+        },
+        {
+          "xc": 0.753906,
+          "yc": 0.230556,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.715
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194900_84edef.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194901_3a1d3e.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.249219,
+          "yc": 0.590278,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8849
+        },
+        {
+          "xc": 0.741406,
+          "yc": 0.216667,
+          "bw": 0.023438,
+          "bh": 0.027778,
+          "conf": 0.7108
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194901_4b8401.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.246875,
+          "yc": 0.573611,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8859
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194902_8dd658.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.255469,
+          "yc": 0.605556,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194902_cd8fb0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.253125,
+          "yc": 0.598611,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8691
+        },
+        {
+          "xc": 0.735938,
+          "yc": 0.209722,
+          "bw": 0.021875,
+          "bh": 0.025,
+          "conf": 0.7127
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194903_ca28fc.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.264062,
+          "yc": 0.605556,
+          "bw": 0.0125,
+          "bh": 0.016667,
+          "conf": 0.8738
+        },
+        {
+          "xc": 0.723437,
+          "yc": 0.209722,
+          "bw": 0.021875,
+          "bh": 0.025,
+          "conf": 0.7224
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194904_32f0e2.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.277344,
+          "yc": 0.609722,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8886
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194904_f5758c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.29375,
+          "yc": 0.606944,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8714
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194905_55f142.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.428125,
+          "yc": 0.393056,
+          "bw": 0.01875,
+          "bh": 0.030556,
+          "conf": 0.7457
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194905_ccf8ab.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.301563,
+          "yc": 0.609722,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.895
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.3625,
+          "bw": 0.017188,
+          "bh": 0.025,
+          "conf": 0.7104
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194906_a59ded.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194906_f607a6.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.321094,
+          "yc": 0.609722,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8614
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194907_b3fb8a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.196094,
+          "yc": 0.175,
+          "bw": 0.010937,
+          "bh": 0.033333,
+          "conf": 0.7303
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194907_b80475.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.325781,
+          "yc": 0.605556,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8832
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194908_6bf7ef.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.335156,
+          "yc": 0.577778,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8579
+        },
+        {
+          "xc": 0.2,
+          "yc": 0.2375,
+          "bw": 0.009375,
+          "bh": 0.036111,
+          "conf": 0.7172
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194908_a8d920.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.334375,
+          "yc": 0.586111,
+          "bw": 0.0125,
+          "bh": 0.016667,
+          "conf": 0.8885
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194909_27162a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.333594,
+          "yc": 0.572222,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8714
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194909_53ddbd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.333594,
+          "yc": 0.568056,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8433
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194910_123186.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.332031,
+          "yc": 0.566667,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8596
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194911_e93c4f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.327344,
+          "yc": 0.566667,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8596
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194911_f5f7d4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.328906,
+          "yc": 0.566667,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8983
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.3875,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.7129
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194912_344c24.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.326562,
+          "yc": 0.566667,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8416
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194912_50f91c.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.325781,
+          "yc": 0.569444,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8691
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194913_2668ec.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.322656,
+          "yc": 0.575,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8691
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194913_bf4ac4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.324219,
+          "yc": 0.580556,
+          "bw": 0.014063,
+          "bh": 0.016667,
+          "conf": 0.8691
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194914_900e01.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.332813,
+          "yc": 0.576389,
+          "bw": 0.015625,
+          "bh": 0.013889,
+          "conf": 0.8453
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194914_c2eb9d.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.274219,
+          "yc": 0.594444,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.8042
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194915_41e1df.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.33125,
+          "yc": 0.581944,
+          "bw": 0.015625,
+          "bh": 0.013889,
+          "conf": 0.824
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194915_7ab7eb.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194916_d357a7.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.33125,
+          "yc": 0.5875,
+          "bw": 0.015625,
+          "bh": 0.013889,
+          "conf": 0.8347
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194917_88261a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194917_b2f6f0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.332813,
+          "yc": 0.566667,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8537
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194918_d459b5.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.317188,
+          "yc": 0.575,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8339
+        },
+        {
+          "xc": 0.73125,
+          "yc": 0.486111,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8225
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194918_f8491f.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.323437,
+          "yc": 0.569444,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8339
+        },
+        {
+          "xc": 0.723437,
+          "yc": 0.480556,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8121
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.391667,
+          "bw": 0.014063,
+          "bh": 0.022222,
+          "conf": 0.7911
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194919_1fb9a4.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.307031,
+          "yc": 0.579167,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8301
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194919_acf5dd.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.29375,
+          "yc": 0.586111,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8301
+        },
+        {
+          "xc": 0.428125,
+          "yc": 0.377778,
+          "bw": 0.015625,
+          "bh": 0.027778,
+          "conf": 0.7711
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194920_133f9a.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.289062,
+          "yc": 0.583333,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8301
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.3875,
+          "bw": 0.020313,
+          "bh": 0.030556,
+          "conf": 0.703
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787196851\\images\\catfish_1787194922_90dfde.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.273438,
+          "yc": 0.5625,
+          "bw": 0.015625,
+          "bh": 0.013889,
+          "conf": 0.8233
+        },
+        {
+          "xc": 0.430469,
+          "yc": 0.4,
+          "bw": 0.017188,
+          "bh": 0.022222,
+          "conf": 0.7644
+        }
+      ],
+      "split": "val",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787213105\\images\\catfish_1787201715_8f06b0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.45,
+          "yc": 0.855556,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8584
+        },
+        {
+          "xc": 0.429688,
+          "yc": 0.398611,
+          "bw": 0.015625,
+          "bh": 0.030556,
+          "conf": 0.7682
+        }
+      ],
+      "split": "train",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787213105\\images\\catfish_1787207580_d4a1a0.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.609375,
+          "yc": 0.720833,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8772
+        },
+        {
+          "xc": 0.560937,
+          "yc": 0.605556,
+          "bw": 0.025,
+          "bh": 0.033333,
+          "conf": 0.8013
+        },
+        {
+          "xc": 0.571875,
+          "yc": 0.577778,
+          "bw": 0.015625,
+          "bh": 0.016667,
+          "conf": 0.8121
+        },
+        {
+          "xc": 0.196094,
+          "yc": 0.395833,
+          "bw": 0.010937,
+          "bh": 0.025,
+          "conf": 0.8353
+        },
+        {
+          "xc": 0.595313,
+          "yc": 0.322222,
+          "bw": 0.01875,
+          "bh": 0.022222,
+          "conf": 0.7594
+        }
+      ],
+      "split": "train",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787213105\\images\\catfish_1787207581_41e5b1.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.607812,
+          "yc": 0.720833,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8772
+        },
+        {
+          "xc": 0.55625,
+          "yc": 0.706944,
+          "bw": 0.078125,
+          "bh": 0.069444,
+          "conf": 0.7771
+        },
+        {
+          "xc": 0.561719,
+          "yc": 0.608333,
+          "bw": 0.020313,
+          "bh": 0.022222,
+          "conf": 0.8518
+        }
+      ],
+      "split": "train",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787213105\\images\\catfish_1787207582_f0b889.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.553906,
+          "yc": 0.880556,
+          "bw": 0.064062,
+          "bh": 0.088889,
+          "conf": 0.8009
+        },
+        {
+          "xc": 0.608594,
+          "yc": 0.720833,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8641
+        },
+        {
+          "xc": 0.560937,
+          "yc": 0.606944,
+          "bw": 0.021875,
+          "bh": 0.025,
+          "conf": 0.8268
+        }
+      ],
+      "split": "train",
+      "reviewer": "Iir"
+    },
+    "catfishcare_dataset_1787213105\\images\\catfish_1787207583_1408ae.jpg": {
+      "action": "APPROVED",
+      "bboxes": [
+        {
+          "xc": 0.609375,
+          "yc": 0.720833,
+          "bw": 0.0125,
+          "bh": 0.019444,
+          "conf": 0.8691
+        },
+        {
+          "xc": 0.559375,
+          "yc": 0.708333,
+          "bw": 0.075,
+          "bh": 0.077778,
+          "conf": 0.7403
+        },
+        {
+          "xc": 0.561719,
+          "yc": 0.606944,
+          "bw": 0.020313,
+          "bh": 0.025,
+          "conf": 0.8376
+        },
+        {
+          "xc": 0.572656,
+          "yc": 0.576389,
+          "bw": 0.014063,
+          "bh": 0.019444,
+          "conf": 0.8225
+        },
+        {
+          "xc": 0.736719,
+          "yc": 0.455556,
+          "bw": 0.020313,
+          "bh": 0.027778,
+          "conf": 0.7894
+        },
+        {
+          "xc": 0.710938,
+          "yc": 0.434722,
+          "bw": 0.015625,
+          "bh": 0.036111,
+          "conf": 0.7872
+        },
+        {
+          "xc": 0.585938,
+          "yc": 0.327778,
+          "bw": 0.01875,
+          "bh": 0.016667,
+          "conf": 0.7724
+        }
+      ],
+      "split": "train",
+      "reviewer": "Iir"
+    }
+  },
+  "stats": {
+    "approved": 293,
+    "rejected": 0,
+    "edited": 0,
+    "total_reviewed": 293
+  },
+  "last_rel_path": "catfishcare_dataset_1787213105\\images\\catfish_1787207583_1408ae.jpg"
+}
