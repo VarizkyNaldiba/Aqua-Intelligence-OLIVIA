@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { 
     Database, Pencil, Trash2, X, Waves, Info, 
-    Thermometer, Droplet, Eye, ShieldCheck, Wifi, Calendar, Fish 
+    Thermometer, Droplet, ShieldCheck, Wifi, Calendar, Fish 
 } from "lucide-react";
 import type { TabName } from "@/Types";
 
@@ -26,8 +26,8 @@ interface PondsTabProps {
 }
 
 const PondsTab = ({
-    selectedPondId,
-    setSelectedPondId,
+    selectedPondId: _selectedPondId,
+    setSelectedPondId: _setSelectedPondId,
 }: PondsTabProps) => {
     // Single active dynamic IoT pond
     const [ponds, setPonds] = useState<PondItem[]>([
@@ -347,7 +347,7 @@ const PondsTab = ({
                                                 <div className="pm-pond-icon-circle">
                                                     <Waves size={16} />
                                                 </div>
-                                                <div style={{ textItems: "left", textAlign: "left" }}>
+                                                <div style={{ textAlign: "left" }}>
                                                     <div className="pm-pond-title">{pond.name}</div>
                                                     <div className="pm-pond-location">{pond.location}</div>
                                                 </div>
