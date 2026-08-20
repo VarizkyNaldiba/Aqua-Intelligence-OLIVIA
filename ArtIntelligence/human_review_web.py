@@ -320,10 +320,9 @@ APP_HTML = """<!DOCTYPE html>
         <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
         <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
             <span style="font-size:12px; font-weight:bold; color:#38bdf8;">Tim Reviewer:</span>
-            <button class="btn" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #4803)</button>
+            <button class="btn active" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #4803)</button>
             <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#4804 - #9605)</button>
             <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#9606 - #14407)</button>
-            <button class="btn active" id="btn-user-all" onclick="setReviewer('all')">🌐 All Team</button>
         </div>
     </div>
     
@@ -395,6 +394,7 @@ APP_HTML = """<!DOCTYPE html>
     let startX = 0, startY = 0;
     let currentBatch = 'all';
     let currentStatus = 'pending';
+    let currentReviewer = 'Iir';
 
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
