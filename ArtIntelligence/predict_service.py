@@ -6,25 +6,27 @@ import numpy as np
 # Suppress TensorFlow verbose log messages
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+# Safe import joblib
+try:
+    import joblib  # type: ignore
+except ImportError:
+    joblib = None
+
+# Safe import Keras / TensorFlow (Optional DL backend)
 keras_available = False
 keras = None
-joblib = None
 
 try:
-    import joblib
-    import keras
+    import keras  # type: ignore
     keras_available = True
 except ImportError:
     try:
-        import joblib
-        import tensorflow as tf
+        import tensorflow as tf  # type: ignore
         keras = tf.keras
         keras_available = True
     except ImportError:
-        try:
-            import joblib
-        except ImportError:
-            pass
+        keras = None
+        keras_available = False
 
 def load_prediction_service():
     if not keras_available or keras is None or joblib is None:
