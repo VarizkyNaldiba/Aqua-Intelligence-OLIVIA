@@ -1,0 +1,547 @@
+import os
+import glob
+import json
+import urllib.parse
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+BASE_DIR = r"e:\lele dumbo\Aqua-Intelligence-OLIVIA"
+DATASETS_DIR = os.path.join(BASE_DIR, "datasets")
+REVIEWED_DIR = os.path.join(DATASETS_DIR, "catfishcare_surface_activity_reviewed")
+STATE_FILE = os.path.join(BASE_DIR, "ArtIntelligence", "human_review_state.json")
+
+# Ensure reviewed dataset directories exist
+for split in ["train", "val", "test"]:
+    os.makedirs(os.path.join(REVIEWED_DIR, split, "images"), exist_ok=True)
+    os.makedirs(os.path.join(REVIEWED_DIR, split, "labels"), exist_ok=True)
+
+# Ensure data.yaml exists
+data_yaml_path = os.path.join(REVIEWED_DIR, "data.yaml")
+with open(data_yaml_path, "w") as f:
+    f.write(f"path: {REVIEWED_DIR}\ntrain: train/images\nval: val/images\ntest: test/images\n\nnames:\n  0: surface_activity\n")
+
+def load_state():
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"reviews": {}, "stats": {"approved": 0, "rejected": 0, "edited": 0, "total_reviewed": 0}}
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+class HumanReviewHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        query = urllib.parse.parse_qs(parsed.query)
+
+        if path in ["/", "/index.html"]:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.end_headers()
+            self.wfile.write(APP_HTML.encode("utf-8"))
+            return
+
+        elif path == "/api/list":
+            batch = query.get("batch", ["all"])[0]
+            items = self.get_items(batch)
+            state = load_state()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(json.dumps({"items": items, "stats": state["stats"]}).encode("utf-8"))
+            return
+
+        elif path.startswith("/img/"):
+            rel_path = urllib.parse.unquote(path[5:])
+            full_path = os.path.join(DATASETS_DIR, rel_path)
+            if os.path.exists(full_path):
+                self.send_response(200)
+                self.send_header("Content-Type", "image/jpeg")
+                self.send_header("Cache-Control", "no-cache")
+                self.end_headers()
+                with open(full_path, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_error(404, "Image Not Found")
+            return
+
+        super().do_GET()
+
+    def do_POST(self):
+        content_len = int(self.headers.get("Content-Length", 0))
+        post_bytes = self.rfile.read(content_len)
+        
+        if self.path == "/api/save":
+            payload = json.loads(post_bytes.decode("utf-8"))
+            rel_path = payload.get("rel_path")
+            action = payload.get("action") # APPROVED, REJECTED, EDITED
+            bboxes = payload.get("bboxes", [])
+            split = payload.get("split", "train")
+
+            state = load_state()
+            prev_action = state["reviews"].get(rel_path, {}).get("action")
+
+            state["reviews"][rel_path] = {
+                "action": action,
+                "bboxes": bboxes,
+                "split": split
+            }
+
+            # Update stats
+            if prev_action != action:
+                if prev_action:
+                    state["stats"][prev_action.lower()] = max(0, state["stats"].get(prev_action.lower(), 0) - 1)
+                else:
+                    state["stats"]["total_reviewed"] += 1
+                state["stats"][action.lower()] = state["stats"].get(action.lower(), 0) + 1
+
+            save_state(state)
+
+            # Copy image and label to ground truth dataset folder
+            src_img = os.path.join(DATASETS_DIR, rel_path)
+            base_name = os.path.splitext(os.path.basename(rel_path))[0]
+            dest_img = os.path.join(REVIEWED_DIR, split, "images", os.path.basename(rel_path))
+            dest_lbl = os.path.join(REVIEWED_DIR, split, "labels", base_name + ".txt")
+
+            if os.path.exists(src_img):
+                import shutil
+                shutil.copy2(src_img, dest_img)
+
+            if action == "REJECTED":
+                # Save empty txt for negative background sample
+                with open(dest_lbl, "w") as f:
+                    f.write("")
+            else:
+                lines = [f"0 {b['xc']:.6f} {b['yc']:.6f} {b['bw']:.6f} {b['bh']:.6f}" for b in bboxes]
+                with open(dest_lbl, "w") as f:
+                    f.write("\n".join(lines))
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "stats": state["stats"]}).encode("utf-8"))
+            return
+
+        elif self.path == "/api/reset":
+            state = {"reviews": {}, "stats": {"approved": 0, "rejected": 0, "edited": 0, "total_reviewed": 0}}
+            save_state(state)
+            if os.path.exists(REVIEWED_DIR):
+                import shutil
+                shutil.rmtree(REVIEWED_DIR, ignore_errors=True)
+                for split in ["train", "val", "test"]:
+                    os.makedirs(os.path.join(REVIEWED_DIR, split, "images"), exist_ok=True)
+                    os.makedirs(os.path.join(REVIEWED_DIR, split, "labels"), exist_ok=True)
+                with open(os.path.join(REVIEWED_DIR, "data.yaml"), "w") as f:
+                    f.write(f"path: {REVIEWED_DIR}\ntrain: train/images\nval: val/images\ntest: test/images\n\nnames:\n  0: surface_activity\n")
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "stats": state["stats"]}).encode("utf-8"))
+            return
+
+    def get_items(self, batch):
+        folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
+        folder_splits = {
+            "catfishcare_dataset_1787213105": "train",
+            "catfishcare_dataset_1787196851": "val",
+            "catfishcare_dataset_1787199872": "test"
+        }
+        state = load_state()
+        items = []
+
+        for folder in folders:
+            img_dir = os.path.join(DATASETS_DIR, folder, "images")
+            cand_dir = os.path.join(DATASETS_DIR, folder, "auto_labeled_candidates", "candidate_labels")
+            split = folder_splits.get(folder, "train")
+
+            img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
+
+            for img_path in img_files:
+                rel_path = os.path.relpath(img_path, DATASETS_DIR)
+                base_name = os.path.splitext(os.path.basename(img_path))[0]
+                cand_txt = os.path.join(cand_dir, base_name + ".txt")
+
+                bboxes = []
+                max_conf = 0.0
+
+                if os.path.exists(cand_txt):
+                    with open(cand_txt, "r") as f:
+                        for l in f.readlines():
+                            parts = l.strip().split()
+                            if len(parts) >= 5:
+                                xc, yc, bw, bh = map(float, parts[1:5])
+                                conf = float(parts[5]) if len(parts) >= 6 else 1.0
+                                bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
+                                if conf > max_conf:
+                                    max_conf = conf
+
+                rev_info = state["reviews"].get(rel_path, {})
+                status = rev_info.get("action", "PENDING")
+                if status != "PENDING" and "bboxes" in rev_info:
+                    bboxes = rev_info["bboxes"]
+
+                # Filter batch
+                match = False
+                if batch == "all":
+                    match = True
+                elif batch == "high" and max_conf >= 0.75:
+                    match = True
+                elif batch == "med" and 0.45 <= max_conf < 0.75:
+                    match = True
+                elif batch == "negative" and len(bboxes) == 0:
+                    match = True
+                elif batch == "pending" and status == "PENDING":
+                    match = True
+
+                if match:
+                    items.append({
+                        "rel_path": rel_path,
+                        "filename": os.path.basename(img_path),
+                        "folder": folder,
+                        "split": split,
+                        "max_conf": max_conf,
+                        "bboxes": bboxes,
+                        "status": status
+                    })
+        return items[:300] # Limit response size for ultra-fast UI response
+
+APP_HTML = """<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatfishCare Ground-Truth Review Studio</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #090d16; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        header { background: #131c2e; border-bottom: 1px solid #1e293b; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 18px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+        .batch-selector { display: flex; gap: 8px; }
+        .btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+        .btn:hover { background: #334155; color: #f8fafc; }
+        .btn.active { background: #0284c7; color: white; border-color: #38bdf8; }
+        .btn-approve { background: #059669; color: white; border: none; } .btn-approve:hover { background: #047857; }
+        .btn-reject { background: #dc2626; color: white; border: none; } .btn-reject:hover { background: #b91c1c; }
+        .btn-reset { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; } .btn-reset:hover { background: #991b1b; }
+
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .canvas-area { flex: 1; background: #050811; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; }
+        .canvas-container { position: relative; border: 2px solid #334155; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); cursor: crosshair; }
+        canvas { display: block; }
+        
+        .sidebar { width: 320px; background: #0f172a; border-left: 1px solid #1e293b; display: flex; flex-direction: column; padding: 16px; gap: 16px; overflow-y: auto; }
+        .panel-card { background: #1e293b; border-radius: 8px; padding: 14px; border: 1px solid #334155; }
+        .panel-title { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; text-align: center; }
+        .stat-value { font-size: 20px; font-weight: 800; color: #38bdf8; }
+        .stat-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+
+        .bbox-list { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+        .bbox-item { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .bbox-item:hover { border-color: #38bdf8; }
+        .bbox-tag { font-weight: 700; color: #10b981; }
+        .btn-del-box { background: #334155; color: #ef4444; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-del-box:hover { background: #ef4444; color: white; }
+
+        .action-toolbar { display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 15px; }
+        .status-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .status-APPROVED { background: #065f46; color: #6ee7b7; }
+        .status-REJECTED { background: #881337; color: #fda4af; }
+        .status-PENDING { background: #1e293b; color: #94a3b8; }
+        
+        .instructions { font-size: 12px; color: #94a3b8; line-height: 1.5; background: #0f172a; padding: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
+    
+    <div class="batch-selector">
+        <button class="btn active" id="btn-all" onclick="setBatch('all')">All Samples</button>
+        <button class="btn" id="btn-high" onclick="setBatch('high')">High Conf (&ge;0.75)</button>
+        <button class="btn" id="btn-med" onclick="setBatch('med')">Med Conf</button>
+        <button class="btn" id="btn-pending" onclick="setBatch('pending')">Pending Only</button>
+        <button class="btn btn-reset" onclick="resetAll()">🔄 Reset All Progress</button>
+    </div>
+</header>
+
+<div class="main-layout">
+    <div class="canvas-area">
+        <div style="margin-bottom: 10px; font-size: 13px; color: #cbd5e1; display: flex; gap: 20px;">
+            <div>Image: <strong id="lbl-filename">-</strong></div>
+            <div>Status: <span id="lbl-status" class="status-pill status-PENDING">PENDING</span></div>
+            <div>Index: <strong id="lbl-index">0 / 0</strong></div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas" width="640" height="360"></canvas>
+        </div>
+
+        <div class="action-toolbar">
+            <button class="btn btn-approve" style="padding: 10px 24px; font-size: 14px;" onclick="submitReview('APPROVED')">✓ APPROVE (Save BBoxes)</button>
+            <button class="btn btn-reject" style="padding: 10px 24px; font-size: 14px;" onclick="submitReview('REJECTED')">✕ REJECT (Pure Background / Glare)</button>
+            <button class="btn" style="padding: 10px 18px;" onclick="clearAllBBoxes()">🗑 Clear All BBoxes</button>
+            <button class="btn" style="padding: 10px 18px;" onclick="prevImage()">&larr; Prev</button>
+            <button class="btn" style="padding: 10px 18px;" onclick="nextImage()">Next &rarr;</button>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="panel-card">
+            <div class="panel-title">Review Statistics</div>
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-value" id="st-approved">0</div><div class="stat-label">Approved</div></div>
+                <div class="stat-box"><div class="stat-value" id="st-rejected">0</div><div class="stat-label">Rejected</div></div>
+                <div class="stat-box"><div class="stat-value" id="st-total">0</div><div class="stat-label">Total Done</div></div>
+                <div class="stat-box"><div class="stat-value" id="st-gt">0</div><div class="stat-label">BBoxes Saved</div></div>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <div class="panel-title">
+                <span>Active BBoxes (<span id="box-count">0</span>)</span>
+            </div>
+            <div class="bbox-list" id="bbox-list-container">
+                <!-- BBox Items render here -->
+            </div>
+        </div>
+
+        <div class="instructions">
+            <strong>💡 Quick Controls:</strong><br>
+            • <strong>Draw Box</strong>: Click & Drag on Canvas.<br>
+            • <strong>Delete Single Box</strong>: Click red 🗑 button next to box in list.<br>
+            • <strong>APPROVE</strong>: Save boxes as Ground Truth.<br>
+            • <strong>REJECT</strong>: Mark as clean background image (noise/glare/wall deleted).
+        </div>
+    </div>
+</div>
+
+<script>
+    let items = [];
+    let currentIndex = 0;
+    let currentImg = new Image();
+    let activeBBoxes = [];
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let currentBatch = 'all';
+
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+
+    function getCoords(e) {
+        let rect = canvas.getBoundingClientRect();
+        let scaleX = canvas.width / rect.width;
+        let scaleY = canvas.height / rect.height;
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+
+    canvas.addEventListener('mousedown', function(e) {
+        let c = getCoords(e);
+        startX = c.x;
+        startY = c.y;
+        isDrawing = true;
+    });
+
+    canvas.addEventListener('mousemove', function(e) {
+        if (!isDrawing) return;
+        let c = getCoords(e);
+        render();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(startX, startY, c.x - startX, c.y - startY);
+        ctx.setLineDash([]);
+    });
+
+    canvas.addEventListener('mouseup', function(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+        let c = getCoords(e);
+        let bw = Math.abs(c.x - startX);
+        let bh = Math.abs(c.y - startY);
+        let bx = Math.min(startX, c.x);
+        let by = Math.min(startY, c.y);
+
+        if (bw > 6 && bh > 6) {
+            activeBBoxes.push({
+                xc: (bx + bw / 2.0) / 640,
+                yc: (by + bh / 2.0) / 360,
+                bw: bw / 640,
+                bh: bh / 360,
+                conf: 1.0
+            });
+        }
+        render();
+    });
+
+    function setBatch(batch) {
+        currentBatch = batch;
+        document.querySelectorAll('.batch-selector .btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + batch).classList.add('active');
+        fetchList();
+    }
+
+    function fetchList() {
+        fetch('/api/list?batch=' + currentBatch)
+            .then(res => res.json())
+            .then(data => {
+                items = data.items;
+                currentIndex = 0;
+                updateStats(data.stats);
+                renderCurrent();
+            });
+    }
+
+    function renderCurrent() {
+        if (items.length === 0) {
+            ctx.fillStyle = "#050811";
+            ctx.fillRect(0,0,640,360);
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "14px sans-serif";
+            ctx.fillText("No images found in this batch", 220, 180);
+            document.getElementById('lbl-filename').innerText = "-";
+            document.getElementById('lbl-index').innerText = "0 / 0";
+            return;
+        }
+
+        let item = items[currentIndex];
+        document.getElementById('lbl-filename').innerText = item.filename;
+        document.getElementById('lbl-index').innerText = `${currentIndex + 1} / ${items.length}`;
+        let statusEl = document.getElementById('lbl-status');
+        statusEl.innerText = item.status;
+        statusEl.className = 'status-pill status-' + item.status;
+
+        activeBBoxes = JSON.parse(JSON.stringify(item.bboxes));
+
+        currentImg.onload = function() {
+            render();
+        };
+        currentImg.src = '/img/' + item.rel_path;
+    }
+
+    function render() {
+        ctx.drawImage(currentImg, 0, 0, 640, 360);
+        let listContainer = document.getElementById('bbox-list-container');
+        listContainer.innerHTML = '';
+        document.getElementById('box-count').innerText = activeBBoxes.length;
+
+        activeBBoxes.forEach((b, idx) => {
+            let w = 640, h = 360;
+            let bw = b.bw * w, bh = b.bh * h;
+            let bx = (b.xc * w) - (bw / 2);
+            let by = (b.yc * h) - (bh / 2);
+
+            let color = b.conf >= 0.75 ? '#10b981' : (b.conf >= 0.45 ? '#f59e0b' : '#ef4444');
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(bx, by, bw, bh);
+
+            ctx.fillStyle = color;
+            ctx.font = "11px sans-serif";
+            ctx.fillText(`surface_act ${b.conf ? b.conf.toFixed(2) : '1.0'}`, bx, Math.max(12, by - 4));
+
+            // Render list item in sidebar
+            let div = document.createElement('div');
+            div.className = 'bbox-item';
+            div.innerHTML = `
+                <div>
+                    <span class="bbox-tag">Box #${idx + 1}</span> 
+                    <span style="color:#94a3b8; font-size:10px;">(${Math.round(bw)}x${Math.round(bh)}px)</span>
+                </div>
+                <button class="btn-del-box" onclick="deleteSingleBox(${idx})">🗑 Delete</button>
+            `;
+            listContainer.appendChild(div);
+        });
+    }
+
+    function deleteSingleBox(idx) {
+        activeBBoxes.splice(idx, 1);
+        render();
+    }
+
+    function clearAllBBoxes() {
+        activeBBoxes = [];
+        render();
+    }
+
+    function submitReview(action) {
+        if (items.length === 0) return;
+        let item = items[currentIndex];
+
+        fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                rel_path: item.rel_path,
+                action: action,
+                bboxes: activeBBoxes,
+                split: item.split
+            })
+        }).then(res => res.json()).then(data => {
+            item.status = action;
+            item.bboxes = [...activeBBoxes];
+            updateStats(data.stats);
+            nextImage();
+        });
+    }
+
+    function resetAll() {
+        if (confirm("Reset ALL review progress and start fresh from 0?")) {
+            fetch('/api/reset', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    updateStats(data.stats);
+                    fetchList();
+                });
+        }
+    }
+
+    function updateStats(stats) {
+        if (!stats) return;
+        document.getElementById('st-approved').innerText = stats.approved || 0;
+        document.getElementById('st-rejected').innerText = stats.rejected || 0;
+        document.getElementById('st-total').innerText = stats.total_reviewed || 0;
+        document.getElementById('st-gt').innerText = (stats.approved || 0) + (stats.edited || 0);
+    }
+
+    function prevImage() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCurrent();
+        }
+    }
+
+    function nextImage() {
+        if (currentIndex < items.length - 1) {
+            currentIndex++;
+            renderCurrent();
+        }
+    }
+
+    fetchList();
+</script>
+</body>
+</html>"""
+
+def run(port=5055):
+    server = HTTPServer(('', port), HumanReviewHandler)
+    print(f"==================================================")
+    print(f"CatfishCare Review Studio Running at http://127.0.0.1:{port}")
+    print(f"==================================================")
+    server.serve_forever()
+
+if __name__ == "__main__":
+    run()
