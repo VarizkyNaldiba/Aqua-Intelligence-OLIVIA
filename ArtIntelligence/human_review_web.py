@@ -54,11 +54,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.send_header("Cache-Control", "no-cache")
             self.end_headers()
-            self.wfile.write(json.dumps({
-                "items": items,
-                "stats": state["stats"],
-                "last_rel_path": state.get("last_rel_path", "")
-            }).encode("utf-8"))
+            self.wfile.write(json.dumps({"items": items, "stats": state["stats"]}).encode("utf-8"))
             return
 
         elif path.startswith("/img/"):
@@ -96,7 +92,6 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
                 "bboxes": bboxes,
                 "split": split
             }
-            state["last_rel_path"] = rel_path
 
             # Update stats
             if prev_action != action:
@@ -205,6 +200,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
                 elif batch == "pending" and status == "PENDING":
                     match = True
 
+                if match:
                     items.append({
                         "rel_path": rel_path,
                         "filename": os.path.basename(img_path),
@@ -281,14 +277,10 @@ APP_HTML = """<!DOCTYPE html>
 
 <div class="main-layout">
     <div class="canvas-area">
-        <div style="margin-bottom: 10px; font-size: 13px; color: #cbd5e1; display: flex; gap: 20px; align-items: center;">
+        <div style="margin-bottom: 10px; font-size: 13px; color: #cbd5e1; display: flex; gap: 20px;">
             <div>Image: <strong id="lbl-filename">-</strong></div>
             <div>Status: <span id="lbl-status" class="status-pill status-PENDING">PENDING</span></div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                Index: <input id="input-index" type="number" min="1" style="width: 75px; background: #0f172a; border: 1px solid #334155; color: #38bdf8; border-radius: 4px; padding: 3px 6px; font-weight: bold; text-align: center;" onchange="jumpToIndex(this.value)"> 
-                / <strong id="lbl-total-count">0</strong>
-            </div>
-            <button class="btn" style="padding: 3px 10px; font-size: 11px; background: #0284c7; color: white;" onclick="jumpToFirstPending()">⏩ Jump to First Pending</button>
+            <div>Index: <strong id="lbl-index">0 / 0</strong></div>
         </div>
 
         <div class="canvas-container">
@@ -399,34 +391,16 @@ APP_HTML = """<!DOCTYPE html>
         currentBatch = batch;
         document.querySelectorAll('.batch-selector .btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-' + batch).classList.add('active');
-        fetchList(true);
+        fetchList();
     }
 
-    function fetchList(restoreState = true) {
+    function fetchList() {
         fetch('/api/list?batch=' + currentBatch)
             .then(res => res.json())
             .then(data => {
                 items = data.items;
+                currentIndex = 0;
                 updateStats(data.stats);
-
-                if (restoreState && items.length > 0) {
-                    let targetRel = data.last_rel_path || localStorage.getItem('catfishcare_last_rel_path');
-                    let foundIdx = -1;
-                    if (targetRel) {
-                        foundIdx = items.findIndex(it => it.rel_path === targetRel);
-                    }
-                    if (foundIdx !== -1) {
-                        currentIndex = foundIdx;
-                    } else {
-                        let savedIdx = localStorage.getItem('catfishcare_last_index');
-                        if (savedIdx !== null && !isNaN(savedIdx)) {
-                            let parsed = parseInt(savedIdx);
-                            if (parsed >= 0 && parsed < items.length) {
-                                currentIndex = parsed;
-                            }
-                        }
-                    }
-                }
                 renderCurrent();
             });
     }
@@ -439,22 +413,16 @@ APP_HTML = """<!DOCTYPE html>
             ctx.font = "14px sans-serif";
             ctx.fillText("No images found in this batch", 220, 180);
             document.getElementById('lbl-filename').innerText = "-";
-            document.getElementById('input-index').value = 0;
-            document.getElementById('lbl-total-count').innerText = "0";
+            document.getElementById('lbl-index').innerText = "0 / 0";
             return;
         }
 
         let item = items[currentIndex];
         document.getElementById('lbl-filename').innerText = item.filename;
-        document.getElementById('input-index').value = currentIndex + 1;
-        document.getElementById('lbl-total-count').innerText = items.length;
+        document.getElementById('lbl-index').innerText = `${currentIndex + 1} / ${items.length}`;
         let statusEl = document.getElementById('lbl-status');
         statusEl.innerText = item.status;
         statusEl.className = 'status-pill status-' + item.status;
-
-        // Persist last viewed state
-        localStorage.setItem('catfishcare_last_rel_path', item.rel_path);
-        localStorage.setItem('catfishcare_last_index', currentIndex);
 
         activeBBoxes = JSON.parse(JSON.stringify(item.bboxes));
 
@@ -462,24 +430,6 @@ APP_HTML = """<!DOCTYPE html>
             render();
         };
         currentImg.src = '/img/' + item.rel_path;
-    }
-
-    function jumpToIndex(val) {
-        let num = parseInt(val);
-        if (!isNaN(num) && num >= 1 && num <= items.length) {
-            currentIndex = num - 1;
-            renderCurrent();
-        }
-    }
-
-    function jumpToFirstPending() {
-        let pIdx = items.findIndex(it => it.status === 'PENDING');
-        if (pIdx !== -1) {
-            currentIndex = pIdx;
-            renderCurrent();
-        } else {
-            alert('Semua gambar dalam batch ini sudah selesai di-review!');
-        }
     }
 
     function render() {
