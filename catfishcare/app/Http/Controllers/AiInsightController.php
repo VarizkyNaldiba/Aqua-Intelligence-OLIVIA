@@ -12,29 +12,59 @@ class AiInsightController extends Controller
     /**
      * Get 24-Hour Forecast Predictions for Water Quality (BiLSTM).
      */
+    /**
+     * Get 24-Hour Forecast Predictions for Water Quality (BiLSTM).
+     */
     public function getForecast(int $kolamId = 1): JsonResponse
     {
-        $forecast = [
-            ['time' => '00:00', 'temperature' => 25.2, 'pH' => 7.30, 'turbidity' => 16.5, 'tds' => 410, 'sfr' => 0.04],
-            ['time' => '02:00', 'temperature' => 26.5, 'pH' => 7.48, 'turbidity' => 17.2, 'tds' => 415, 'sfr' => 0.05],
-            ['time' => '04:00', 'temperature' => 27.8, 'pH' => 7.60, 'turbidity' => 18.0, 'tds' => 420, 'sfr' => 0.06],
-            ['time' => '06:00', 'temperature' => 28.5, 'pH' => 7.35, 'turbidity' => 19.1, 'tds' => 430, 'sfr' => 0.08],
-            ['time' => '08:00', 'temperature' => 27.2, 'pH' => 7.02, 'turbidity' => 22.4, 'tds' => 450, 'sfr' => 0.11],
-            ['time' => '10:00', 'temperature' => 26.5, 'pH' => 6.85, 'turbidity' => 24.8, 'tds' => 470, 'sfr' => 0.14],
-            ['time' => '12:00', 'temperature' => 25.8, 'pH' => 6.92, 'turbidity' => 23.5, 'tds' => 460, 'sfr' => 0.12],
-            ['time' => '14:00', 'temperature' => 24.9, 'pH' => 7.08, 'turbidity' => 21.0, 'tds' => 440, 'sfr' => 0.09],
-            ['time' => '16:00', 'temperature' => 25.1, 'pH' => 7.15, 'turbidity' => 19.5, 'tds' => 430, 'sfr' => 0.07],
-            ['time' => '17:00', 'temperature' => 25.3, 'pH' => 7.08, 'turbidity' => 18.8, 'tds' => 425, 'sfr' => 0.06],
-            ['time' => '18:00', 'temperature' => 25.6, 'pH' => 7.01, 'turbidity' => 18.2, 'tds' => 420, 'sfr' => 0.05],
-            ['time' => '20:00', 'temperature' => 26.4, 'pH' => 7.25, 'turbidity' => 17.5, 'tds' => 415, 'sfr' => 0.05],
-            ['time' => '22:00', 'temperature' => 27.1, 'pH' => 7.42, 'turbidity' => 17.0, 'tds' => 410, 'sfr' => 0.04],
-        ];
+        $historyKey = "kolam_{$kolamId}_telemetry_history";
+        $history = Cache::get($historyKey, []);
+
+        $pythonCmd = 'C:\Users\USER\AppData\Local\Programs\Python\Python311\python.exe';
+        $scriptPath = base_path('../ArtIntelligence/predict_service.py');
+
+        $predictions = null;
+        $source = 'Fallback Baseline Curve';
+
+        if (file_exists($scriptPath)) {
+            try {
+                $payloadJson = escapeshellarg(json_encode($history));
+                $command = "\"{$pythonCmd}\" \"{$scriptPath}\" {$payloadJson}";
+                $output = shell_exec($command);
+                if ($output) {
+                    $json = json_decode($output, true);
+                    if (isset($json['predictions']) && is_array($json['predictions'])) {
+                        $predictions = $json['predictions'];
+                        $source = $json['source'] ?? 'BiLSTM (.keras)';
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        if (!$predictions) {
+            $predictions = [
+                ['time' => '00:00', 'temperature' => 25.2, 'pH' => 7.30, 'turbidity' => 16.5, 'tds' => 410, 'sfr' => 0.04],
+                ['time' => '02:00', 'temperature' => 26.5, 'pH' => 7.48, 'turbidity' => 17.2, 'tds' => 420, 'sfr' => 0.05],
+                ['time' => '04:00', 'temperature' => 27.8, 'pH' => 7.60, 'turbidity' => 18.0, 'tds' => 420, 'sfr' => 0.06],
+                ['time' => '06:00', 'temperature' => 28.5, 'pH' => 7.35, 'turbidity' => 19.1, 'tds' => 430, 'sfr' => 0.08],
+                ['time' => '08:00', 'temperature' => 27.2, 'pH' => 7.02, 'turbidity' => 22.4, 'tds' => 450, 'sfr' => 0.11],
+                ['time' => '10:00', 'temperature' => 26.5, 'pH' => 6.85, 'turbidity' => 24.8, 'tds' => 470, 'sfr' => 0.14],
+                ['time' => '12:00', 'temperature' => 25.8, 'pH' => 6.92, 'turbidity' => 23.5, 'tds' => 460, 'sfr' => 0.12],
+                ['time' => '14:00', 'temperature' => 24.9, 'pH' => 7.08, 'turbidity' => 21.0, 'tds' => 440, 'sfr' => 0.09],
+                ['time' => '16:00', 'temperature' => 25.1, 'pH' => 7.15, 'turbidity' => 19.5, 'tds' => 430, 'sfr' => 0.07],
+                ['time' => '17:00', 'temperature' => 25.3, 'pH' => 7.08, 'turbidity' => 18.8, 'tds' => 425, 'sfr' => 0.06],
+                ['time' => '18:00', 'temperature' => 25.6, 'pH' => 7.01, 'turbidity' => 18.2, 'tds' => 420, 'sfr' => 0.05],
+                ['time' => '20:00', 'temperature' => 26.4, 'pH' => 7.25, 'turbidity' => 17.5, 'tds' => 415, 'sfr' => 0.05],
+                ['time' => '22:00', 'temperature' => 27.1, 'pH' => 7.42, 'turbidity' => 17.0, 'tds' => 410, 'sfr' => 0.04],
+            ];
+        }
 
         return response()->json([
             'kolam_id' => $kolamId,
             'model' => 'BiLSTM (Bidirectional Long Short-Term Memory)',
             'horizon' => '24 Jam ke Depan',
-            'forecast' => $forecast,
+            'source' => $source,
+            'forecast' => $predictions,
         ]);
     }
 
@@ -53,6 +83,11 @@ class AiInsightController extends Controller
         $riskScore = (float) $request->input('risk_score', 15.0);
         $riskStatus = (string) $request->input('risk_status', 'Low');
 
+        $activeThresholds = TelemetryController::getThresholdsForPond($kolamId);
+        $thresholdSummary = "Batas Aktif Kolam: pH [{$activeThresholds['ph']['normal_min']}-{$activeThresholds['ph']['normal_max']}], " .
+            "Suhu [{$activeThresholds['suhu']['normal_min']}-{$activeThresholds['suhu']['normal_max']}°C], " .
+            "Turbidity max {$activeThresholds['turbidity']['normal_max']} NTU, TDS max {$activeThresholds['tds']['normal_max']} ppm.";
+
         $deepSeekApiKey = env('DEEPSEEK_API_KEY');
 
         if ($deepSeekApiKey) {
@@ -60,6 +95,7 @@ class AiInsightController extends Controller
                 $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
                     "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
                     "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
+                    "{$thresholdSummary} " .
                     "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
 
                 $response = Http::withHeaders([
@@ -81,6 +117,7 @@ class AiInsightController extends Controller
                         return response()->json([
                             'status' => 'success',
                             'provider' => 'DeepSeek LLM (Live API)',
+                            'threshold_context' => $thresholdSummary,
                             'insight' => $insightText,
                         ]);
                     }
@@ -118,6 +155,7 @@ class AiInsightController extends Controller
         return response()->json([
             'status' => 'success',
             'provider' => 'CatfishCare Multimodal AI Engine',
+            'threshold_context' => $thresholdSummary,
             'risk_status' => $riskStatus,
             'risk_score' => $riskScore,
             'sections' => $sections,

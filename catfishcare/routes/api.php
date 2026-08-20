@@ -42,6 +42,12 @@ Route::get('/actuators/status/{kolam_id?}', [ActuatorController::class, 'getStat
 Route::post('/actuators/water-exchange/trigger', [ActuatorController::class, 'triggerWaterExchange'])->name('api.actuators.water_exchange');
 Route::post('/actuators/aerator/toggle', [ActuatorController::class, 'toggleAerator'])->name('api.actuators.aerator');
 
+// Dynamic Pond Thresholds API
+use App\Http\Controllers\PondThresholdController;
+Route::get('/thresholds/{kolam_id?}', [PondThresholdController::class, 'getThresholds'])->name('api.thresholds.get');
+Route::post('/thresholds/update', [PondThresholdController::class, 'updateThresholds'])->name('api.thresholds.update');
+Route::post('/thresholds/reset', [PondThresholdController::class, 'resetThresholds'])->name('api.thresholds.reset');
+
 // AI Predictions (BiLSTM) & AI Insight (DeepSeek LLM)
 Route::get('/predictions/{kolam_id?}', [AiInsightController::class, 'getForecast'])->name('api.predictions.forecast');
 Route::post('/ai/insight', [AiInsightController::class, 'generateInsight'])->name('api.ai.insight');
