@@ -48,13 +48,18 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
 
         elif path == "/api/list":
             batch = query.get("batch", ["all"])[0]
-            items = self.get_items(batch)
+            status_filter = query.get("status", ["all"])[0]
+            items = self.get_items(batch, status_filter)
             state = load_state()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Cache-Control", "no-cache")
             self.end_headers()
-            self.wfile.write(json.dumps({"items": items, "stats": state["stats"]}).encode("utf-8"))
+            self.wfile.write(json.dumps({
+                "items": items,
+                "stats": state["stats"],
+                "last_rel_path": state.get("last_rel_path", "")
+            }).encode("utf-8"))
             return
 
         elif path.startswith("/img/"):
@@ -146,7 +151,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "ok", "stats": state["stats"]}).encode("utf-8"))
             return
 
-    def get_items(self, batch):
+    def get_items(self, batch, status_filter="all"):
         folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
         folder_splits = {
             "catfishcare_dataset_1787213105": "train",
@@ -186,6 +191,10 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
                 status = rev_info.get("action", "PENDING")
                 if status != "PENDING" and "bboxes" in rev_info:
                     bboxes = rev_info["bboxes"]
+
+                # Status Filter Guard
+                if status_filter != "all" and status.lower() != status_filter.lower():
+                    continue
 
                 # Filter batch
                 match = False
@@ -267,10 +276,11 @@ APP_HTML = """<!DOCTYPE html>
     <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
     
     <div class="batch-selector">
-        <button class="btn active" id="btn-all" onclick="setBatch('all')">All Samples</button>
-        <button class="btn" id="btn-high" onclick="setBatch('high')">High Conf (&ge;0.75)</button>
-        <button class="btn" id="btn-med" onclick="setBatch('med')">Med Conf</button>
-        <button class="btn" id="btn-pending" onclick="setBatch('pending')">Pending Only</button>
+        <button class="btn active" id="btn-status-pending" onclick="setFilter('all', 'pending')">🟡 Pending Only</button>
+        <button class="btn" id="btn-status-approved" onclick="setFilter('all', 'approved')">🟢 Approved Only</button>
+        <button class="btn" id="btn-status-rejected" onclick="setFilter('all', 'rejected')">🔴 Rejected Only</button>
+        <button class="btn" id="btn-status-all" onclick="setFilter('all', 'all')">🌐 All Samples</button>
+        <button class="btn" id="btn-batch-high" onclick="setFilter('high', currentStatus)">High Conf (&ge;0.75)</button>
         <button class="btn btn-reset" onclick="resetAll()">🔄 Reset All Progress</button>
     </div>
 </header>
@@ -334,6 +344,7 @@ APP_HTML = """<!DOCTYPE html>
     let isDrawing = false;
     let startX = 0, startY = 0;
     let currentBatch = 'all';
+    let currentStatus = 'pending';
 
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
@@ -387,20 +398,36 @@ APP_HTML = """<!DOCTYPE html>
         render();
     });
 
-    function setBatch(batch) {
+    function setFilter(batch, status) {
         currentBatch = batch;
+        currentStatus = status;
         document.querySelectorAll('.batch-selector .btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + batch).classList.add('active');
-        fetchList();
+        let activeBtn = document.getElementById('btn-status-' + status) || document.getElementById('btn-batch-' + batch);
+        if (activeBtn) activeBtn.classList.add('active');
+        fetchList(true);
     }
 
-    function fetchList() {
-        fetch('/api/list?batch=' + currentBatch)
+    function fetchList(restoreState = true) {
+        fetch('/api/list?batch=' + currentBatch + '&status=' + currentStatus)
             .then(res => res.json())
             .then(data => {
                 items = data.items;
-                currentIndex = 0;
                 updateStats(data.stats);
+
+                if (restoreState && items.length > 0) {
+                    let targetRel = data.last_rel_path || localStorage.getItem('catfishcare_last_rel_path');
+                    let foundIdx = -1;
+                    if (targetRel) {
+                        foundIdx = items.findIndex(it => it.rel_path === targetRel);
+                    }
+                    if (foundIdx !== -1) {
+                        currentIndex = foundIdx;
+                    } else {
+                        currentIndex = 0;
+                    }
+                } else {
+                    currentIndex = 0;
+                }
                 renderCurrent();
             });
     }
@@ -537,9 +564,10 @@ APP_HTML = """<!DOCTYPE html>
 </html>"""
 
 def run(port=5055):
-    server = HTTPServer(('', port), HumanReviewHandler)
+    server = HTTPServer(('0.0.0.0', port), HumanReviewHandler)
     print(f"==================================================")
     print(f"CatfishCare Review Studio Running at http://127.0.0.1:{port}")
+    print(f"Team / LAN Access: http://<YOUR_IP_ADDRESS>:{port}")
     print(f"==================================================")
     server.serve_forever()
 
