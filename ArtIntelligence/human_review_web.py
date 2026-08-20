@@ -563,8 +563,13 @@ APP_HTML = """<!DOCTYPE html>
 </body>
 </html>"""
 
+from socketserver import ThreadingMixIn
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+
 def run(port=5055):
-    server = HTTPServer(('0.0.0.0', port), HumanReviewHandler)
+    server = ThreadedHTTPServer(('0.0.0.0', port), HumanReviewHandler)
     print(f"==================================================")
     print(f"CatfishCare Review Studio Running at http://127.0.0.1:{port}")
     print(f"Team / LAN Access: http://<YOUR_IP_ADDRESS>:{port}")
