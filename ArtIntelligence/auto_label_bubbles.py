@@ -42,40 +42,65 @@ def run_auto_labeling(dataset_dir, output_dir=None, conf_high=0.75, conf_med=0.4
             
         h, w = img.shape[:2]
         
-        # Simple baseline blob/surface activity detector (HSV + Contour analysis) for bubble clusters
+        # Enhanced Baseline Bubble & Ripple Cluster Detector (Strict Geometry & Contrast Guard)
+        # Exclude top wall region (Y < 50px)
+        roi_mask = np.ones((h, w), dtype=np.uint8)
+        roi_mask[:50, :] = 0 # Mask top 50px (pond wall border)
+
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        _, thresh = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY)
         
+        # Adaptive contrast thresholding for white bubble spots
+        thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                       cv2.THRESH_BINARY, 19, -8)
+        thresh = cv2.bitwise_and(thresh, thresh, mask=roi_mask)
+
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         cand_lines = []
         preview_img = img.copy()
         
+        # Draw ROI Boundary on preview (blue line)
+        cv2.line(preview_img, (0, 50), (w, 50), (255, 100, 0), 1)
+
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if 15 <= area <= 5000: # Filter typical bubble cluster area in px
+            # Tighten area bounds for realistic bubble clusters (30px^2 to 900px^2)
+            if 30 <= area <= 900:
                 bx, by, bw, bh = cv2.boundingRect(cnt)
                 
+                # Exclude top wall
+                if by < 50:
+                    continue
+
+                # Filter out long horizontal streaks (wall glare/light reflections) via Aspect Ratio
+                aspect_ratio = float(bw) / float(bh) if bh > 0 else 0
+                if aspect_ratio < 0.4 or aspect_ratio > 2.5:
+                    continue # Ignore non-circular streaks/glare
+
+                perimeter = cv2.arcLength(cnt, True)
+                circularity = (4 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else 0
+                
+                # Enforce minimum circularity for bubbles & round ripples (>= 0.45)
+                if circularity < 0.45:
+                    continue
+
                 # Calculate normalized YOLO format
                 x_center = (bx + bw / 2.0) / w
                 y_center = (by + bh / 2.0) / h
                 norm_w = bw / float(w)
                 norm_h = bh / float(h)
                 
-                # Heuristic confidence score based on circularity & intensity contrast
-                perimeter = cv2.arcLength(cnt, True)
-                circularity = (4 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else 0
-                conf = float(np.clip(0.4 + 0.5 * circularity, 0.2, 0.95))
+                conf = float(np.clip(0.5 + 0.45 * circularity, 0.45, 0.95))
                 
-                # Class 1: surface_activity / bubble cluster
-                cls_id = 1
+                # Class 0: surface_activity / bubble cluster
+                cls_id = 0
                 cand_lines.append(f"{cls_id} {x_center:.6f} {y_center:.6f} {norm_w:.6f} {norm_h:.6f} {conf:.4f}")
                 
-                if conf >= conf_high:
+                if conf >= 0.75:
                     color = (0, 255, 0) # Green for High
                     summary["high_conf_count"] += 1
-                elif conf >= conf_med:
+                elif conf >= 0.45:
                     color = (0, 255, 255) # Yellow for Medium
                     summary["med_conf_count"] += 1
                 else:
