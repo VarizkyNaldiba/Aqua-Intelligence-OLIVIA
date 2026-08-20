@@ -521,7 +521,7 @@ APP_HTML = """<!DOCTYPE html>
         currentImg.src = '/img/' + item.rel_path;
     }
 
-    function render() {
+    function render(highlightIdx = -1) {
         ctx.drawImage(currentImg, 0, 0, 640, 360);
         let listContainer = document.getElementById('bbox-list-container');
         listContainer.innerHTML = '';
@@ -532,25 +532,40 @@ APP_HTML = """<!DOCTYPE html>
             let bw = b.bw * w, bh = b.bh * h;
             let bx = (b.xc * w) - (bw / 2);
             let by = (b.yc * h) - (bh / 2);
+            let confStr = b.conf ? b.conf.toFixed(2) : '1.0';
 
-            let color = b.conf >= 0.75 ? '#10b981' : (b.conf >= 0.45 ? '#f59e0b' : '#ef4444');
+            let isHighlighted = (idx === highlightIdx);
+            let color = isHighlighted ? '#38bdf8' : (b.conf >= 0.75 ? '#10b981' : (b.conf >= 0.45 ? '#f59e0b' : '#ef4444'));
             ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = isHighlighted ? 3.5 : 2;
             ctx.strokeRect(bx, by, bw, bh);
 
+            // Draw label background box for high visibility
+            let labelText = `#${idx + 1} surface_act ${confStr}`;
+            ctx.font = "bold 11px sans-serif";
+            let txtWidth = ctx.measureText(labelText).width;
+            
             ctx.fillStyle = color;
-            ctx.font = "11px sans-serif";
-            ctx.fillText(`surface_act ${b.conf ? b.conf.toFixed(2) : '1.0'}`, bx, Math.max(12, by - 4));
+            ctx.fillRect(bx, Math.max(0, by - 16), txtWidth + 6, 16);
 
-            // Render list item in sidebar
+            ctx.fillStyle = '#0f172a';
+            ctx.fillText(labelText, bx + 3, Math.max(12, by - 3));
+
+            // Render matching list item in sidebar
             let div = document.createElement('div');
             div.className = 'bbox-item';
+            div.style.borderLeft = `4px solid ${color}`;
+            if (isHighlighted) div.style.borderColor = '#38bdf8';
+            div.onmouseenter = function() { render(idx); };
+            div.onmouseleave = function() { render(-1); };
+
             div.innerHTML = `
                 <div>
-                    <span class="bbox-tag">Box #${idx + 1}</span> 
-                    <span style="color:#94a3b8; font-size:10px;">(${Math.round(bw)}x${Math.round(bh)}px)</span>
+                    <span class="bbox-tag" style="color:${color};">#${idx + 1} surface_activity</span>
+                    <span style="color:#cbd5e1; font-size:11px; margin-left:2px;">(conf: ${confStr})</span>
+                    <div style="color:#64748b; font-size:10px;">Ukuran: ${Math.round(bw)} &times; ${Math.round(bh)} px</div>
                 </div>
-                <button class="btn-del-box" onclick="deleteSingleBox(${idx})">🗑 Delete</button>
+                <button class="btn-del-box" onclick="deleteSingleBox(${idx})" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
             `;
             listContainer.appendChild(div);
         });
