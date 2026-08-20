@@ -65,17 +65,14 @@ const HomeTab = ({
 
     const quickActions = [
         {
-            label: "Catat Pemberian Pakan",
-            icon: ClipboardList,
-            action: () =>
-                alert(
-                    "Fitur mencatat pakan terintegrasi dengan Laravel backend.",
-                ),
-        },
-        {
-            label: "Lihat Detail Monitoring",
+            label: "Monitoring IoT & Sensor",
             icon: FileText,
             action: () => setActiveTab("dashboard"),
+        },
+        {
+            label: "Prediksi Kualitas Air AI",
+            icon: ClipboardList,
+            action: () => setActiveTab("analytics"),
         },
         {
             label: "Kelola Seluruh Kolam",
@@ -172,7 +169,7 @@ const HomeTab = ({
                     <div className="card-header-advisory">
                         <CloudRain size={28} className="weather-icon" />
                         <div>
-                            <h3>Rekomendasi Cuaca & Pakan AI</h3>
+                            <h3>Rekomendasi Cuaca & Kolam AI</h3>
                             <p>Prakiraan: Hujan Sedang Sore Hari</p>
                         </div>
                     </div>
@@ -183,11 +180,10 @@ const HomeTab = ({
                         </p>
                         <ul>
                             <li>
-                                Kurangi dosis pakan sore <strong>20%</strong>{" "}
-                                pada kolam aktif.
+                                Optimalkan sirkulasi aerator pada kolam aktif.
                             </li>
-                            <li>Jangan beri pakan saat hujan deras.</li>
-                            <li>Pantau pH setelah hujan reda.</li>
+                            <li>Pastikan drainase dan jalur overflow kolam lancar.</li>
+                            <li>Pantau pH dan kekeruhan setelah hujan reda.</li>
                         </ul>
                     </div>
                 </div>

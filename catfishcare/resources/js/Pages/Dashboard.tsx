@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import {
-    ArrowUpRight,
-    ArrowDownRight,
     Video,
     Sparkles,
     RefreshCw,
@@ -74,8 +72,8 @@ export default function Dashboard() {
         }
         return "dashboard";
     });
-    
-    const [selectedPondId, setSelectedPondId] = useState(9);
+
+    const [selectedPondId, setSelectedPondId] = useState(1);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [currentMetricType, setCurrentMetricType] =
         useState<MetricType>("TEMPERATURE");
@@ -90,12 +88,13 @@ export default function Dashboard() {
         isPlaying,
         setIsPlaying,
         latestRows,
+        isLiveActive,
     } = useSensorData(selectedPondId);
 
     const [alert, setAlert] = useState({ message: "", type: "" });
     const [todos, setTodos] = useState<TodoItem[]>([
         { id: 1, text: "Kuras air kolam A", checked: false },
-        { id: 2, text: "Beri pakan jam 10 malam", checked: false },
+        { id: 2, text: "Cek filter & sirkulasi air", checked: false },
     ]);
 
     const DEFAULT_CAMERA_URL = "http://192.168.137.210:5000/video_feed";
@@ -261,27 +260,6 @@ export default function Dashboard() {
         }
     };
 
-    const handleDispenseFeedNow = async () => {
-        try {
-            const res = await fetch("/api/actuators/feeder/dispense", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    kolam_id: selectedPondId,
-                    amount_grams: 100,
-                }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                showAlert(`🐟 ${data.message}`, "success");
-            } else {
-                showAlert(`⚠️ ${data.message || 'Pemberian pakan ditolak karena kondisi air berbahaya!'}`, "error");
-            }
-        } catch {
-            showAlert("Pakan 100 gram dikeluarkan melalui Automatic Feeder Servo MG996R.", "success");
-        }
-    };
-
     const renderDashboardContent = () => {
         if (!currentData) {
             return (
@@ -291,26 +269,28 @@ export default function Dashboard() {
             );
         }
 
-        // Mapping ponds with warning priorities as defined in mockup
+        // Active IoT pond (Single Dynamic System)
         const ponds = [
-            { id: 9, name: "Pond 09", location: "Sektor Selatan, Blok 1", status: "Bahaya (Tidak Ideal)" },
-            { id: 4, name: "Pond 04", location: "Sektor Selatan, Blok 2", status: "Waspada (Tidak Ideal)" },
-            { id: 12, name: "Pond 12", location: "Sektor Utara, Blok 1", status: "Aman" },
-            { id: 10, name: "Pond 10", location: "Sektor Utara, Blok 2", status: "Aman" },
+            { id: 1, name: "Kolam TFS 1", location: "Kolam Riset IoT TFS", status: "Optimal (IoT Aktif)" },
         ];
 
         const activePond = ponds.find((p) => p.id === selectedPondId) || ponds[0];
 
-        // Get limited history array for sparkline plotting (last 15 entries)
+        // Dynamic real time-series history for sparklines (last 15 entries)
         const sparklineHistory = latestRows.slice(-15);
+        const tempHistory = sparklineHistory.map((r) => r.TEMPERATURE || 27.5);
         const phHistory = sparklineHistory.map((r) => r.pH);
         const turbidityHistory = sparklineHistory.map((r) => r.TURBIDITY);
-        
-        // Mock TDS and Water Height dynamic histories
-        const tdsHistory = sparklineHistory.map((r) => r.pH * 130);
-        const heightHistory = sparklineHistory.map((r) => 100 + r.TEMPERATURE * 0.2);
+        const tdsHistory = sparklineHistory.map((r) => r.NITRATE || 420);
+        const heightHistory = sparklineHistory.map((r) => r.Length || 25.0);
 
         // Helper to check parameter statuses
+        const getTempStatus = (temp: number): "Aman" | "Waspada" | "Bahaya" => {
+            if (temp >= 25 && temp <= 32) return "Aman";
+            if (temp >= 22 && temp <= 35) return "Waspada";
+            return "Bahaya";
+        };
+
         const getPhStatus = (ph: number): "Aman" | "Waspada" | "Bahaya" => {
             if (ph >= 6.5 && ph <= 8.5) return "Aman";
             if (ph >= 5.8 && ph <= 9.0) return "Waspada";
@@ -330,39 +310,52 @@ export default function Dashboard() {
         };
 
         const getHeightStatus = (height: number): "Aman" | "Waspada" | "Bahaya" => {
-            if (height >= 95 && height <= 105) return "Aman";
-            if (height >= 90 && height <= 110) return "Waspada";
+            if (height >= 8 && height <= 35) return "Aman";
+            if (height >= 4 && height <= 40) return "Waspada";
             return "Bahaya";
+        };
+
+        const renderStatusBadge = (status: "Aman" | "Waspada" | "Bahaya") => {
+            switch (status) {
+                case "Aman":
+                    return <span className="db-metric-badge" style={{ backgroundColor: "#dcfce7", color: "#15803d", fontWeight: 700 }}>Optimal</span>;
+                case "Waspada":
+                    return <span className="db-metric-badge" style={{ backgroundColor: "#fef3c7", color: "#b45309", fontWeight: 700 }}>Waspada</span>;
+                case "Bahaya":
+                    return <span className="db-metric-badge" style={{ backgroundColor: "#fee2e2", color: "#b91c1c", fontWeight: 700 }}>Kritis</span>;
+            }
         };
 
         const getCardStyle = (status: "Aman" | "Waspada" | "Bahaya") => {
             switch (status) {
                 case "Aman":
                     return {
-                        backgroundColor: "#f0fdf4",
-                        borderColor: "#bbf7d0",
+                        backgroundColor: "#ffffff",
+                        borderColor: "#e2e8f0",
                         transition: "all 0.3s ease",
                     };
                 case "Waspada":
                     return {
-                        backgroundColor: "#fffbeb",
-                        borderColor: "#fef3c7",
+                        backgroundColor: "#fffdf5",
+                        borderColor: "#fef08a",
                         transition: "all 0.3s ease",
                     };
                 case "Bahaya":
                     return {
-                        backgroundColor: "#fef2f2",
-                        borderColor: "#fee2e2",
+                        backgroundColor: "#fff5f5",
+                        borderColor: "#fecaca",
                         transition: "all 0.3s ease",
                     };
             }
         };
 
+        const tempVal = currentData.TEMPERATURE;
         const phVal = currentData.pH;
         const turbVal = currentData.TURBIDITY;
-        const tdsVal = currentData.pH * 130;
-        const heightVal = 100 + currentData.TEMPERATURE * 0.2;
+        const tdsVal = currentData.NITRATE ?? 420;
+        const heightVal = currentData.Length ?? 12.0;
 
+        const tempStatus = getTempStatus(tempVal);
         const phStatus = getPhStatus(phVal);
         const turbStatus = getTurbidityStatus(turbVal);
         const tdsStatus = getTdsStatus(tdsVal);
@@ -378,6 +371,33 @@ export default function Dashboard() {
                     </div>
 
                     {/* Custom Scrollable Selector */}
+                {/* IoT Live Status Badge */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "4px 10px",
+                            borderRadius: "20px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            letterSpacing: "0.05em",
+                            backgroundColor: isLiveActive ? "rgba(16, 185, 129, 0.12)" : "rgba(100, 116, 139, 0.12)",
+                            color: isLiveActive ? "#10b981" : "#94a3b8",
+                            border: `1px solid ${isLiveActive ? "rgba(16, 185, 129, 0.3)" : "rgba(100, 116, 139, 0.2)"}`,
+                            transition: "all 0.5s ease",
+                        }}>
+                            <span style={{
+                                width: "7px",
+                                height: "7px",
+                                borderRadius: "50%",
+                                backgroundColor: isLiveActive ? "#10b981" : "#94a3b8",
+                                animation: isLiveActive ? "lp-pulse 2s infinite" : "none",
+                                display: "inline-block",
+                            }} />
+                            {isLiveActive ? "ESP32 LIVE" : "ESP32 OFFLINE"}
+                        </span>
+                    </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                         <span style={{ fontSize: "14px", fontWeight: 700, color: "#64748b" }}>Pond:</span>
                         <div style={{ position: "relative" }}>
@@ -483,20 +503,49 @@ export default function Dashboard() {
 
                 {/* Metrics Mini Cards Grid */}
                 <div className="db-metrics-grid">
-                    {/* Card 1: pH Air */}
+                    {/* Card 1: Suhu Air */}
+                    <div className="db-metric-card" style={getCardStyle(tempStatus)}>
+                        <div className="db-metric-card-header">
+                            <span className="db-metric-label">Suhu Air</span>
+                            {renderStatusBadge(tempStatus)}
+                        </div>
+                        <div className="db-metric-value">{tempVal.toFixed(1)} <span style={{ fontSize: "16px", fontWeight: 600, color: "#64748b" }}>°C</span></div>
+                        <div className="db-metric-chart">
+                            <svg viewBox="0 0 120 30" style={{ width: "100%", height: "100%" }}>
+                                <defs>
+                                    <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.25" />
+                                        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
+                                    </linearGradient>
+                                </defs>
+                                <path
+                                    d={`${getSparklinePoints(tempHistory)} L 120,30 L 0,30 Z`}
+                                    fill="url(#tempGrad)"
+                                />
+                                <path
+                                    d={getSparklinePoints(tempHistory)}
+                                    fill="none"
+                                    stroke="#f59e0b"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                        </div>
+                        <div className="db-metric-footer">Ideal: 25.0 – 32.0 °C</div>
+                    </div>
+
+                    {/* Card 2: pH Air */}
                     <div className="db-metric-card" style={getCardStyle(phStatus)}>
                         <div className="db-metric-card-header">
-                            <span className="db-metric-label">PH Air</span>
-                            <span className="db-metric-badge down">
-                                <ArrowDownRight size={11} /> 1%
-                            </span>
+                            <span className="db-metric-label">pH Air</span>
+                            {renderStatusBadge(phStatus)}
                         </div>
-                        <div className="db-metric-value">{currentData.pH.toFixed(1)} pH</div>
+                        <div className="db-metric-value">{phVal.toFixed(2)} <span style={{ fontSize: "16px", fontWeight: 600, color: "#64748b" }}>pH</span></div>
                         <div className="db-metric-chart">
                             <svg viewBox="0 0 120 30" style={{ width: "100%", height: "100%" }}>
                                 <defs>
                                     <linearGradient id="phGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
                                         <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
                                     </linearGradient>
                                 </defs>
@@ -513,23 +562,21 @@ export default function Dashboard() {
                                 />
                             </svg>
                         </div>
-                        <div className="db-metric-footer">vs. yesterday</div>
+                        <div className="db-metric-footer">Ideal: 6.50 – 8.50 pH</div>
                     </div>
 
-                    {/* Card 2: Turbidity */}
+                    {/* Card 3: Turbidity */}
                     <div className="db-metric-card" style={getCardStyle(turbStatus)}>
                         <div className="db-metric-card-header">
-                            <span className="db-metric-label">Turbidity</span>
-                            <span className="db-metric-badge up">
-                                <ArrowUpRight size={11} /> 5%
-                            </span>
+                            <span className="db-metric-label">Kekeruhan</span>
+                            {renderStatusBadge(turbStatus)}
                         </div>
-                        <div className="db-metric-value">{currentData.TURBIDITY.toFixed(0)} NTU</div>
+                        <div className="db-metric-value">{turbVal.toFixed(0)} <span style={{ fontSize: "16px", fontWeight: 600, color: "#64748b" }}>NTU</span></div>
                         <div className="db-metric-chart">
                             <svg viewBox="0 0 120 30" style={{ width: "100%", height: "100%" }}>
                                 <defs>
                                     <linearGradient id="turbGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.2" />
+                                        <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.25" />
                                         <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.0" />
                                     </linearGradient>
                                 </defs>
@@ -546,30 +593,28 @@ export default function Dashboard() {
                                 />
                             </svg>
                         </div>
-                        <div className="db-metric-footer">vs. yesterday</div>
+                        <div className="db-metric-footer">Ideal: &lt; 35 NTU</div>
                     </div>
 
-                    {/* Card 3: TDS */}
+                    {/* Card 4: TDS */}
                     <div className="db-metric-card" style={getCardStyle(tdsStatus)}>
                         <div className="db-metric-card-header">
                             <span className="db-metric-label">TDS</span>
-                            <span className="db-metric-badge up">
-                                <ArrowUpRight size={11} /> 3%
-                            </span>
+                            {renderStatusBadge(tdsStatus)}
                         </div>
-                        <div className="db-metric-value">{(currentData.pH * 130).toFixed(0)} PPM</div>
+                        <div className="db-metric-value">{tdsVal.toFixed(0)} <span style={{ fontSize: "16px", fontWeight: 600, color: "#64748b" }}>PPM</span></div>
                         <div className="db-metric-chart">
                             <svg viewBox="0 0 120 30" style={{ width: "100%", height: "100%" }}>
                                 <defs>
                                     <linearGradient id="tdsGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2" />
+                                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.25" />
                                         <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0" />
                                     </linearGradient>
                                 </defs>
                                 <path
                                     d={`${getSparklinePoints(tdsHistory)} L 120,30 L 0,30 Z`}
                                     fill="url(#tdsGrad)"
-                                />
+                                    />
                                 <path
                                     d={getSparklinePoints(tdsHistory)}
                                     fill="none"
@@ -579,24 +624,22 @@ export default function Dashboard() {
                                 />
                             </svg>
                         </div>
-                        <div className="db-metric-footer">vs. yesterday</div>
+                        <div className="db-metric-footer">Ideal: &lt; 900 PPM</div>
                     </div>
 
-                    {/* Card 4: Tinggi Air */}
+                    {/* Card 5: Tinggi Air */}
                     <div className="db-metric-card" style={getCardStyle(heightStatus)}>
                         <div className="db-metric-card-header">
                             <span className="db-metric-label">Tinggi Air</span>
-                            <span className="db-metric-badge down">
-                                <ArrowDownRight size={11} /> 2%
-                            </span>
+                            {renderStatusBadge(heightStatus)}
                         </div>
-                        <div className="db-metric-value">{(100 + currentData.TEMPERATURE * 0.2).toFixed(0)} cm</div>
+                        <div className="db-metric-value">{heightVal.toFixed(1)} <span style={{ fontSize: "16px", fontWeight: 600, color: "#64748b" }}>cm</span></div>
                         <div className="db-metric-chart">
                             <svg viewBox="0 0 120 30" style={{ width: "100%", height: "100%" }}>
                                 <defs>
                                     <linearGradient id="heightGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.2" />
-                                        <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.0" />
+                                        <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.25" />
+                                        <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
                                     </linearGradient>
                                 </defs>
                                 <path
@@ -606,13 +649,13 @@ export default function Dashboard() {
                                 <path
                                     d={getSparklinePoints(heightHistory)}
                                     fill="none"
-                                    stroke="#0ea5e9"
+                                    stroke="#06b6d4"
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                 />
                             </svg>
                         </div>
-                        <div className="db-metric-footer">vs. yesterday</div>
+                        <div className="db-metric-footer">Kedalaman Kolam: 40 cm</div>
                     </div>
                 </div>
 
@@ -932,12 +975,12 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Right Column: AI Predictions & Feeding Guide */}
+                    {/* Right Column: AI Predictions & System Guide */}
                     <div className="db-panel-card">
                         <div className="db-panel-header">
                             <div className="db-panel-title">
                                 <Sparkles size={18} color="#0ea5e9" />
-                                <span>Action Predictions & Feeding Guide</span>
+                                <span>Action Predictions & System Guide</span>
                             </div>
                         </div>
                         <div className="db-panel-body">
@@ -972,7 +1015,7 @@ export default function Dashboard() {
                                 <div className="db-alert-suggests" style={{ backgroundColor: "#f0fdf4", borderColor: "#bbf7d0" }}>
                                     <div className="db-alert-title" style={{ color: "#16a34a" }}>🛡️ AI SYSTEM STATUS</div>
                                     <div className="db-alert-text" style={{ color: "#166534" }}>
-                                        All water parameters in {activePond.name} are optimal. Maintain standard feeding schedule.
+                                        All water parameters in {activePond.name} are optimal. Maintain standard system settings.
                                     </div>
                                     <button className="db-btn-cyan" style={{ backgroundColor: "#10b981" }} onClick={() => showAlert("Diagnostic test complete. No anomalies detected.", "success")}>
                                         <RefreshCw size={14} />
@@ -980,17 +1023,6 @@ export default function Dashboard() {
                                     </button>
                                 </div>
                             )}
-
-                            {/* Feed schedule */}
-                            <div className="db-schedule-card">
-                                <div className="db-schedule-title">FEED SCHEDULE</div>
-                                <div className="db-schedule-text">
-                                    Next feeding at 10:00 AM — 5kg of pellets for {activePond.name}.
-                                </div>
-                                <button className="db-btn-outline-teal" onClick={handleDispenseFeedNow}>
-                                    <span> Dispense Feed Now</span>
-                                </button>
-                            </div>
 
                             {/* Link footer */}
                             <button className="db-link-btn" onClick={() => setActiveTab("analytics")}>

@@ -35,11 +35,11 @@ Route::delete('/esp/{id}', [EspController::class, 'destroy'])->name('api.esp.des
 Route::post('/telemetry', [TelemetryController::class, 'receiveTelemetry'])->name('api.telemetry.receive');
 Route::post('/sfr/update', [TelemetryController::class, 'updateSfr'])->name('api.sfr.update');
 Route::get('/telemetry/latest/{kolam_id?}', [TelemetryController::class, 'getLatestTelemetry'])->name('api.telemetry.latest');
+Route::get('/telemetry/history/{kolam_id?}', [TelemetryController::class, 'getTelemetryHistory'])->name('api.telemetry.history');
 
 // Smart Water Exchange & Actuators API
 Route::get('/actuators/status/{kolam_id?}', [ActuatorController::class, 'getStatus'])->name('api.actuators.status');
 Route::post('/actuators/water-exchange/trigger', [ActuatorController::class, 'triggerWaterExchange'])->name('api.actuators.water_exchange');
-Route::post('/actuators/feeder/dispense', [ActuatorController::class, 'triggerFeeder'])->name('api.actuators.feeder');
 Route::post('/actuators/aerator/toggle', [ActuatorController::class, 'toggleAerator'])->name('api.actuators.aerator');
 
 // AI Predictions (BiLSTM) & AI Insight (DeepSeek LLM)

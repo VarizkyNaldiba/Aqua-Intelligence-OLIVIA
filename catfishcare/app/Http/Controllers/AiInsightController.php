@@ -12,7 +12,7 @@ class AiInsightController extends Controller
     /**
      * Get 24-Hour Forecast Predictions for Water Quality (BiLSTM).
      */
-    public function getForecast(int $kolamId = 9): JsonResponse
+    public function getForecast(int $kolamId = 1): JsonResponse
     {
         $forecast = [
             ['time' => '00:00', 'temperature' => 25.2, 'pH' => 7.30, 'turbidity' => 16.5, 'tds' => 410, 'sfr' => 0.04],
@@ -43,7 +43,7 @@ class AiInsightController extends Controller
      */
     public function generateInsight(Request $request): JsonResponse
     {
-        $kolamId = (int) ($request->input('kolam_id', 9));
+        $kolamId = (int) ($request->input('kolam_id', 1));
         $ph = (float) $request->input('ph', 7.2);
         $suhu = (float) $request->input('suhu', 27.5);
         $turbidity = (float) $request->input('turbidity', 18.0);
@@ -60,7 +60,7 @@ class AiInsightController extends Controller
                 $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
                     "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
                     "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
-                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Pakan / Aerasi).";
+                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
 
                 $response = Http::withHeaders([
                     'Authorization' => "Bearer {$deepSeekApiKey}",
@@ -95,24 +95,24 @@ class AiInsightController extends Controller
 
         if ($riskStatus === 'Critical') {
             $sections['summary'] = "Kondisi Kolam {$kolamId} berada pada tingkat KRITIS (Risk Score: {$riskScore}/100). Terjadi penurunan mutu air drastis dengan SFR tinggi (" . round($sfr * 100, 1) . "% lele berenang ke permukaan).";
-            $sections['cause'] = "Akumulasi amonia terlarut akibat penumpukan sisa pakan organik dan penurunan saturasi oksigen terlarut (hipoksia).";
+            $sections['cause'] = "Akumulasi amonia terlarut akibat penumpukan sisa organik dan penurunan saturasi oksigen terlarut (hipoksia).";
             $sections['impact'] = "Risiko mortalitas masal lele dalam 12–24 jam ke depan jika tidak segera dieksekusi mitigasi pergantian air.";
-            $sections['mitigation'] = "Sistem telah memicu Smart Water Exchange 50% secara otomatis, mengunci automatic feeder, dan menyalakan aerator darurat.";
+            $sections['mitigation'] = "Sistem telah memicu Smart Water Exchange 50% secara otomatis dan menyalakan aerator darurat.";
         } elseif ($riskStatus === 'High') {
             $sections['summary'] = "Peringatan tingkat TINGGI pada Kolam {$kolamId} (Risk Score: {$riskScore}/100). Parameter air mendekati ambang batas toleransi fisiologis lele.";
             $sections['cause'] = "Fluktuasi pH (" . round($ph, 2) . ") dan peningkatan kekeruhan (" . round($turbidity, 1) . " NTU) memicu stres ringan pada ikan.";
-            $sections['impact'] = "Nafsu makan menurun dan efisiensi konversi pakan (FCR) memburuk.";
-            $sections['mitigation'] = "Jalankan Smart Water Exchange terukur (20–30%), tunda pemberian pakan malam, dan maksimalkan output aerator.";
+            $sections['impact'] = "Stres fisiologis lele meningkat dan daya tahan tubuh memburuk.";
+            $sections['mitigation'] = "Jalankan Smart Water Exchange terukur (20–30%) dan maksimalkan output aerator.";
         } elseif ($riskStatus === 'Medium') {
             $sections['summary'] = "Kondisi Kolam {$kolamId} berstatus WASPADA (Risk Score: {$riskScore}/100). Parameter relatif stabil namun ada kecenderungan peningkatan TDS.";
-            $sections['cause'] = "Aktivitas dekomposisi feses dan sisa pakan mulai terakumulasi di dasar kolam.";
+            $sections['cause'] = "Aktivitas dekomposisi feses dan sisa organik mulai terakumulasi di dasar kolam.";
             $sections['impact'] = "Potensi pergeseran pH ke arah asam dalam 24 jam berikutnya.";
-            $sections['mitigation'] = "Pantau tren kurva 24-jam BiLSTM dan kurangi takaran pakan sebesar 15% pada sesi pemberian berikutnya.";
+            $sections['mitigation'] = "Pantau tren kurva 24-jam BiLSTM dan jalankan sirkulasi air tambahan.";
         } else {
             $sections['summary'] = "Semua parameter Kolam {$kolamId} berada dalam rentang OPTIMAL (Risk Score: {$riskScore}/100, WQS: " . (100 - $riskScore) . ").";
             $sections['cause'] = "Keseimbangan ekosistem kolam terjaga dengan baik. Kekeruhan (" . round($turbidity, 1) . " NTU) dan pH (" . round($ph, 2) . ") sangat ideal.";
             $sections['impact'] = "Pertumbuhan biomassa ikan optimal dan laju kelangsungan hidup (SR) maksimal.";
-            $sections['mitigation'] = "Pertahankan jadwal pakan standar (5kg per sesi) dan pastikan aerasi beroperasi normal.";
+            $sections['mitigation'] = "Pertahankan sirkulasi air standar dan pastikan aerasi beroperasi normal.";
         }
 
         return response()->json([

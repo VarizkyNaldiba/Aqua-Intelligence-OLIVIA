@@ -350,7 +350,7 @@ export default function NotificationsTab({
                 {/* Content Body */}
                 <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "24px" }}>
                     <p style={{ fontSize: "14px", lineHeight: "1.6", color: "#334155", margin: 0, textAlign: "left" }}>
-                        Over the analyzed period, the AI model identified a <strong>recurring weekly quality degradation cycle</strong> closely correlated with feeding intensity and reduced aeration on weekends. Turbidity and TDS tend to peak 12–18 hours after high-volume feeding events, while pH shows a lagging dip. The water level shows <strong>stable mid-week baselines</strong> with minor evaporative loss on warmer afternoons. No anomalous sensor readings were detected beyond expected seasonal variance.
+                        Over the analyzed period, the AI model identified a <strong>recurring weekly quality degradation cycle</strong> closely correlated with organic waste accumulation and reduced aeration on weekends. Turbidity and TDS tend to peak 12–18 hours after organic accumulation periods, while pH shows a lagging dip. The water level shows <strong>stable mid-week baselines</strong> with minor evaporative loss on warmer afternoons. No anomalous sensor readings were detected beyond expected seasonal variance.
                     </p>
 
                     {/* Three Column Details Cards */}
@@ -363,7 +363,7 @@ export default function NotificationsTab({
                                     <span>Weekend Quality Drop</span>
                                 </h5>
                                 <p style={{ fontSize: "13px", lineHeight: "1.5", color: "#475569", marginTop: "12px", marginBottom: "16px", textAlign: "left" }}>
-                                    Water quality consistently degrades on Saturdays and Sundays — turbidity spikes an average of +38% and pH drops by ~0.3 units. This correlates with increased feeding and reduced aeration checks.
+                                    Water quality consistently degrades on Saturdays and Sundays — turbidity spikes an average of +38% and pH drops by ~0.3 units. This correlates with organic load accumulation and reduced aeration checks.
                                 </p>
                             </div>
                             <button

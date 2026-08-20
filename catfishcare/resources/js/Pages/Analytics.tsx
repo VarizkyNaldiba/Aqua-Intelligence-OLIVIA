@@ -50,7 +50,7 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
         setIsLoadingInsight(true);
         try {
             // 1. Predictions
-            const pRes = await fetch("/api/predictions/9");
+            const pRes = await fetch("/api/predictions/1");
             if (pRes.ok) {
                 const pData = await pRes.json();
                 if (pData.forecast) setForecastData(pData.forecast);
@@ -61,14 +61,14 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    kolam_id: 9,
+                    kolam_id: 1,
                     ph: currentData?.pH || 7.2,
                     suhu: currentData?.TEMPERATURE || 27.5,
                     turbidity: currentData?.TURBIDITY || 18.0,
-                    tds: (currentData?.pH || 7.2) * 130,
-                    tinggi_air: 100 + (currentData?.TEMPERATURE || 27.5) * 0.2,
-                    sfr: 0.08,
-                    risk_score: 18.0,
+                    tds: currentData?.NITRATE || 420.0,
+                    tinggi_air: currentData?.Length || 25.0,
+                    sfr: currentData?.Weight || 0.05,
+                    risk_score: 15.0,
                     risk_status: "Low",
                 }),
             });

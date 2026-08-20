@@ -12,16 +12,14 @@ class ActuatorController extends Controller
     /**
      * Get current status of all actuators for a pond.
      */
-    public function getStatus(int $kolamId = 9): JsonResponse
+    public function getStatus(int $kolamId = 1): JsonResponse
     {
         $status = Cache::get("kolam_{$kolamId}_actuators", [
             'drain_pump' => false,
             'fill_pump' => false,
             'aerator' => true,
-            'feeder_locked' => false,
             'mode' => 'auto', // 'auto' | 'manual'
             'last_exchange' => Carbon::now()->subHours(6)->toIso8601String(),
-            'last_feeding' => Carbon::now()->subHours(2)->toIso8601String(),
             'pending_action' => null,
         ]);
 
@@ -33,7 +31,7 @@ class ActuatorController extends Controller
      */
     public function triggerWaterExchange(Request $request): JsonResponse
     {
-        $kolamId = (int) ($request->input('kolam_id', 9));
+        $kolamId = (int) ($request->input('kolam_id', 1));
         $targetPercent = (int) ($request->input('target_percent', 30));
 
         // Queue action for ESP32
@@ -46,7 +44,6 @@ class ActuatorController extends Controller
         // Update local actuator status
         $current = Cache::get("kolam_{$kolamId}_actuators", []);
         $current['drain_pump'] = true;
-        $current['feeder_locked'] = true;
         $current['last_exchange'] = Carbon::now()->toIso8601String();
         Cache::put("kolam_{$kolamId}_actuators", $current, 120);
 
@@ -55,40 +52,6 @@ class ActuatorController extends Controller
             'message' => "Smart Water Exchange (Target: {$targetPercent}%) berhasil dipicu untuk Kolam {$kolamId}.",
             'action' => 'water_exchange',
             'target_percent' => $targetPercent,
-        ]);
-    }
-
-    /**
-     * Trigger Automatic Feeder Dispense.
-     */
-    public function triggerFeeder(Request $request): JsonResponse
-    {
-        $kolamId = (int) ($request->input('kolam_id', 9));
-        $amountGrams = (int) ($request->input('amount_grams', 100));
-
-        // Check if feeder is locked due to poor water quality
-        $current = Cache::get("kolam_{$kolamId}_actuators", []);
-        if (!empty($current['feeder_locked'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pemberian pakan ditolak! Kondisi air kolam sedang dalam level High/Critical.',
-            ], 422);
-        }
-
-        // Queue action for ESP32
-        Cache::put("kolam_{$kolamId}_pending_action", [
-            'action' => 'feed',
-            'amount' => $amountGrams,
-            'queued_at' => Carbon::now()->toIso8601String(),
-        ], 60);
-
-        $current['last_feeding'] = Carbon::now()->toIso8601String();
-        Cache::put("kolam_{$kolamId}_actuators", $current, 3600);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => "Pakan {$amountGrams} gram berhasil dikeluarkan untuk Kolam {$kolamId}.",
-            'amount_grams' => $amountGrams,
         ]);
     }
 

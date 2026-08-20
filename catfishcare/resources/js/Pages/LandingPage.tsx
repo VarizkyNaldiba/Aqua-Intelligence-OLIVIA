@@ -51,7 +51,7 @@ export default function LandingPage() {
                         Better Harvests.
                     </h1>
                     <p className="lp-hero-subtext">
-                        CatfishCare combines AI-driven water monitoring, automated feeding schedules, and real-time ESP32 sensor data to help aquaculture farmers reduce losses and maximize yield — with zero guesswork.
+                        CatfishCare combines AI-driven water monitoring, automated smart water exchange, and real-time ESP32 sensor data to help aquaculture farmers reduce losses and maximize yield — with zero guesswork.
                     </p>
                     <div className="lp-hero-actions">
                         <Link href="/login" className="lp-btn-gradient">

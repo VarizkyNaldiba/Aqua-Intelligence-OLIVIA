@@ -76,7 +76,7 @@ export const getPondStatus = (
         actionList: [
             {
                 id: 1,
-                text: "Kondisi kolam sangat baik. Lanjutkan jadwal pakan standar.",
+                text: "Kondisi kolam sangat baik. Seluruh parameter dalam batas optimal.",
                 checked: false,
             },
         ],

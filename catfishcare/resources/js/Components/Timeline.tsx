@@ -69,7 +69,7 @@ const Timeline = () => {
                                     color="var(--color-danger)"
                                 />
                             </div>
-                            <span>Nitrate Puncak (Sisa Pakan)</span>
+                            <span>Nitrate Puncak (Akumulasi Organik)</span>
                         </div>
                     </div>
                 </div>

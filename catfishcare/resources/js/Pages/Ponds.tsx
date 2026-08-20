@@ -29,60 +29,63 @@ const PondsTab = ({
     selectedPondId,
     setSelectedPondId,
 }: PondsTabProps) => {
-    // Initial ponds data with Warning status and IoT states matching mockup directive
+    // Single active dynamic IoT pond
     const [ponds, setPonds] = useState<PondItem[]>([
         {
-            id: 12,
-            name: "Pond 12",
-            location: "Sektor Utara, Blok 1",
+            id: 1,
+            name: "Kolam TFS 1",
+            location: "Kolam Riset IoT TFS",
             status: "Aman",
             iot: "Aktif",
-            capacity: 1200,
-            lastMaintained: "05 Jul 2026",
-            temp: 28.2,
+            capacity: 1000,
+            lastMaintained: "19 Agu 2026",
+            temp: 27.5,
             ph: 7.2,
             turbidity: 18,
         },
-        {
-            id: 10,
-            name: "Pond 10",
-            location: "Sektor Utara, Blok 2",
-            status: "Aman",
-            iot: "Aktif",
-            capacity: 950,
-            lastMaintained: "03 Jul 2026",
-            temp: 27.5,
-            ph: 7.4,
-            turbidity: 22,
-        },
-        {
-            id: 9,
-            name: "Pond 09",
-            location: "Sektor Selatan, Blok 1",
-            status: "Bahaya",
-            iot: "Tidak Aktif",
-            capacity: 800,
-            lastMaintained: "20 Jun 2026",
-            temp: 26.1,
-            ph: 5.8,
-            turbidity: 65,
-        },
-        {
-            id: 4,
-            name: "Pond 04",
-            location: "Sektor Selatan, Blok 2",
-            status: "Waspada",
-            iot: "Aktif",
-            capacity: 1500,
-            lastMaintained: "08 Jul 2026",
-            temp: 29.3,
-            ph: 6.7,
-            turbidity: 45,
-        },
     ]);
 
+    // Live Telemetry Sync for Pond list
+    useEffect(() => {
+        const syncTelemetry = async () => {
+            try {
+                const res = await fetch("/api/telemetry/latest/1");
+                if (res.ok) {
+                    const json = await res.json();
+                    const telem = json.telemetry;
+                    if (telem) {
+                        setPonds((prev) =>
+                            prev.map((p) =>
+                                p.id === 1
+                                    ? {
+                                          ...p,
+                                          temp: Number(telem.suhu ?? 27.5),
+                                          ph: Number(telem.ph ?? 7.2),
+                                          turbidity: Number(telem.kekeruhan ?? 18.0),
+                                          status: telem.risk_status === "High" || telem.risk_status === "Critical"
+                                              ? "Bahaya"
+                                              : telem.risk_status === "Medium"
+                                              ? "Waspada"
+                                              : "Aman",
+                                          iot: telem.is_simulated ? "Tidak Aktif" : "Aktif",
+                                      }
+                                    : p
+                            )
+                        );
+                    }
+                }
+            } catch {
+                // Ignore
+            }
+        };
+
+        syncTelemetry();
+        const interval = setInterval(syncTelemetry, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
     // Currently active selected pond for popup modal
-    const [activePondId, setActivePondId] = useState<number>(9);
+    const [activePondId, setActivePondId] = useState<number>(1);
     
     // Popup modal state
     const [isModalOpen, setIsModalOpen] = useState(false);

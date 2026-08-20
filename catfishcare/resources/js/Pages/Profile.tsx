@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
     User,
     Bell,
-    Clock,
     Cpu,
     Save,
     RefreshCw,
@@ -22,7 +21,7 @@ interface ProfileTabProps {
     onProfileUpdate: (user: AppUser) => void;
 }
 
-type SubmenuType = "profile" | "notifications" | "feeding" | "hardware";
+type SubmenuType = "profile" | "notifications" | "hardware";
 
 export default function ProfileTab({
     currentUser,
@@ -43,10 +42,6 @@ export default function ProfileTab({
     const [waEnabled, setWaEnabled] = useState(false);
     const [waPhone, setWaPhone] = useState("812-3456-7890");
     const [waCountry, setWaCountry] = useState("+62");
-
-    // Feeding state fields
-    const [feedingTime, setFeedingTime] = useState("10:00 AM");
-    const [feedingAmount, setFeedingAmount] = useState("5");
 
     // Devices state list
     const [devices, setDevices] = useState([
@@ -114,11 +109,6 @@ export default function ProfileTab({
         showSaveAlert("Profile settings saved successfully.");
     };
 
-    const handleSaveFeeding = (e: React.FormEvent) => {
-        e.preventDefault();
-        showSaveAlert("Feeding schedule updated successfully.");
-    };
-
     const toggleDevice = (id: number) => {
         setDevices((prev) =>
             prev.map((d) =>
@@ -174,7 +164,6 @@ export default function ProfileTab({
                         {[
                             { id: "profile", icon: User, label: "Profile" },
                             { id: "notifications", icon: Bell, label: "Notifications" },
-                            { id: "feeding", icon: Clock, label: "Feeding Schedule" },
                             { id: "hardware", icon: Cpu, label: "ESP Hardware" },
                         ].map((menu) => {
                             const Icon = menu.icon;
@@ -495,85 +484,7 @@ export default function ProfileTab({
                         </div>
                     )}
 
-                    {/* Pane 3: Feeding Schedule */}
-                    {activeSubmenu === "feeding" && (
-                        <form onSubmit={handleSaveFeeding} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                            <div style={{ textAlign: "left" }}>
-                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#0f172a", margin: 0 }}>
-                                    Automated Feeding Schedule
-                                </h3>
-                                <p style={{ fontSize: "13px", color: "#64748b", marginTop: "4px", margin: 0 }}>
-                                    Configure the daily feeding time and pellet amount for your automated dispenser across all ponds.
-                                </p>
-                            </div>
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                                <label style={{ fontSize: "12px", fontWeight: 700, color: "#475569" }}>Feeding Time</label>
-                                <input
-                                    type="text"
-                                    value={feedingTime}
-                                    onChange={(e) => setFeedingTime(e.target.value)}
-                                    className="pm-input"
-                                    style={{ height: "40px", padding: "0 12px", width: "100%" }}
-                                />
-                                <span style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>
-                                    24-hour format · local time (WIB)
-                                </span>
-                            </div>
-
-                            <div style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                                <label style={{ fontSize: "12px", fontWeight: 700, color: "#475569" }}>Amount of Pellets (kg)</label>
-                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                    <input
-                                        type="number"
-                                        value={feedingAmount}
-                                        onChange={(e) => setFeedingAmount(e.target.value)}
-                                        className="pm-input"
-                                        style={{ height: "40px", padding: "0 12px", width: "100px" }}
-                                    />
-                                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#475569" }}>kg per session</span>
-                                </div>
-                                <span style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>
-                                    Distributed equally across all active ponds
-                                </span>
-                            </div>
-
-                            {/* Schedule Preview Callout */}
-                            <div style={{ padding: "16px", borderRadius: "10px", backgroundColor: "#f0f9ff", border: "1px solid #bae6fd", textAlign: "left" }}>
-                                <div style={{ fontSize: "13px", fontWeight: 700, color: "#0369a1" }}>Schedule Preview</div>
-                                <p style={{ fontSize: "13px", color: "#0369a1", margin: "6px 0 0 0", lineHeight: 1.4 }}>
-                                    Every day at <strong>10:00 WIB</strong> — <strong>{feedingAmount} kg</strong> of pellets will be dispensed.
-                                </p>
-                            </div>
-
-                            {/* Save Button */}
-                            <div style={{ textAlign: "left", marginTop: "8px" }}>
-                                <button
-                                    type="submit"
-                                    className="db-btn-cyan"
-                                    style={{
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                        padding: "0 16px",
-                                        height: "40px",
-                                        backgroundColor: "#0ea5e9",
-                                        color: "#ffffff",
-                                        fontWeight: 600,
-                                        fontSize: "13px",
-                                        border: "none",
-                                        borderRadius: "8px",
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    <Save size={14} />
-                                    <span>Save Schedule</span>
-                                </button>
-                            </div>
-                        </form>
-                    )}
-
-                    {/* Pane 4: ESP Hardware */}
+                    {/* Pane 3: ESP Hardware */}
                     {activeSubmenu === "hardware" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
                             

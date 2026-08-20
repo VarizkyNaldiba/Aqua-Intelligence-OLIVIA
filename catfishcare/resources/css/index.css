@@ -3984,8 +3984,8 @@ body.light-theme .dt-wrapper {
 /* Metric mini cards grid */
 .db-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
 }
 
 .db-metric-card {

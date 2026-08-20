@@ -1,66 +1,101 @@
-import { useState, useEffect } from "react";
-import Papa from "papaparse";
-import type { SensorRow, CsvRow } from "@/Types";
-import { normalizeSensorRow } from "@/Utils/csvParser";
+import { useState, useEffect, useRef } from "react";
+import type { SensorRow } from "@/Types";
 
-export const useSensorData = (selectedPondId: number) => {
+export const useSensorData = (selectedPondId: number = 1) => {
     const [rawData, setRawData] = useState<SensorRow[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLiveActive, setIsLiveActive] = useState(false);
     const [liveData, setLiveData] = useState<SensorRow | null>(null);
+    // Store last seen timestamp as a number for reliable comparison
+    const lastTimestampRef = useRef<number>(0);
 
-    // Load and parse the CSV data
+    // Load initial time-series telemetry history from backend
     useEffect(() => {
-        // Reset simulation index and playing state on pond change
+        let isMounted = true;
         setCurrentIndex(0);
         setIsPlaying(false);
-        setLiveData(null);
-        setIsLiveActive(false);
 
-        fetch(`/datasets/IoTPond${selectedPondId}.csv`)
-            .then((response) => response.text())
-            .then((csvText) => {
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (results: { data: CsvRow[] }) => {
-                        const cleanedData = results.data.map(normalizeSensorRow);
-                        setRawData(cleanedData);
-                    },
-                });
+        fetch(`/api/telemetry/history/${selectedPondId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (isMounted && data.history && Array.isArray(data.history) && data.history.length > 0) {
+                    setRawData(data.history);
+                    setCurrentIndex(data.history.length - 1);
+                    const latest = data.history[data.history.length - 1];
+                    setLiveData(latest);
+                }
             })
-            .catch((error) => console.error("Error fetching CSV:", error));
+            .catch(() => {
+                // Fallback initial baseline
+                const now = new Date();
+                const baseline: SensorRow[] = Array.from({ length: 15 }, (_, i) => ({
+                    created_at: new Date(now.getTime() - (15 - i) * 10000).toISOString(),
+                    entry_id: `init-${selectedPondId}-${i}`,
+                    TEMPERATURE: 27.5,
+                    TURBIDITY: 18.0,
+                    pH: 7.2,
+                    NITRATE: 420.0,
+                    Population: 1000,
+                    Length: 25.0,
+                    Weight: 0.05,
+                }));
+                if (isMounted) {
+                    setRawData(baseline);
+                    setCurrentIndex(baseline.length - 1);
+                    setLiveData(baseline[baseline.length - 1]);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
     }, [selectedPondId]);
 
-    // Live Telemetry Polling (Every 2.5s when not playing dataset simulation)
+    // Live Telemetry Polling (Every 2.5s)
     useEffect(() => {
         let isMounted = true;
         const fetchLiveTelemetry = async () => {
-            if (isPlaying) return;
             try {
                 const res = await fetch(`/api/telemetry/latest/${selectedPondId}`);
                 if (res.ok) {
                     const json = await res.json();
                     const telem = json.telemetry;
                     if (telem && isMounted) {
-                        const row: SensorRow = {
+                        // Use numeric UNIX timestamp for reliable "new data" detection
+                        const updatedAtMs = telem.updated_at
+                            ? new Date(telem.updated_at).getTime()
+                            : 0;
+
+                        const newRow: SensorRow = {
                             created_at: telem.updated_at || new Date().toISOString(),
-                            entry_id: `live-${selectedPondId}-${Date.now()}`,
+                            entry_id: `live-${selectedPondId}-${updatedAtMs}`,
                             TEMPERATURE: Number(telem.suhu ?? 27.5),
                             TURBIDITY: Number(telem.kekeruhan ?? 18.0),
                             pH: Number(telem.ph ?? 7.2),
                             NITRATE: Number(telem.tds ?? 420.0),
-                            Population: 10000,
-                            Length: Number(telem.tinggi_air ?? 100.0),
+                            Population: 1000,
+                            Length: Number(telem.tinggi_air ?? 25.0),
                             Weight: Number(telem.sfr ?? 0.05),
                         };
-                        setLiveData(row);
+
+                        // Always update the live card display
+                        setLiveData(newRow);
                         setIsLiveActive(!telem.is_simulated);
+
+                        // Only append to chart history if this is genuinely newer data
+                        if (updatedAtMs > lastTimestampRef.current) {
+                            lastTimestampRef.current = updatedAtMs;
+                            setRawData((prev) => {
+                                const next = [...prev, newRow];
+                                return next.length > 30 ? next.slice(-30) : next;
+                            });
+                            setCurrentIndex((prev) => prev + 1);
+                        }
                     }
                 }
             } catch {
-                // Silently fallback to dataset CSV
+                // Ignore network glitch
             }
         };
 
@@ -71,34 +106,12 @@ export const useSensorData = (selectedPondId: number) => {
             isMounted = false;
             clearInterval(pollInterval);
         };
-    }, [selectedPondId, isPlaying]);
+    }, [selectedPondId]);
 
-    // Simulation loop
-    useEffect(() => {
-        let intervalId: ReturnType<typeof setInterval> | undefined;
-        if (isPlaying && rawData.length > 0) {
-            intervalId = setInterval(() => {
-                setCurrentIndex((prevIndex) => {
-                    if (prevIndex >= rawData.length - 1) {
-                        setIsPlaying(false);
-                        return prevIndex;
-                    }
-                    return prevIndex + 1;
-                });
-            }, 2000); // Step every 2 seconds
-        }
-        return () => {
-            if (intervalId) clearInterval(intervalId);
-        };
-    }, [isPlaying, rawData.length]);
+    const currentData = liveData || (rawData[rawData.length - 1] ?? null);
 
-    const currentData = (!isPlaying && liveData) ? liveData : (rawData[currentIndex] ?? null);
-
-    // Sliding window of exactly 15 elements for charts
-    const latestRows = rawData.slice(
-        Math.max(0, currentIndex - 14),
-        Math.max(15, currentIndex + 1),
-    );
+    // Dynamic rolling window of last 15 elements for charts
+    const latestRows = rawData.length > 15 ? rawData.slice(-15) : rawData;
 
     return {
         rawData,
@@ -111,4 +124,3 @@ export const useSensorData = (selectedPondId: number) => {
         isLiveActive,
     };
 };
-
