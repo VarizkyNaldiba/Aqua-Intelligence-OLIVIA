@@ -49,7 +49,8 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
         elif path == "/api/list":
             batch = query.get("batch", ["all"])[0]
             status_filter = query.get("status", ["all"])[0]
-            items = self.get_items(batch, status_filter)
+            reviewer = query.get("reviewer", ["all"])[0]
+            items = self.get_items(batch, status_filter, reviewer)
             state = load_state()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -88,6 +89,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             action = payload.get("action") # APPROVED, REJECTED, EDITED
             bboxes = payload.get("bboxes", [])
             split = payload.get("split", "train")
+            reviewer = payload.get("reviewer", "Unknown")
 
             state = load_state()
             prev_action = state["reviews"].get(rel_path, {}).get("action")
@@ -95,8 +97,10 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             state["reviews"][rel_path] = {
                 "action": action,
                 "bboxes": bboxes,
-                "split": split
+                "split": split,
+                "reviewer": reviewer
             }
+            state["last_rel_path"] = rel_path
 
             # Update stats
             if prev_action != action:
@@ -151,7 +155,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "ok", "stats": state["stats"]}).encode("utf-8"))
             return
 
-    def get_items(self, batch, status_filter="all"):
+    def get_items(self, batch, status_filter="all", reviewer="all"):
         folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
         folder_splits = {
             "catfishcare_dataset_1787213105": "train",
@@ -159,7 +163,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             "catfishcare_dataset_1787199872": "test"
         }
         state = load_state()
-        items = []
+        all_raw_items = []
 
         for folder in folders:
             img_dir = os.path.join(DATASETS_DIR, folder, "images")
@@ -192,33 +196,53 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
                 if status != "PENDING" and "bboxes" in rev_info:
                     bboxes = rev_info["bboxes"]
 
-                # Status Filter Guard
-                if status_filter != "all" and status.lower() != status_filter.lower():
-                    continue
+                all_raw_items.append({
+                    "rel_path": rel_path,
+                    "filename": os.path.basename(img_path),
+                    "folder": folder,
+                    "split": split,
+                    "max_conf": max_conf,
+                    "bboxes": bboxes,
+                    "status": status,
+                    "reviewer": rev_info.get("reviewer", "")
+                })
 
-                # Filter batch
-                match = False
-                if batch == "all":
-                    match = True
-                elif batch == "high" and max_conf >= 0.75:
-                    match = True
-                elif batch == "med" and 0.45 <= max_conf < 0.75:
-                    match = True
-                elif batch == "negative" and len(bboxes) == 0:
-                    match = True
-                elif batch == "pending" and status == "PENDING":
-                    match = True
+        # Partition dataset among 3 Team Members if requested (iir, variz, gopar)
+        if reviewer.lower() in ["iir", "variz", "gopar"]:
+            total = len(all_raw_items)
+            chunk_size = (total + 2) // 3
+            if reviewer.lower() == "iir":
+                all_raw_items = all_raw_items[0:chunk_size]
+            elif reviewer.lower() == "variz":
+                all_raw_items = all_raw_items[chunk_size:chunk_size*2]
+            elif reviewer.lower() == "gopar":
+                all_raw_items = all_raw_items[chunk_size*2:]
 
-                if match:
-                    items.append({
-                        "rel_path": rel_path,
-                        "filename": os.path.basename(img_path),
-                        "folder": folder,
-                        "split": split,
-                        "max_conf": max_conf,
-                        "bboxes": bboxes,
-                        "status": status
-                    })
+        items = []
+        for item in all_raw_items:
+            status = item["status"]
+            max_conf = item["max_conf"]
+
+            # Status Filter Guard
+            if status_filter != "all" and status.lower() != status_filter.lower():
+                continue
+
+            # Filter batch
+            match = False
+            if batch == "all":
+                match = True
+            elif batch == "high" and max_conf >= 0.75:
+                match = True
+            elif batch == "med" and 0.45 <= max_conf < 0.75:
+                match = True
+            elif batch == "negative" and len(item["bboxes"]) == 0:
+                match = True
+            elif batch == "pending" and status == "PENDING":
+                match = True
+
+            if match:
+                items.append(item)
+
         return items
 
 APP_HTML = """<!DOCTYPE html>
@@ -273,14 +297,22 @@ APP_HTML = """<!DOCTYPE html>
 <body>
 
 <header>
-    <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
+    <div>
+        <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
+        <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
+            <span style="font-size:12px; font-weight:bold; color:#38bdf8;">Tim Reviewer:</span>
+            <button class="btn" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #4803)</button>
+            <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#4804 - #9605)</button>
+            <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#9606 - #14407)</button>
+            <button class="btn active" id="btn-user-all" onclick="setReviewer('all')">🌐 All Team</button>
+        </div>
+    </div>
     
     <div class="batch-selector">
         <button class="btn active" id="btn-status-pending" onclick="setFilter('all', 'pending')">🟡 Pending Only</button>
         <button class="btn" id="btn-status-approved" onclick="setFilter('all', 'approved')">🟢 Approved Only</button>
         <button class="btn" id="btn-status-rejected" onclick="setFilter('all', 'rejected')">🔴 Rejected Only</button>
         <button class="btn" id="btn-status-all" onclick="setFilter('all', 'all')">🌐 All Samples</button>
-        <button class="btn" id="btn-batch-high" onclick="setFilter('high', currentStatus)">High Conf (&ge;0.75)</button>
         <button class="btn btn-reset" onclick="resetAll()">🔄 Reset All Progress</button>
     </div>
 </header>
@@ -398,6 +430,14 @@ APP_HTML = """<!DOCTYPE html>
         render();
     });
 
+    function setReviewer(name) {
+        currentReviewer = name;
+        document.querySelectorAll('header div div button').forEach(b => b.classList.remove('active'));
+        let btn = document.getElementById('btn-user-' + name.toLowerCase());
+        if (btn) btn.classList.add('active');
+        fetchList(true);
+    }
+
     function setFilter(batch, status) {
         currentBatch = batch;
         currentStatus = status;
@@ -408,7 +448,7 @@ APP_HTML = """<!DOCTYPE html>
     }
 
     function fetchList(restoreState = true) {
-        fetch('/api/list?batch=' + currentBatch + '&status=' + currentStatus)
+        fetch('/api/list?batch=' + currentBatch + '&status=' + currentStatus + '&reviewer=' + currentReviewer)
             .then(res => res.json())
             .then(data => {
                 items = data.items;
@@ -515,7 +555,8 @@ APP_HTML = """<!DOCTYPE html>
                 rel_path: item.rel_path,
                 action: action,
                 bboxes: activeBBoxes,
-                split: item.split
+                split: item.split,
+                reviewer: currentReviewer
             })
         }).then(res => res.json()).then(data => {
             item.status = action;
@@ -555,6 +596,14 @@ APP_HTML = """<!DOCTYPE html>
         if (currentIndex < items.length - 1) {
             currentIndex++;
             renderCurrent();
+        }
+    }
+
+    if (currentReviewer !== 'all') {
+        let btn = document.getElementById('btn-user-' + currentReviewer.toLowerCase());
+        if (btn) {
+            document.querySelectorAll('header div div button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
     }
 
