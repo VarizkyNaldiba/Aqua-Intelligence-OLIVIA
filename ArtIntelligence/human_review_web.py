@@ -32,6 +32,66 @@ def save_state(state):
     with open(STATE_FILE, "w") as f:
         json.dump(state, f, indent=2)
 
+ALL_DATASET_ITEMS = []
+
+def init_dataset_cache():
+    global ALL_DATASET_ITEMS
+    folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
+    folder_splits = {
+        "catfishcare_dataset_1787213105": "train",
+        "catfishcare_dataset_1787196851": "val",
+        "catfishcare_dataset_1787199872": "test"
+    }
+    state = load_state()
+    items = []
+
+    for folder in folders:
+        img_dir = os.path.join(DATASETS_DIR, folder, "images")
+        cand_dir = os.path.join(DATASETS_DIR, folder, "auto_labeled_candidates", "candidate_labels")
+        split = folder_splits.get(folder, "train")
+
+        img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
+
+        for img_path in img_files:
+            rel_path = os.path.relpath(img_path, DATASETS_DIR)
+            base_name = os.path.splitext(os.path.basename(img_path))[0]
+            cand_txt = os.path.join(cand_dir, base_name + ".txt")
+
+            bboxes = []
+            max_conf = 0.0
+
+            if os.path.exists(cand_txt):
+                with open(cand_txt, "r") as f:
+                    for l in f.readlines():
+                        parts = l.strip().split()
+                        if len(parts) >= 5:
+                            xc, yc, bw, bh = map(float, parts[1:5])
+                            conf = float(parts[5]) if len(parts) >= 6 else 1.0
+                            bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
+                            if conf > max_conf:
+                                max_conf = conf
+
+            rev_info = state["reviews"].get(rel_path, {})
+            status = rev_info.get("action", "PENDING")
+            if status != "PENDING" and "bboxes" in rev_info:
+                bboxes = rev_info["bboxes"]
+
+            items.append({
+                "rel_path": rel_path,
+                "filename": os.path.basename(img_path),
+                "folder": folder,
+                "split": split,
+                "max_conf": max_conf,
+                "bboxes": bboxes,
+                "status": status,
+                "reviewer": rev_info.get("reviewer", "")
+            })
+
+    ALL_DATASET_ITEMS = items
+
+# Populate RAM cache on startup
+init_dataset_cache()
+
 class HumanReviewHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -42,6 +102,8 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
             self.end_headers()
             self.wfile.write(APP_HTML.encode("utf-8"))
             return
@@ -54,7 +116,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             state = load_state()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
-            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.end_headers()
             self.wfile.write(json.dumps({
                 "items": items,
@@ -102,6 +164,14 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             }
             state["last_rel_path"] = rel_path
 
+            # Update in-memory RAM cache instantly
+            for item in ALL_DATASET_ITEMS:
+                if item["rel_path"] == rel_path:
+                    item["status"] = action
+                    item["bboxes"] = bboxes
+                    item["reviewer"] = reviewer
+                    break
+
             # Update stats
             if prev_action != action:
                 if prev_action:
@@ -140,6 +210,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
         elif self.path == "/api/reset":
             state = {"reviews": {}, "stats": {"approved": 0, "rejected": 0, "edited": 0, "total_reviewed": 0}}
             save_state(state)
+            init_dataset_cache() # Reset RAM cache
             if os.path.exists(REVIEWED_DIR):
                 import shutil
                 shutil.rmtree(REVIEWED_DIR, ignore_errors=True)
@@ -156,70 +227,21 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             return
 
     def get_items(self, batch, status_filter="all", reviewer="all"):
-        folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
-        folder_splits = {
-            "catfishcare_dataset_1787213105": "train",
-            "catfishcare_dataset_1787196851": "val",
-            "catfishcare_dataset_1787199872": "test"
-        }
-        state = load_state()
-        all_raw_items = []
-
-        for folder in folders:
-            img_dir = os.path.join(DATASETS_DIR, folder, "images")
-            cand_dir = os.path.join(DATASETS_DIR, folder, "auto_labeled_candidates", "candidate_labels")
-            split = folder_splits.get(folder, "train")
-
-            img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
-
-            for img_path in img_files:
-                rel_path = os.path.relpath(img_path, DATASETS_DIR)
-                base_name = os.path.splitext(os.path.basename(img_path))[0]
-                cand_txt = os.path.join(cand_dir, base_name + ".txt")
-
-                bboxes = []
-                max_conf = 0.0
-
-                if os.path.exists(cand_txt):
-                    with open(cand_txt, "r") as f:
-                        for l in f.readlines():
-                            parts = l.strip().split()
-                            if len(parts) >= 5:
-                                xc, yc, bw, bh = map(float, parts[1:5])
-                                conf = float(parts[5]) if len(parts) >= 6 else 1.0
-                                bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
-                                if conf > max_conf:
-                                    max_conf = conf
-
-                rev_info = state["reviews"].get(rel_path, {})
-                status = rev_info.get("action", "PENDING")
-                if status != "PENDING" and "bboxes" in rev_info:
-                    bboxes = rev_info["bboxes"]
-
-                all_raw_items.append({
-                    "rel_path": rel_path,
-                    "filename": os.path.basename(img_path),
-                    "folder": folder,
-                    "split": split,
-                    "max_conf": max_conf,
-                    "bboxes": bboxes,
-                    "status": status,
-                    "reviewer": rev_info.get("reviewer", "")
-                })
+        all_raw = ALL_DATASET_ITEMS[:]
 
         # Partition dataset among 3 Team Members if requested (iir, variz, gopar)
         if reviewer.lower() in ["iir", "variz", "gopar"]:
-            total = len(all_raw_items)
+            total = len(all_raw)
             chunk_size = (total + 2) // 3
             if reviewer.lower() == "iir":
-                all_raw_items = all_raw_items[0:chunk_size]
+                all_raw = all_raw[0:chunk_size]
             elif reviewer.lower() == "variz":
-                all_raw_items = all_raw_items[chunk_size:chunk_size*2]
+                all_raw = all_raw[chunk_size:chunk_size*2]
             elif reviewer.lower() == "gopar":
-                all_raw_items = all_raw_items[chunk_size*2:]
+                all_raw = all_raw[chunk_size*2:]
 
         items = []
-        for item in all_raw_items:
+        for item in all_raw:
             status = item["status"]
             max_conf = item["max_conf"]
 
