@@ -2,25 +2,22 @@ import os
 import glob
 import cv2
 import numpy as np
-import json
 
-DATASETS_DIR = r"e:\lele dumbo\Aqua-Intelligence-OLIVIA\datasets"
-TARGET_FOLDER = "catfishcare_dataset_1787196851"
-IMG_DIR = os.path.join(DATASETS_DIR, TARGET_FOLDER, "images")
-CAND_DIR = os.path.join(DATASETS_DIR, TARGET_FOLDER, "auto_labeled_candidates", "candidate_labels")
+TARGET_DIR = r"e:\lele dumbo\Aqua-Intelligence-OLIVIA\datasets\dataset-1500\catfishcare_dataset_1787243240"
+IMG_DIR = os.path.join(TARGET_DIR, "images")
+CAND_DIR = os.path.join(TARGET_DIR, "auto_labeled_candidates", "candidate_labels")
 
 os.makedirs(CAND_DIR, exist_ok=True)
 
-# Purge any old candidate files in CAND_DIR
-old_cands = glob.glob(os.path.join(CAND_DIR, "*.txt"))
-for f in old_cands:
+# Purge old candidates in CAND_DIR
+for f in glob.glob(os.path.join(CAND_DIR, "*.txt")):
     try:
         os.remove(f)
     except Exception:
         pass
 
 img_files = glob.glob(os.path.join(IMG_DIR, "*.jpg")) + glob.glob(os.path.join(IMG_DIR, "*.png"))
-print(f"Starting High-Precision Auto-Labeling for {len(img_files)} images in {TARGET_FOLDER}...")
+print(f"Starting High-Precision Auto-Labeling for {len(img_files)} images in dataset-1500...")
 
 total_candidates = 0
 processed_images = 0
@@ -98,7 +95,7 @@ for img_path in img_files:
         std_dev = np.std(roi_gray)
         mean_val = np.mean(roi_gray)
 
-        # Pure white glare has high mean (> 230) and low std_dev (< 10) -> Skip
+        # Pure white glare has high mean (> 235) and low std_dev (< 12) -> Skip
         if mean_val > 235 and std_dev < 12:
             continue
 
@@ -118,7 +115,7 @@ for img_path in img_files:
     processed_images += 1
 
 print(f"==================================================")
-print(f"Auto-Labeling Complete!")
+print(f"Auto-Labeling Complete for dataset-1500/catfishcare_dataset_1787243240!")
 print(f"Processed Images : {processed_images}")
 print(f"Total Candidates Generated : {total_candidates}")
 print(f"Average Candidates per Image : {total_candidates / max(1, processed_images):.2f}")

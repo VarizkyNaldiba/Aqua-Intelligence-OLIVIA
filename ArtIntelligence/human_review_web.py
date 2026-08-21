@@ -47,54 +47,61 @@ ALL_DATASET_ITEMS = []
 
 def init_dataset_cache():
     global ALL_DATASET_ITEMS
-    folders = ["catfishcare_dataset_1787196851"]
-    folder_splits = {
-        "catfishcare_dataset_1787196851": "val"
-    }
+    target_folder = os.path.join(DATASETS_DIR, "dataset-1500", "catfishcare_dataset_1787243240")
+    img_dir = os.path.join(target_folder, "images")
+    cand_dir = os.path.join(target_folder, "auto_labeled_candidates", "candidate_labels")
+    lbl_dir = os.path.join(target_folder, "labels")
+    split = "train"
+
     state = load_state()
     items = []
 
-    for folder in folders:
-        img_dir = os.path.join(DATASETS_DIR, folder, "images")
-        cand_dir = os.path.join(DATASETS_DIR, folder, "auto_labeled_candidates", "candidate_labels")
-        split = folder_splits.get(folder, "train")
+    img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
 
-        img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
+    for img_path in img_files:
+        rel_path = os.path.relpath(img_path, DATASETS_DIR).replace("\\", "/")
+        base_name = os.path.splitext(os.path.basename(img_path))[0]
+        cand_txt = os.path.join(cand_dir, base_name + ".txt")
+        lbl_txt = os.path.join(lbl_dir, base_name + ".txt")
 
-        for img_path in img_files:
-            rel_path = os.path.relpath(img_path, DATASETS_DIR).replace("\\", "/")
-            base_name = os.path.splitext(os.path.basename(img_path))[0]
-            cand_txt = os.path.join(cand_dir, base_name + ".txt")
+        bboxes = []
+        max_conf = 0.0
 
-            bboxes = []
-            max_conf = 0.0
+        if os.path.exists(cand_txt):
+            with open(cand_txt, "r") as f:
+                for l in f.readlines():
+                    parts = l.strip().split()
+                    if len(parts) >= 5:
+                        xc, yc, bw, bh = map(float, parts[1:5])
+                        conf = float(parts[5]) if len(parts) >= 6 else 1.0
+                        bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
+                        if conf > max_conf:
+                            max_conf = conf
+        elif os.path.exists(lbl_txt):
+            with open(lbl_txt, "r") as f:
+                for l in f.readlines():
+                    parts = l.strip().split()
+                    if len(parts) >= 5:
+                        xc, yc, bw, bh = map(float, parts[1:5])
+                        conf = 1.0
+                        bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
+                        max_conf = 1.0
 
-            if os.path.exists(cand_txt):
-                with open(cand_txt, "r") as f:
-                    for l in f.readlines():
-                        parts = l.strip().split()
-                        if len(parts) >= 5:
-                            xc, yc, bw, bh = map(float, parts[1:5])
-                            conf = float(parts[5]) if len(parts) >= 6 else 1.0
-                            bboxes.append({"xc": xc, "yc": yc, "bw": bw, "bh": bh, "conf": conf})
-                            if conf > max_conf:
-                                max_conf = conf
+        rev_info = state["reviews"].get(rel_path, {})
+        status = rev_info.get("action", "PENDING")
+        if status != "PENDING" and "bboxes" in rev_info:
+            bboxes = rev_info["bboxes"]
 
-            rev_info = state["reviews"].get(rel_path, {})
-            status = rev_info.get("action", "PENDING")
-            if status != "PENDING" and "bboxes" in rev_info:
-                bboxes = rev_info["bboxes"]
-
-            items.append({
-                "rel_path": rel_path,
-                "filename": os.path.basename(img_path),
-                "folder": folder,
-                "split": split,
-                "max_conf": max_conf,
-                "bboxes": bboxes,
-                "status": status,
-                "reviewer": rev_info.get("reviewer", "")
-            })
+        items.append({
+            "rel_path": rel_path,
+            "filename": os.path.basename(img_path),
+            "folder": "dataset-1500/catfishcare_dataset_1787243240",
+            "split": split,
+            "max_conf": max_conf,
+            "bboxes": bboxes,
+            "status": status,
+            "reviewer": rev_info.get("reviewer", "Unknown")
+        })
 
     ALL_DATASET_ITEMS = items
 
@@ -331,9 +338,9 @@ APP_HTML = """<!DOCTYPE html>
         <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
         <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
             <span style="font-size:12px; font-weight:bold; color:#38bdf8;">Tim Reviewer:</span>
-            <button class="btn active" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #508)</button>
-            <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#509 - #1016)</button>
-            <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#1017 - #1523)</button>
+            <button class="btn active" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #551)</button>
+            <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#552 - #1102)</button>
+            <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#1103 - #1653)</button>
         </div>
     </div>
     
