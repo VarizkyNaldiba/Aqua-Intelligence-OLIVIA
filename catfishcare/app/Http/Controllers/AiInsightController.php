@@ -121,28 +121,22 @@ class AiInsightController extends Controller
         $riskScore = (float) $request->input('risk_score', 15.0);
         $riskStatus = (string) $request->input('risk_status', 'Low');
 
-<<<<<<< HEAD
         $activeThresholds = TelemetryController::getThresholdsForPond($kolamId);
         $thresholdSummary = "Batas Aktif Kolam: pH [{$activeThresholds['ph']['normal_min']}-{$activeThresholds['ph']['normal_max']}], " .
             "Suhu [{$activeThresholds['suhu']['normal_min']}-{$activeThresholds['suhu']['normal_max']}°C], " .
             "Turbidity max {$activeThresholds['turbidity']['normal_max']} NTU, TDS max {$activeThresholds['tds']['normal_max']} ppm.";
 
-        $deepSeekApiKey = env('DEEPSEEK_API_KEY');
-=======
         $geminiApiKey = env('GEMINI_API_KEY');
->>>>>>> f0cb8d2a00de86aace82ea302b8504bba6a62c22
+        $deepSeekApiKey = env('DEEPSEEK_API_KEY');
 
+        // 1. Google Gemini API Integration
         if ($geminiApiKey) {
             try {
                 $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
                     "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
                     "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
-<<<<<<< HEAD
                     "{$thresholdSummary} " .
-                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
-=======
                     "Berikan analisis ringkas dalam format JSON dengan key persis sebagai berikut: \"summary\" (Kondisi Terkini), \"cause\" (Analisis Penyebab & Perilaku Ikan), \"impact\" (Prediksi Dampak 24 Jam), dan \"mitigation\" (Rekomendasi Mitigasi Otomatis). Format WAJIB JSON murni tanpa awalan markdown.";
->>>>>>> f0cb8d2a00de86aace82ea302b8504bba6a62c22
 
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
@@ -163,25 +157,55 @@ class AiInsightController extends Controller
                     $json = $response->json();
                     $insightText = $json['candidates'][0]['content']['parts'][0]['text'] ?? null;
                     if ($insightText) {
-<<<<<<< HEAD
+                        $sectionsData = json_decode($insightText, true);
+                        if (is_array($sectionsData)) {
+                            return response()->json([
+                                'status' => 'success',
+                                'provider' => 'Google Gemini 1.5 Flash (Live API)',
+                                'threshold_context' => $thresholdSummary,
+                                'risk_status' => $riskStatus,
+                                'risk_score' => $riskScore,
+                                'sections' => $sectionsData,
+                            ]);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fallback to next provider or internal reasoning engine
+            }
+        }
+
+        // 2. DeepSeek API Integration
+        if ($deepSeekApiKey) {
+            try {
+                $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
+                    "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
+                    "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
+                    "{$thresholdSummary} " .
+                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
+
+                $response = Http::withHeaders([
+                    'Authorization' => "Bearer {$deepSeekApiKey}",
+                    'Content-Type' => 'application/json',
+                ])->timeout(12)->post('https://api.deepseek.com/chat/completions', [
+                    'model' => 'deepseek-chat',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Anda adalah asisten AI budidaya perikanan presisi.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 0.4,
+                ]);
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    $insightText = $json['choices'][0]['message']['content'] ?? null;
+                    if ($insightText) {
                         return response()->json([
                             'status' => 'success',
                             'provider' => 'DeepSeek LLM (Live API)',
                             'threshold_context' => $thresholdSummary,
                             'insight' => $insightText,
                         ]);
-=======
-                        $sectionsData = json_decode($insightText, true);
-                        if (is_array($sectionsData)) {
-                            return response()->json([
-                                'status' => 'success',
-                                'provider' => 'Gemini 1.5 Flash (Live API)',
-                                'risk_status' => $riskStatus,
-                                'risk_score' => $riskScore,
-                                'sections' => $sectionsData,
-                            ]);
-                        }
->>>>>>> f0cb8d2a00de86aace82ea302b8504bba6a62c22
                     }
                 }
             } catch (\Throwable $e) {
@@ -189,7 +213,7 @@ class AiInsightController extends Controller
             }
         }
 
-        // High-Quality Rule-Based AI Engine (aligned with Paper rules)
+        // 3. High-Quality Rule-Based AI Engine (aligned with Paper rules)
         $sections = [];
 
         if ($riskStatus === 'Critical') {
