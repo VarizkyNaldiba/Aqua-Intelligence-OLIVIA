@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { 
     Database, Pencil, Trash2, X, Waves, Info, 
-    Thermometer, Droplet, Eye, ShieldCheck, Wifi, Calendar, Fish 
+    Thermometer, Droplet, ShieldCheck, Wifi, Calendar, Fish 
 } from "lucide-react";
 import type { TabName } from "@/Types";
 
@@ -26,8 +26,8 @@ interface PondsTabProps {
 }
 
 const PondsTab = ({
-    selectedPondId,
-    setSelectedPondId,
+    selectedPondId: _selectedPondId,
+    setSelectedPondId: _setSelectedPondId,
 }: PondsTabProps) => {
     // Single active dynamic IoT pond
     const [ponds, setPonds] = useState<PondItem[]>([
@@ -108,9 +108,15 @@ const PondsTab = ({
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipCoords, setTooltipCoords] = useState({ x: 0, y: 0 });
 
+    // Threshold Settings state
+    const [thresholdData, setThresholdData] = useState<any>(null);
+    const [isCustomThreshold, setIsCustomThreshold] = useState(false);
+    const [activeModalTab, setActiveModalTab] = useState<"info" | "thresholds">("info");
+    const [thresholdSaving, setThresholdSaving] = useState(false);
+
     // Load active pond details into form when selection changes
     const activePond = ponds.find((p) => p.id === activePondId) || ponds[0];
-    
+
     useEffect(() => {
         if (activePond) {
             setEditName(activePond.name);
@@ -123,6 +129,72 @@ const PondsTab = ({
             setEditTurbidity(activePond.turbidity);
         }
     }, [activePondId, ponds]);
+
+    // Fetch pond thresholds when modal opens
+    useEffect(() => {
+        if (isModalOpen && activePondId) {
+            fetch(`/api/thresholds/${activePondId}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.thresholds) {
+                        setThresholdData(data.thresholds);
+                        setIsCustomThreshold(Boolean(data.is_custom));
+                    }
+                })
+                .catch(() => {});
+        }
+    }, [isModalOpen, activePondId]);
+
+    const handleSaveThresholds = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!thresholdData) return;
+        setThresholdSaving(true);
+        try {
+            const res = await fetch("/api/thresholds/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    kolam_id: activePondId,
+                    thresholds: thresholdData,
+                }),
+            });
+            if (res.ok) {
+                const json = await res.json();
+                setAlertMessage(json.message || "Threshold updated successfully!");
+                setIsCustomThreshold(true);
+                setTimeout(() => setAlertMessage(""), 4000);
+            }
+        } catch {
+            setAlertMessage("Gagal menyimpan threshold.");
+        } finally {
+            setThresholdSaving(false);
+        }
+    };
+
+    const handleResetThresholds = async () => {
+        if (!confirm("Kembalikan ambang batas kolam ke nilai Paper Default (CatfishCare 2026)?")) return;
+        setThresholdSaving(true);
+        try {
+            const res = await fetch("/api/thresholds/reset", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ kolam_id: activePondId }),
+            });
+            if (res.ok) {
+                const json = await res.json();
+                setAlertMessage(json.message || "Threshold reset to Paper Default!");
+                setIsCustomThreshold(false);
+                const getRes = await fetch(`/api/thresholds/${activePondId}`);
+                const getJson = await getRes.json();
+                if (getJson.thresholds) setThresholdData(getJson.thresholds);
+                setTimeout(() => setAlertMessage(""), 4000);
+            }
+        } catch {
+            setAlertMessage("Gagal reset threshold.");
+        } finally {
+            setThresholdSaving(false);
+        }
+    };
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
@@ -275,7 +347,7 @@ const PondsTab = ({
                                                 <div className="pm-pond-icon-circle">
                                                     <Waves size={16} />
                                                 </div>
-                                                <div style={{ textItems: "left", textAlign: "left" }}>
+                                                <div style={{ textAlign: "left" }}>
                                                     <div className="pm-pond-title">{pond.name}</div>
                                                     <div className="pm-pond-location">{pond.location}</div>
                                                 </div>
@@ -498,121 +570,342 @@ const PondsTab = ({
                                 </div>
                             </div>
                         ) : (
-                            /* EDIT MODE FORM */
-                            <form onSubmit={handleSave} className="pm-details-body">
-                                {/* Pond Name Input */}
-                                <div className="pm-details-field">
-                                    <label className="pm-details-label">Pond Name</label>
-                                    <input
-                                        type="text"
-                                        className="pm-input"
-                                        value={editName}
-                                        onChange={(e) => setEditName(e.target.value)}
-                                        placeholder="Enter pond name"
-                                        required
-                                    />
-                                </div>
-
-                                {/* Location Input */}
-                                <div className="pm-details-field">
-                                    <label className="pm-details-label">Location</label>
-                                    <input
-                                        type="text"
-                                        className="pm-input"
-                                        value={editLocation}
-                                        onChange={(e) => setEditLocation(e.target.value)}
-                                        placeholder="Enter sector and block location"
-                                        required
-                                    />
-                                </div>
-
-                                {/* Fish Capacity Input */}
-                                <div className="pm-details-field">
-                                    <label className="pm-details-label">Fish Capacity (ekor)</label>
-                                    <input
-                                        type="number"
-                                        className="pm-input"
-                                        value={editCapacity}
-                                        onChange={(e) => setEditCapacity(Number(e.target.value))}
-                                        placeholder="Enter capacity limit"
-                                        required
-                                    />
-                                </div>
-
-                                {/* Warning Status Select */}
-                                <div className="pm-details-field">
-                                    <label className="pm-details-label">Pond Status</label>
-                                    <select
-                                        className="pm-input"
-                                        value={editStatus}
-                                        onChange={(e) => setEditStatus(e.target.value as "Aman" | "Waspada" | "Bahaya")}
+                            /* EDIT MODE FORM WITH THRESHOLD SETTINGS TAB */
+                            <div className="pm-details-body">
+                                {/* Tab selector inside Edit Modal */}
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "8px" }}>
+                                    <button
+                                        type="button"
+                                        style={{
+                                            padding: "6px 14px",
+                                            borderRadius: "6px",
+                                            fontSize: "13px",
+                                            fontWeight: 600,
+                                            border: "none",
+                                            cursor: "pointer",
+                                            backgroundColor: activeModalTab === "info" ? "#0ea5e9" : "transparent",
+                                            color: activeModalTab === "info" ? "#ffffff" : "#94a3b8",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                        onClick={() => setActiveModalTab("info")}
                                     >
-                                        <option value="Aman">Aman</option>
-                                        <option value="Waspada">Waspada</option>
-                                        <option value="Bahaya">Bahaya</option>
-                                    </select>
-                                </div>
-
-                                {/* IoT Connection Select */}
-                                <div className="pm-details-field">
-                                    <label className="pm-details-label">IoT Connection State</label>
-                                    <select
-                                        className="pm-input"
-                                        value={editIot}
-                                        onChange={(e) => setEditIot(e.target.value as "Aktif" | "Tidak Aktif")}
-                                    >
-                                        <option value="Aktif">Aktif</option>
-                                        <option value="Tidak Aktif">Tidak Aktif</option>
-                                    </select>
-                                </div>
-
-                                {/* Static Telemetry Inputs for demo testing */}
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
-                                    <div className="pm-details-field">
-                                        <label className="pm-details-label">Suhu (°C)</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            className="pm-input"
-                                            value={editTemp}
-                                            onChange={(e) => setEditTemp(Number(e.target.value))}
-                                        />
-                                    </div>
-                                    <div className="pm-details-field">
-                                        <label className="pm-details-label">pH</label>
-                                        <input
-                                            type="number"
-                                            step="0.1"
-                                            className="pm-input"
-                                            value={editPh}
-                                            onChange={(e) => setEditPh(Number(e.target.value))}
-                                        />
-                                    </div>
-                                    <div className="pm-details-field">
-                                        <label className="pm-details-label">Kekeruhan</label>
-                                        <input
-                                            type="number"
-                                            className="pm-input"
-                                            value={editTurbidity}
-                                            onChange={(e) => setEditTurbidity(Number(e.target.value))}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Action buttons */}
-                                <div className="pm-btn-block">
-                                    <button type="submit" className="pm-btn-full">
-                                        Save Changes
+                                        Informasi Kolam
                                     </button>
                                     <button
                                         type="button"
-                                        className="pm-btn-cancel"
-                                        onClick={() => setIsEditing(false)}
+                                        style={{
+                                            padding: "6px 14px",
+                                            borderRadius: "6px",
+                                            fontSize: "13px",
+                                            fontWeight: 600,
+                                            border: "none",
+                                            cursor: "pointer",
+                                            backgroundColor: activeModalTab === "thresholds" ? "#0ea5e9" : "transparent",
+                                            color: activeModalTab === "thresholds" ? "#ffffff" : "#94a3b8",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                        onClick={() => setActiveModalTab("thresholds")}
                                     >
-                                        Cancel
+                                        Ambang Batas (Thresholds)
                                     </button>
                                 </div>
-                            </form>
+
+                                {activeModalTab === "info" ? (
+                                    <form onSubmit={handleSave}>
+                                        {/* Pond Name Input */}
+                                        <div className="pm-details-field">
+                                            <label className="pm-details-label">Pond Name</label>
+                                            <input
+                                                type="text"
+                                                className="pm-input"
+                                                value={editName}
+                                                onChange={(e) => setEditName(e.target.value)}
+                                                placeholder="Enter pond name"
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Location Input */}
+                                        <div className="pm-details-field">
+                                            <label className="pm-details-label">Location</label>
+                                            <input
+                                                type="text"
+                                                className="pm-input"
+                                                value={editLocation}
+                                                onChange={(e) => setEditLocation(e.target.value)}
+                                                placeholder="Enter sector and block location"
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Fish Capacity Input */}
+                                        <div className="pm-details-field">
+                                            <label className="pm-details-label">Fish Capacity (ekor)</label>
+                                            <input
+                                                type="number"
+                                                className="pm-input"
+                                                value={editCapacity}
+                                                onChange={(e) => setEditCapacity(Number(e.target.value))}
+                                                placeholder="Enter capacity limit"
+                                                required
+                                            />
+                                        </div>
+
+                                        {/* Warning Status Select */}
+                                        <div className="pm-details-field">
+                                            <label className="pm-details-label">Pond Status</label>
+                                            <select
+                                                className="pm-input"
+                                                value={editStatus}
+                                                onChange={(e) => setEditStatus(e.target.value as "Aman" | "Waspada" | "Bahaya")}
+                                            >
+                                                <option value="Aman">Aman</option>
+                                                <option value="Waspada">Waspada</option>
+                                                <option value="Bahaya">Bahaya</option>
+                                            </select>
+                                        </div>
+
+                                        {/* IoT Connection Select */}
+                                        <div className="pm-details-field">
+                                            <label className="pm-details-label">IoT Connection State</label>
+                                            <select
+                                                className="pm-input"
+                                                value={editIot}
+                                                onChange={(e) => setEditIot(e.target.value as "Aktif" | "Tidak Aktif")}
+                                            >
+                                                <option value="Aktif">Aktif</option>
+                                                <option value="Tidak Aktif">Tidak Aktif</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Action buttons */}
+                                        <div className="pm-btn-block">
+                                            <button type="submit" className="pm-btn-full">
+                                                Save Changes
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="pm-btn-cancel"
+                                                onClick={() => setIsEditing(false)}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    /* THRESHOLD CONFIGURATION TAB FORM */
+                                    <form onSubmit={handleSaveThresholds}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                                            <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                                                Threshold Source:
+                                            </span>
+                                            <span 
+                                                style={{ 
+                                                    fontSize: "11px", 
+                                                    fontWeight: 700, 
+                                                    padding: "2px 8px", 
+                                                    borderRadius: "12px",
+                                                    backgroundColor: isCustomThreshold ? "rgba(168, 85, 247, 0.15)" : "rgba(16, 185, 129, 0.15)",
+                                                    color: isCustomThreshold ? "#c084fc" : "#34d399",
+                                                    border: `1px solid ${isCustomThreshold ? "rgba(168, 85, 247, 0.3)" : "rgba(16, 185, 129, 0.3)"}`
+                                                }}
+                                            >
+                                                {isCustomThreshold ? "Custom Configuration" : "Using Paper Default (CatfishCare 2026)"}
+                                            </span>
+                                        </div>
+
+                                        {thresholdData && (
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "320px", overflowY: "auto", paddingRight: "4px" }}>
+                                                {/* pH Thresholds */}
+                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#14b8a6" }}>
+                                                        pH Air (pH)
+                                                    </span>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Min - Max</label>
+                                                            <div style={{ display: "flex", gap: "4px" }}>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.1"
+                                                                    className="pm-input"
+                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                    value={thresholdData.ph?.normal_min ?? 6.5}
+                                                                    onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, normal_min: Number(e.target.value) } })}
+                                                                />
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.1"
+                                                                    className="pm-input"
+                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                    value={thresholdData.ph?.normal_max ?? 8.2}
+                                                                    onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, normal_max: Number(e.target.value) } })}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.1"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.ph?.warning_max ?? 9.0}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, warning_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Suhu Thresholds */}
+                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#0ea5e9" }}>
+                                                        Suhu Air (°C)
+                                                    </span>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Min - Max</label>
+                                                            <div style={{ display: "flex", gap: "4px" }}>
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.5"
+                                                                    className="pm-input"
+                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                    value={thresholdData.suhu?.normal_min ?? 25.0}
+                                                                    onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, normal_min: Number(e.target.value) } })}
+                                                                />
+                                                                <input
+                                                                    type="number"
+                                                                    step="0.5"
+                                                                    className="pm-input"
+                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                    value={thresholdData.suhu?.normal_max ?? 30.0}
+                                                                    onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, normal_max: Number(e.target.value) } })}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.5"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.suhu?.warning_max ?? 32.0}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, warning_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Turbidity Thresholds */}
+                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#8b5cf6" }}>
+                                                        Kekeruhan (NTU)
+                                                    </span>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max</label>
+                                                            <input
+                                                                type="number"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.turbidity?.normal_max ?? 25}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, turbidity: { ...thresholdData.turbidity, normal_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
+                                                            <input
+                                                                type="number"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.turbidity?.warning_max ?? 50}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, turbidity: { ...thresholdData.turbidity, warning_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* TDS Thresholds */}
+                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>
+                                                        TDS (ppm)
+                                                    </span>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max</label>
+                                                            <input
+                                                                type="number"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.tds?.normal_max ?? 500}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, tds: { ...thresholdData.tds, normal_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
+                                                            <input
+                                                                type="number"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.tds?.warning_max ?? 800}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, tds: { ...thresholdData.tds, warning_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* SFR Thresholds */}
+                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#ec4899" }}>
+                                                        SFR (Surface Fish Ratio %)
+                                                    </span>
+                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max (%)</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.sfr?.normal_max ?? 0.10}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, sfr: { ...thresholdData.sfr, normal_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max (%)</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                className="pm-input"
+                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
+                                                                value={thresholdData.sfr?.warning_max ?? 0.20}
+                                                                onChange={(e) => setThresholdData({ ...thresholdData, sfr: { ...thresholdData.sfr, warning_max: Number(e.target.value) } })}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Action buttons for Thresholds */}
+                                        <div className="pm-btn-block" style={{ marginTop: "16px" }}>
+                                            <button type="submit" className="pm-btn-full" disabled={thresholdSaving}>
+                                                {thresholdSaving ? "Saving..." : "Save Threshold Configuration"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="pm-btn-cancel"
+                                                onClick={handleResetThresholds}
+                                                disabled={thresholdSaving}
+                                            >
+                                                Reset to Paper Default
+                                            </button>
+                                        </div>
+                                    </form>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

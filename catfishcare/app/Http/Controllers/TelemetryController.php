@@ -11,7 +11,36 @@ use Carbon\Carbon;
 class TelemetryController extends Controller
 {
     /**
-     * Compute weighted Risk Score (0 - 100) according to CatfishCare Paper Table 10.
+     * Get active threshold configuration for a pond (or paper default).
+     */
+    public static function getThresholdsForPond(int $kolamId = 1): array
+    {
+        $cacheKey = "kolam_{$kolamId}_thresholds";
+        return Cache::remember($cacheKey, 3600, function () use ($kolamId) {
+            $defaults = \Database\Seeders\PondThresholdSeeder::getDefaultPaperThresholds();
+            try {
+                $dbThresholds = \App\Models\PondThreshold::where('kolam_id', $kolamId)->get();
+                if ($dbThresholds->isNotEmpty()) {
+                    foreach ($dbThresholds as $row) {
+                        $defaults[$row->parameter] = [
+                            'normal_min' => $row->normal_min,
+                            'normal_max' => $row->normal_max,
+                            'warning_min' => $row->warning_min,
+                            'warning_max' => $row->warning_max,
+                            'high_min' => $row->high_min,
+                            'high_max' => $row->high_max,
+                            'critical_min' => $row->critical_min,
+                            'critical_max' => $row->critical_max,
+                        ];
+                    }
+                }
+            } catch (\Throwable $e) {}
+            return $defaults;
+        });
+    }
+
+    /**
+     * Compute weighted Risk Score (0 - 100) according to CatfishCare Paper Table 10 / Dynamic Pond Thresholds.
      * Each of the 6 parameters has a weight of 1/6 (16.67%).
      */
     public static function computeRiskScore(
@@ -20,42 +49,51 @@ class TelemetryController extends Controller
         float $turbidity,
         float $tds,
         float $waterLevelDev,
-        float $sfr
+        float $sfr,
+        int $kolamId = 1
     ): array {
+        $t = self::getThresholdsForPond($kolamId);
+
         // 1. pH
-        if ($ph >= 6.5 && $ph <= 8.2) $scorePh = 0;
-        elseif (($ph >= 6.0 && $ph < 6.5) || ($ph > 8.2 && $ph <= 9.0)) $scorePh = 40;
-        elseif (($ph >= 5.5 && $ph < 6.0) || ($ph > 9.0 && $ph <= 9.5)) $scorePh = 70;
+        $tPh = $t['ph'];
+        if ($ph >= $tPh['normal_min'] && $ph <= $tPh['normal_max']) $scorePh = 0;
+        elseif (($ph >= $tPh['warning_min'] && $ph < $tPh['normal_min']) || ($ph > $tPh['normal_max'] && $ph <= $tPh['warning_max'])) $scorePh = 40;
+        elseif (($ph >= $tPh['high_min'] && $ph < $tPh['warning_min']) || ($ph > $tPh['warning_max'] && $ph <= $tPh['high_max'])) $scorePh = 70;
         else $scorePh = 100;
 
         // 2. Suhu (°C)
-        if ($suhu >= 25.0 && $suhu <= 30.0) $scoreSuhu = 0;
-        elseif (($suhu >= 23.0 && $suhu < 25.0) || ($suhu > 30.0 && $suhu <= 32.0)) $scoreSuhu = 40;
-        elseif (($suhu >= 20.0 && $suhu < 23.0) || ($suhu > 32.0 && $suhu <= 35.0)) $scoreSuhu = 70;
+        $tSuhu = $t['suhu'];
+        if ($suhu >= $tSuhu['normal_min'] && $suhu <= $tSuhu['normal_max']) $scoreSuhu = 0;
+        elseif (($suhu >= $tSuhu['warning_min'] && $suhu < $tSuhu['normal_min']) || ($suhu > $tSuhu['normal_max'] && $suhu <= $tSuhu['warning_max'])) $scoreSuhu = 40;
+        elseif (($suhu >= $tSuhu['high_min'] && $suhu < $tSuhu['warning_min']) || ($suhu > $tSuhu['warning_max'] && $suhu <= $tSuhu['high_max'])) $scoreSuhu = 70;
         else $scoreSuhu = 100;
 
         // 3. Turbidity (NTU)
-        if ($turbidity <= 25.0) $scoreTurb = 0;
-        elseif ($turbidity <= 50.0) $scoreTurb = 40;
-        elseif ($turbidity <= 100.0) $scoreTurb = 70;
+        $tTurb = $t['turbidity'];
+        if ($turbidity <= $tTurb['normal_max']) $scoreTurb = 0;
+        elseif ($turbidity <= $tTurb['warning_max']) $scoreTurb = 40;
+        elseif ($turbidity <= $tTurb['high_max']) $scoreTurb = 70;
         else $scoreTurb = 100;
 
         // 4. TDS (ppm)
-        if ($tds <= 500.0) $scoreTds = 0;
-        elseif ($tds <= 800.0) $scoreTds = 40;
-        elseif ($tds <= 1200.0) $scoreTds = 70;
+        $tTds = $t['tds'];
+        if ($tds <= $tTds['normal_max']) $scoreTds = 0;
+        elseif ($tds <= $tTds['warning_max']) $scoreTds = 40;
+        elseif ($tds <= $tTds['high_max']) $scoreTds = 70;
         else $scoreTds = 100;
 
         // 5. Water Level Deviation (cm)
-        if ($waterLevelDev <= 5.0) $scoreLevel = 0;
-        elseif ($waterLevelDev <= 10.0) $scoreLevel = 40;
-        elseif ($waterLevelDev <= 20.0) $scoreLevel = 70;
+        $tLevel = $t['water_level_dev'];
+        if ($waterLevelDev <= $tLevel['normal_max']) $scoreLevel = 0;
+        elseif ($waterLevelDev <= $tLevel['warning_max']) $scoreLevel = 40;
+        elseif ($waterLevelDev <= $tLevel['high_max']) $scoreLevel = 70;
         else $scoreLevel = 100;
 
         // 6. Surface Fish Ratio (SFR)
-        if ($sfr < 0.10) $scoreSfr = 0;
-        elseif ($sfr <= 0.20) $scoreSfr = 40;
-        elseif ($sfr <= 0.35) $scoreSfr = 70;
+        $tSfr = $t['sfr'];
+        if ($sfr < $tSfr['normal_max']) $scoreSfr = 0;
+        elseif ($sfr <= $tSfr['warning_max']) $scoreSfr = 40;
+        elseif ($sfr <= $tSfr['high_max']) $scoreSfr = 70;
         else $scoreSfr = 100;
 
         $totalScore = ($scorePh + $scoreSuhu + $scoreTurb + $scoreTds + $scoreLevel + $scoreSfr) / 6.0;
@@ -116,7 +154,7 @@ class TelemetryController extends Controller
         $sfr = $request->has('sfr') ? (float) $request->input('sfr') : (isset($payload['sfr']) ? (float) $payload['sfr'] : (float) $sfrCache);
 
         $levelDev = abs(25.0 - $tinggiAir);
-        $assessment = self::computeRiskScore($ph, $suhu, $kekeruhan, $tds, $levelDev, $sfr);
+        $assessment = self::computeRiskScore($ph, $suhu, $kekeruhan, $tds, $levelDev, $sfr, $kolamId);
 
         $telemetryData = [
             'kolam_id' => $kolamId,

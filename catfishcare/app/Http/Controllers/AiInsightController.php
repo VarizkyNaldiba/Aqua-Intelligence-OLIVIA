@@ -10,41 +10,100 @@ use Illuminate\Support\Facades\Cache;
 class AiInsightController extends Controller
 {
     /**
-     * Get 24-Hour Forecast Predictions for Water Quality (BiLSTM).
+     * Get 24-Hour Forecast Predictions for Water Quality Sensor Metrics (BiLSTM).
+     * Excludes SFR metric and provides timestamp of the last telemetry history used.
      */
-    public function getForecast(int $kolamId = 1): JsonResponse
+    public function getForecast(Request $request, int $kolamId = 1): JsonResponse
     {
-        try {
-            $response = Http::timeout(10)->get("http://127.0.0.1:8000/api/predictions/{$kolamId}");
-            if ($response->successful()) {
-                return response()->json($response->json());
-            }
-        } catch (\Throwable $e) {
-            // Fallback if python service is down
+        $kolamId = (int) ($request->input('kolam_id', $kolamId));
+        $forceRefresh = $request->boolean('refresh', false);
+
+        $cacheKey = "kolam_{$kolamId}_bilstm_sensor_forecast";
+        
+        if (!$forceRefresh && Cache::has($cacheKey)) {
+            return response()->json(Cache::get($cacheKey));
         }
 
-        $forecast = [
-            ['time' => '00:00', 'temperature' => 25.2, 'pH' => 7.30, 'turbidity' => 16.5, 'tds' => 410, 'sfr' => 0.04],
-            ['time' => '02:00', 'temperature' => 26.5, 'pH' => 7.48, 'turbidity' => 17.2, 'tds' => 415, 'sfr' => 0.05],
-            ['time' => '04:00', 'temperature' => 27.8, 'pH' => 7.60, 'turbidity' => 18.0, 'tds' => 420, 'sfr' => 0.06],
-            ['time' => '06:00', 'temperature' => 28.5, 'pH' => 7.35, 'turbidity' => 19.1, 'tds' => 430, 'sfr' => 0.08],
-            ['time' => '08:00', 'temperature' => 27.2, 'pH' => 7.02, 'turbidity' => 22.4, 'tds' => 450, 'sfr' => 0.11],
-            ['time' => '10:00', 'temperature' => 26.5, 'pH' => 6.85, 'turbidity' => 24.8, 'tds' => 470, 'sfr' => 0.14],
-            ['time' => '12:00', 'temperature' => 25.8, 'pH' => 6.92, 'turbidity' => 23.5, 'tds' => 460, 'sfr' => 0.12],
-            ['time' => '14:00', 'temperature' => 24.9, 'pH' => 7.08, 'turbidity' => 21.0, 'tds' => 440, 'sfr' => 0.09],
-            ['time' => '16:00', 'temperature' => 25.1, 'pH' => 7.15, 'turbidity' => 19.5, 'tds' => 430, 'sfr' => 0.07],
-            ['time' => '17:00', 'temperature' => 25.3, 'pH' => 7.08, 'turbidity' => 18.8, 'tds' => 425, 'sfr' => 0.06],
-            ['time' => '18:00', 'temperature' => 25.6, 'pH' => 7.01, 'turbidity' => 18.2, 'tds' => 420, 'sfr' => 0.05],
-            ['time' => '20:00', 'temperature' => 26.4, 'pH' => 7.25, 'turbidity' => 17.5, 'tds' => 415, 'sfr' => 0.05],
-            ['time' => '22:00', 'temperature' => 27.1, 'pH' => 7.42, 'turbidity' => 17.0, 'tds' => 410, 'sfr' => 0.04],
-        ];
+        // Get rolling time-series telemetry history from Cache (from TelemetryController)
+        $historyKey = "kolam_{$kolamId}_telemetry_history";
+        $history = Cache::get($historyKey, []);
 
-        return response()->json([
+        // Retrieve last history timestamp
+        $lastHistoryTime = null;
+        if (!empty($history) && is_array($history)) {
+            $lastEntry = end($history);
+            $lastHistoryTime = $lastEntry['created_at'] ?? $lastEntry['updated_at'] ?? null;
+        }
+
+        if (!$lastHistoryTime) {
+            $latestTelemetry = Cache::get("kolam_{$kolamId}_latest_telemetry");
+            $lastHistoryTime = $latestTelemetry['updated_at'] ?? \Carbon\Carbon::now()->toIso8601String();
+        }
+
+        // Format timestamp for Indonesian UI display
+        $formattedLastHistoryTime = \Carbon\Carbon::parse($lastHistoryTime)->timezone('Asia/Jakarta')->format('d M Y, H:i:s') . ' WIB';
+
+        $pythonCmd = 'C:\Users\USER\AppData\Local\Programs\Python\Python311\python.exe';
+        if (!file_exists($pythonCmd)) {
+            $pythonCmd = 'python';
+        }
+        $scriptPath = base_path('../ArtIntelligence/predict_service.py');
+
+        $predictions = null;
+        $source = 'Baseline Fallback Curve';
+
+        if (file_exists($scriptPath)) {
+            try {
+                $payloadJson = escapeshellarg(json_encode($history));
+                $command = "\"{$pythonCmd}\" \"{$scriptPath}\" {$payloadJson}";
+                $output = shell_exec($command);
+                if ($output) {
+                    $json = json_decode($output, true);
+                    if (isset($json['predictions']) && is_array($json['predictions'])) {
+                        $predictions = $json['predictions'];
+                        $source = $json['source'] ?? 'BiLSTM Neural Network (.keras)';
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        if (!$predictions) {
+            $latest = Cache::get("kolam_{$kolamId}_latest_telemetry", []);
+            $baseTemp = $latest['suhu'] ?? 27.5;
+            $basePh = $latest['ph'] ?? 7.2;
+            $baseTurb = $latest['kekeruhan'] ?? 18.0;
+            $baseTds = $latest['tds'] ?? 420.0;
+            $baseLevel = $latest['tinggi_air'] ?? 25.0;
+
+            $predictions = [];
+            for ($i = 0; $i < 24; $i++) {
+                $predictions[] = [
+                    'time' => sprintf('%02d:00', $i),
+                    'temperature' => round($baseTemp + sin($i * M_PI / 12) * 0.8, 2),
+                    'ph' => round($basePh + cos($i * M_PI / 12) * 0.15, 2),
+                    'turbidity' => max(0, round($baseTurb + sin($i * M_PI / 6) * 2.0, 1)),
+                    'tds' => round($baseTds + sin($i * M_PI / 8) * 5.0, 1),
+                    'water_level' => round($baseLevel - ($i * 0.05), 1),
+                ];
+            }
+        }
+
+        $responsePayload = [
+            'status' => 'success',
             'kolam_id' => $kolamId,
             'model' => 'BiLSTM (Bidirectional Long Short-Term Memory)',
-            'horizon' => '24 Jam ke Depan',
-            'forecast' => $forecast,
-        ]);
+            'horizon' => '24 Jam ke Depan (Metrik Sensor)',
+            'source' => $source,
+            'last_history_time' => $lastHistoryTime,
+            'last_history_time_formatted' => $formattedLastHistoryTime,
+            'generated_at' => \Carbon\Carbon::now()->timezone('Asia/Jakarta')->format('H:i:s') . ' WIB',
+            'forecast' => $predictions,
+        ];
+
+        // Cache forecast for 15 minutes to save CPU
+        Cache::put($cacheKey, $responsePayload, now()->addMinutes(15));
+
+        return response()->json($responsePayload);
     }
 
     /**
@@ -62,13 +121,21 @@ class AiInsightController extends Controller
         $riskScore = (float) $request->input('risk_score', 15.0);
         $riskStatus = (string) $request->input('risk_status', 'Low');
 
-        $geminiApiKey = env('GEMINI_API_KEY');
+        $activeThresholds = TelemetryController::getThresholdsForPond($kolamId);
+        $thresholdSummary = "Batas Aktif Kolam: pH [{$activeThresholds['ph']['normal_min']}-{$activeThresholds['ph']['normal_max']}], " .
+            "Suhu [{$activeThresholds['suhu']['normal_min']}-{$activeThresholds['suhu']['normal_max']}°C], " .
+            "Turbidity max {$activeThresholds['turbidity']['normal_max']} NTU, TDS max {$activeThresholds['tds']['normal_max']} ppm.";
 
+        $geminiApiKey = env('GEMINI_API_KEY');
+        $deepSeekApiKey = env('DEEPSEEK_API_KEY');
+
+        // 1. Google Gemini API Integration
         if ($geminiApiKey) {
             try {
                 $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
                     "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
                     "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
+                    "{$thresholdSummary} " .
                     "Berikan analisis ringkas dalam format JSON dengan key persis sebagai berikut: \"summary\" (Kondisi Terkini), \"cause\" (Analisis Penyebab & Perilaku Ikan), \"impact\" (Prediksi Dampak 24 Jam), dan \"mitigation\" (Rekomendasi Mitigasi Otomatis). Format WAJIB JSON murni tanpa awalan markdown.";
 
                 $response = Http::withHeaders([
@@ -94,7 +161,8 @@ class AiInsightController extends Controller
                         if (is_array($sectionsData)) {
                             return response()->json([
                                 'status' => 'success',
-                                'provider' => 'Gemini 1.5 Flash (Live API)',
+                                'provider' => 'Google Gemini 1.5 Flash (Live API)',
+                                'threshold_context' => $thresholdSummary,
                                 'risk_status' => $riskStatus,
                                 'risk_score' => $riskScore,
                                 'sections' => $sectionsData,
@@ -103,11 +171,49 @@ class AiInsightController extends Controller
                     }
                 }
             } catch (\Throwable $e) {
+                // Fallback to next provider or internal reasoning engine
+            }
+        }
+
+        // 2. DeepSeek API Integration
+        if ($deepSeekApiKey) {
+            try {
+                $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
+                    "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
+                    "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
+                    "{$thresholdSummary} " .
+                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
+
+                $response = Http::withHeaders([
+                    'Authorization' => "Bearer {$deepSeekApiKey}",
+                    'Content-Type' => 'application/json',
+                ])->timeout(12)->post('https://api.deepseek.com/chat/completions', [
+                    'model' => 'deepseek-chat',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Anda adalah asisten AI budidaya perikanan presisi.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 0.4,
+                ]);
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    $insightText = $json['choices'][0]['message']['content'] ?? null;
+                    if ($insightText) {
+                        return response()->json([
+                            'status' => 'success',
+                            'provider' => 'DeepSeek LLM (Live API)',
+                            'threshold_context' => $thresholdSummary,
+                            'insight' => $insightText,
+                        ]);
+                    }
+                }
+            } catch (\Throwable $e) {
                 // Fallback to internal reasoning engine
             }
         }
 
-        // High-Quality Rule-Based AI Engine (aligned with Paper rules)
+        // 3. High-Quality Rule-Based AI Engine (aligned with Paper rules)
         $sections = [];
 
         if ($riskStatus === 'Critical') {
@@ -135,6 +241,7 @@ class AiInsightController extends Controller
         return response()->json([
             'status' => 'success',
             'provider' => 'CatfishCare Multimodal AI Engine',
+            'threshold_context' => $thresholdSummary,
             'risk_status' => $riskStatus,
             'risk_score' => $riskScore,
             'sections' => $sections,
