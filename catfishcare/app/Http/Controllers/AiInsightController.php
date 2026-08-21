@@ -14,6 +14,15 @@ class AiInsightController extends Controller
      */
     public function getForecast(int $kolamId = 1): JsonResponse
     {
+        try {
+            $response = Http::timeout(10)->get("http://127.0.0.1:8000/api/predictions/{$kolamId}");
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+        } catch (\Throwable $e) {
+            // Fallback if python service is down
+        }
+
         $forecast = [
             ['time' => '00:00', 'temperature' => 25.2, 'pH' => 7.30, 'turbidity' => 16.5, 'tds' => 410, 'sfr' => 0.04],
             ['time' => '02:00', 'temperature' => 26.5, 'pH' => 7.48, 'turbidity' => 17.2, 'tds' => 415, 'sfr' => 0.05],
@@ -53,36 +62,44 @@ class AiInsightController extends Controller
         $riskScore = (float) $request->input('risk_score', 15.0);
         $riskStatus = (string) $request->input('risk_status', 'Low');
 
-        $deepSeekApiKey = env('DEEPSEEK_API_KEY');
+        $geminiApiKey = env('GEMINI_API_KEY');
 
-        if ($deepSeekApiKey) {
+        if ($geminiApiKey) {
             try {
                 $prompt = "Anda adalah AI CatfishCare Expert berbasis data multimodal budidaya ikan lele (AIoT). " .
                     "Data Kolam ID {$kolamId}: pH: {$ph}, Suhu: {$suhu}°C, Kekeruhan: {$turbidity} NTU, TDS: {$tds} ppm, Tinggi Air: {$waterLevel} cm, " .
                     "Surface Fish Ratio (SFR): " . ($sfr * 100) . "%, Risk Score: {$riskScore}/100 ({$riskStatus}). " .
-                    "Berikan analisis ringkas dalam 4 poin terstruktur: 1. Kondisi Terkini, 2. Analisis Penyebab & Perilaku Ikan, 3. Prediksi Dampak 24 Jam, 4. Rekomendasi Mitigasi Otomatis (Smart Water Exchange / Aerasi).";
+                    "Berikan analisis ringkas dalam format JSON dengan key persis sebagai berikut: \"summary\" (Kondisi Terkini), \"cause\" (Analisis Penyebab & Perilaku Ikan), \"impact\" (Prediksi Dampak 24 Jam), dan \"mitigation\" (Rekomendasi Mitigasi Otomatis). Format WAJIB JSON murni tanpa awalan markdown.";
 
                 $response = Http::withHeaders([
-                    'Authorization' => "Bearer {$deepSeekApiKey}",
                     'Content-Type' => 'application/json',
-                ])->timeout(8)->post('https://api.deepseek.com/chat/completions', [
-                    'model' => 'deepseek-chat',
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'Anda adalah asisten AI budidaya perikanan presisi.'],
-                        ['role' => 'user', 'content' => $prompt],
+                ])->timeout(15)->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$geminiApiKey}", [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt]
+                            ]
+                        ]
                     ],
-                    'temperature' => 0.4,
+                    'generationConfig' => [
+                        'responseMimeType' => 'application/json'
+                    ]
                 ]);
 
                 if ($response->successful()) {
                     $json = $response->json();
-                    $insightText = $json['choices'][0]['message']['content'] ?? null;
+                    $insightText = $json['candidates'][0]['content']['parts'][0]['text'] ?? null;
                     if ($insightText) {
-                        return response()->json([
-                            'status' => 'success',
-                            'provider' => 'DeepSeek LLM (Live API)',
-                            'insight' => $insightText,
-                        ]);
+                        $sectionsData = json_decode($insightText, true);
+                        if (is_array($sectionsData)) {
+                            return response()->json([
+                                'status' => 'success',
+                                'provider' => 'Gemini 1.5 Flash (Live API)',
+                                'risk_status' => $riskStatus,
+                                'risk_score' => $riskScore,
+                                'sections' => $sectionsData,
+                            ]);
+                        }
                     }
                 }
             } catch (\Throwable $e) {
