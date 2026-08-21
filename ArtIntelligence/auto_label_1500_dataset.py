@@ -17,15 +17,14 @@ for f in glob.glob(os.path.join(CAND_DIR, "*.txt")):
         pass
 
 img_files = glob.glob(os.path.join(IMG_DIR, "*.jpg")) + glob.glob(os.path.join(IMG_DIR, "*.png"))
-print(f"Starting Strict Bubble & Yellow Leaf Filter Auto-Labeling for {len(img_files)} images...")
+print(f"Starting Micro-Bubble & Yellow Leaf Free Detector for {len(img_files)} images...")
 
 total_candidates = 0
 processed_images = 0
 images_with_bubbles = 0
 
 clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
-kernel_tophat = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
-kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+kernel_tophat = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
 
 for img_path in img_files:
     base_name = os.path.splitext(os.path.basename(img_path))[0]
@@ -37,30 +36,26 @@ for img_path in img_files:
 
     h, w = img.shape[:2]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # 1. CLAHE Contrast Enhancement
+    # 1. CLAHE Contrast Enhancement for murky/dark water
     enhanced = clahe.apply(gray)
 
-    # 2. Morphological Top-Hat Transform
+    # 2. Morphological Top-Hat Transform (isolates bright micro-bubbles on dark/murky water)
     tophat = cv2.morphologyEx(enhanced, cv2.MORPH_TOPHAT, kernel_tophat)
 
-    # 3. Thresholding
+    # 3. Thresholding for micro-bubbles
     blur_th = cv2.GaussianBlur(tophat, (3, 3), 0)
-    _, thresh = cv2.threshold(blur_th, 30, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(blur_th, 22, 255, cv2.THRESH_BINARY)
 
     # Mask outer container border (top, bottom, left, right)
     mask = np.ones((h, w), dtype=np.uint8) * 255
-    mask[0:18, :] = 0
-    mask[h-18:, :] = 0
-    mask[:, 0:18] = 0
-    mask[:, w-18:] = 0
+    mask[0:15, :] = 0
+    mask[h-15:, :] = 0
+    mask[:, 0:15] = 0
+    mask[:, w-15:] = 0
     thresh = cv2.bitwise_and(thresh, thresh, mask=mask)
 
-    # Morphological Close
-    cleaned = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close)
-
-    contours, _ = cv2.findContours(cleaned, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     candidates = []
 
@@ -73,42 +68,35 @@ for img_path in img_files:
         xc = (bx + bw / 2.0) / float(w)
         yc = (by + bh / 2.0) / float(h)
 
-        # A. Compact Size Filter: Max width <= 0.14, Max height <= 0.14, Area between 100px and 3500px
-        if norm_bw > 0.14 or norm_bh > 0.14 or area < 100 or area > 3500:
+        # A. Micro-Bubble Area & Size Filter (15px to 4000px, max 14% width/height)
+        if area < 15 or area > 4000 or norm_bw > 0.14 or norm_bh > 0.14:
             continue
 
-        # B. Container Edge Guard
+        # B. Container Border Edge Guard
         if xc < 0.02 or xc > 0.98 or yc < 0.03 or yc > 0.97:
             continue
 
-        # C. Aspect Ratio Filter: 0.55 <= BW/BH <= 1.80 (Completely eliminates long vertical shadows & streaks)
+        # C. Yellow Leaf RGB Color Test (Leaf has strong yellow pigment: G > B + 25 and R > B + 25)
+        roi_bgr = img[by:by+bh, bx:bx+bw]
+        mean_b = np.mean(roi_bgr[:, :, 0])
+        mean_g = np.mean(roi_bgr[:, :, 1])
+        mean_r = np.mean(roi_bgr[:, :, 2])
+        if (mean_g - mean_b > 25.0) and (mean_r - mean_b > 25.0):
+            continue
+
+        # D. Aspect Ratio Filter: 0.35 <= BW/BH <= 2.80 (Eliminates long vertical shadows & streaks)
         aspect_ratio = norm_bw / norm_bh
-        if aspect_ratio < 0.55 or aspect_ratio > 1.80:
+        if aspect_ratio < 0.35 or aspect_ratio > 2.80:
             continue
 
-        # D. Yellow/Green Leaf Exclusion Filter (HSV Color Saturation & Hue)
-        roi_hsv = hsv[by:by+bh, bx:bx+bw]
-        sat_mean = np.mean(roi_hsv[:, :, 1])
-        hue_mean = np.mean(roi_hsv[:, :, 0])
-        if sat_mean > 32.0 and (12.0 <= hue_mean <= 85.0):
-            continue
-
-        # E. Laplacian Edge Variance Filter: Pure shadows/water have low variance (< 25.0)
-        roi_gray = gray[by:by+bh, bx:bx+bw]
-        lap_var = cv2.Laplacian(roi_gray, cv2.CV_64F).var()
-        if lap_var < 25.0:
-            continue
-
-        # Compute confidence based on Laplacian variance & compactness
-        perimeter = cv2.arcLength(cnt, True)
-        circ = 4.0 * np.pi * area / (perimeter * perimeter) if perimeter > 0 else 0.5
-        conf = min(0.95, max(0.60, circ * 0.40 + (lap_var / 500.0) * 0.40 + 0.20))
+        # Compute confidence based on area & contrast
+        conf = min(0.95, max(0.60, (area / 100.0) * 0.35 + 0.55))
 
         candidates.append((0, xc, yc, norm_bw, norm_bh, conf))
 
-    # Keep top 3 candidates per image sorted by confidence
+    # Keep top 4 micro-bubble candidates per image sorted by confidence
     candidates.sort(key=lambda c: c[5], reverse=True)
-    top_candidates = candidates[:3]
+    top_candidates = candidates[:4]
 
     # Save to candidate file
     with open(out_txt, "w") as f:
@@ -121,7 +109,7 @@ for img_path in img_files:
     processed_images += 1
 
 print(f"==================================================")
-print(f"Yellow Leaf & Shadow Free Bubble Auto-Labeling Complete!")
+print(f"Micro-Bubble & Yellow Leaf Free Auto-Labeling Complete!")
 print(f"Processed Images : {processed_images}")
 print(f"Images with Bubble Candidates : {images_with_bubbles} / {processed_images}")
 print(f"Total Candidates Kept : {total_candidates}")
