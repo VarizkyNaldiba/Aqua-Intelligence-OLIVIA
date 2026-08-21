@@ -585,8 +585,17 @@ APP_HTML = """<!DOCTYPE html>
                     <span style="color:#cbd5e1; font-size:11px; margin-left:2px;">(conf: ${confStr})</span>
                     <div style="color:#64748b; font-size:10px;">Ukuran: ${Math.round(bw)} &times; ${Math.round(bh)} px</div>
                 </div>
-                <button class="btn-del-box" onclick="deleteSingleBox(event, ${idx})" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
+                <button class="btn-del-box" style="cursor:pointer;" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
             `;
+            let delBtn = div.querySelector('.btn-del-box');
+            delBtn.onclick = function(e) {
+                if (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                activeBBoxes.splice(idx, 1);
+                render(-1);
+            };
             listContainer.appendChild(div);
         });
     }
@@ -599,10 +608,11 @@ APP_HTML = """<!DOCTYPE html>
         activeBBoxes.splice(idx, 1);
         render(-1);
     }
+    window.deleteSingleBox = deleteSingleBox;
 
     function clearAllBBoxes() {
         activeBBoxes = [];
-        render();
+        render(-1);
     }
 
     function submitReview(action) {
