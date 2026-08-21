@@ -53,17 +53,19 @@ def predict_24h(sensor_history=None):
     Predict 24-hour horizon given sensor history for ['Temperature (C)', 'Turbidity(NTU)', 'PH']
     LOOKBACK = 48 timesteps
     HORIZON = 24 timesteps
+    Excludes SFR metric.
     """
     try:
         model, scaler = load_prediction_service()
     except Exception as e:
-        return {"status": "fallback", "reason": str(e), "predictions": generate_fallback_forecast()}
+        return {"status": "fallback", "reason": str(e), "predictions": generate_fallback_forecast(sensor_history)}
 
     # Standard default baseline if history is incomplete (48 timesteps)
     default_step = [27.5, 20.0, 7.2]
     
     if not sensor_history or not isinstance(sensor_history, list) or len(sensor_history) == 0:
         history_matrix = np.tile(default_step, (48, 1))
+        last_item = {}
     else:
         matrix = []
         for item in sensor_history:
@@ -72,6 +74,8 @@ def predict_24h(sensor_history=None):
             ph = float(item.get('pH', item.get('ph', 7.2)))
             matrix.append([temp, turb, ph])
         
+        last_item = sensor_history[-1]
+
         # If fewer than 48 steps, repeat the last observation to reach lookback 48
         if len(matrix) < 48:
             padding = [matrix[-1] if len(matrix) > 0 else default_step] * (48 - len(matrix))
@@ -80,6 +84,9 @@ def predict_24h(sensor_history=None):
             matrix = matrix[-48:]
             
         history_matrix = np.array(matrix)
+
+    base_tds = float(last_item.get('NITRATE', last_item.get('tds', 420.0)))
+    base_level = float(last_item.get('Length', last_item.get('tinggi_air', 25.0)))
 
     try:
         scaled_history = scaler.transform(history_matrix)
@@ -100,35 +107,55 @@ def predict_24h(sensor_history=None):
             turb_val = max(0.0, min(500.0, turb_val))
             ph_val = max(4.0, min(10.0, ph_val))
 
+            tds_val = round(base_tds + (temp_val - 27.5) * 4.0 + (idx * 0.2), 1)
+            level_val = round(base_level - (idx * 0.05), 1)
+
             hour_str = f"{idx:02d}:00"
             result.append({
                 "time": hour_str,
                 "temperature": temp_val,
-                "turbidity": turb_val,
                 "ph": ph_val,
+                "turbidity": turb_val,
+                "tds": max(0.0, tds_val),
+                "water_level": max(0.0, level_val)
             })
 
         return {"status": "success", "source": "BiLSTM Neural Network (.keras)", "predictions": result}
 
     except Exception as err:
-        return {"status": "fallback", "reason": str(err), "predictions": generate_fallback_forecast()}
+        return {"status": "fallback", "reason": str(err), "predictions": generate_fallback_forecast(sensor_history)}
 
-def generate_fallback_forecast():
+def generate_fallback_forecast(sensor_history=None):
     """Fallback 24h baseline curve if prediction runner encounters environment constraints."""
     result = []
     base_temp = 27.5
     base_ph = 7.2
     base_turb = 20.0
+    base_tds = 420.0
+    base_level = 25.0
+
+    if sensor_history and isinstance(sensor_history, list) and len(sensor_history) > 0:
+        last_item = sensor_history[-1]
+        base_temp = float(last_item.get('TEMPERATURE', last_item.get('suhu', 27.5)))
+        base_ph = float(last_item.get('pH', last_item.get('ph', 7.2)))
+        base_turb = float(last_item.get('TURBIDITY', last_item.get('kekeruhan', 20.0)))
+        base_tds = float(last_item.get('NITRATE', last_item.get('tds', 420.0)))
+        base_level = float(last_item.get('Length', last_item.get('tinggi_air', 25.0)))
+
     for idx in range(24):
         hour_str = f"{idx:02d}:00"
         temp = round(base_temp + 0.8 * np.sin(idx * np.pi / 12), 2)
         ph = round(base_ph + 0.15 * np.cos(idx * np.pi / 12), 2)
         turb = round(base_turb + 2.0 * np.sin(idx * np.pi / 6), 2)
+        tds = round(base_tds + 5.0 * np.sin(idx * np.pi / 8), 1)
+        level = round(base_level - (idx * 0.05), 1)
         result.append({
             "time": hour_str,
             "temperature": temp,
+            "ph": ph,
             "turbidity": max(0.0, turb),
-            "ph": ph
+            "tds": tds,
+            "water_level": max(0.0, level)
         })
     return result
 

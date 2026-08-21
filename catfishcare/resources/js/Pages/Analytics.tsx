@@ -19,20 +19,28 @@ interface AnalyticsTabProps {
 const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
     // 24-Hour Forecast Data (BiLSTM model predictions)
     const [forecastData, setForecastData] = useState([
-        { time: "00:00", temperature: 25.2, pH: 7.30, turbidity: 16.5, tds: 410, sfr: 0.04 },
-        { time: "02:00", temperature: 26.5, pH: 7.48, turbidity: 17.2, tds: 415, sfr: 0.05 },
-        { time: "04:00", temperature: 27.8, pH: 7.60, turbidity: 18.0, tds: 420, sfr: 0.06 },
-        { time: "06:00", temperature: 28.5, pH: 7.35, turbidity: 19.1, tds: 430, sfr: 0.08 },
-        { time: "08:00", temperature: 27.2, pH: 7.02, turbidity: 22.4, tds: 450, sfr: 0.11 },
-        { time: "10:00", temperature: 26.5, pH: 6.85, turbidity: 24.8, tds: 470, sfr: 0.14 },
-        { time: "12:00", temperature: 25.8, pH: 6.92, turbidity: 23.5, tds: 460, sfr: 0.12 },
-        { time: "14:00", temperature: 24.9, pH: 7.08, turbidity: 21.0, tds: 440, sfr: 0.09 },
-        { time: "16:00", temperature: 25.1, pH: 7.15, turbidity: 19.5, tds: 430, sfr: 0.07 },
-        { time: "17:00", temperature: 25.3, pH: 7.08, turbidity: 18.8, tds: 425, sfr: 0.06 },
-        { time: "18:00", temperature: 25.6, pH: 7.01, turbidity: 18.2, tds: 420, sfr: 0.05 },
-        { time: "20:00", temperature: 26.4, pH: 7.25, turbidity: 17.5, tds: 415, sfr: 0.05 },
-        { time: "22:00", temperature: 27.1, pH: 7.42, turbidity: 17.0, tds: 410, sfr: 0.04 },
+        { time: "00:00", temperature: 25.2, ph: 7.30, turbidity: 16.5, tds: 410, water_level: 25.0 },
+        { time: "02:00", temperature: 26.5, ph: 7.48, turbidity: 17.2, tds: 415, water_level: 24.9 },
+        { time: "04:00", temperature: 27.8, ph: 7.60, turbidity: 18.0, tds: 420, water_level: 24.8 },
+        { time: "06:00", temperature: 28.5, ph: 7.35, turbidity: 19.1, tds: 430, water_level: 24.7 },
+        { time: "08:00", temperature: 27.2, ph: 7.02, turbidity: 22.4, tds: 450, water_level: 24.6 },
+        { time: "10:00", temperature: 26.5, ph: 6.85, turbidity: 24.8, tds: 470, water_level: 24.5 },
+        { time: "12:00", temperature: 25.8, ph: 6.92, turbidity: 23.5, tds: 460, water_level: 24.4 },
+        { time: "14:00", temperature: 24.9, ph: 7.08, turbidity: 21.0, tds: 440, water_level: 24.3 },
+        { time: "16:00", temperature: 25.1, ph: 7.15, turbidity: 19.5, tds: 430, water_level: 24.2 },
+        { time: "18:00", temperature: 25.6, ph: 7.01, turbidity: 18.2, tds: 420, water_level: 24.1 },
+        { time: "20:00", temperature: 26.4, ph: 7.25, turbidity: 17.5, tds: 415, water_level: 24.0 },
+        { time: "22:00", temperature: 27.1, ph: 7.42, turbidity: 17.0, tds: 410, water_level: 23.9 },
     ]);
+
+    const [forecastMeta, setForecastMeta] = useState({
+        lastHistoryTime: "Memuat...",
+        source: "BiLSTM Neural Network (.keras)",
+        generatedAt: "Baru saja",
+    });
+
+    const [activeChartMetric, setActiveChartMetric] = useState<"temp_ph" | "turbidity" | "tds_level">("temp_ph");
+    const [isLoadingForecast, setIsLoadingForecast] = useState(false);
 
     const [aiInsight, setAiInsight] = useState({
         summary: "Model BiLSTM 24-jam mendeteksi korelasi inversi antara kenaikan suhu siang hari dan penurunan pH. Penurunan pH subuh (04:00–06:00) dipicu akumulasi respirasi CO2.",
@@ -46,14 +54,21 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
     const [isLoadingInsight, setIsLoadingInsight] = useState(false);
 
     // Fetch predictions and AI insights
-    const fetchAiData = async () => {
+    const fetchAiData = async (forceRefresh = false) => {
         setIsLoadingInsight(true);
+        setIsLoadingForecast(true);
         try {
-            // 1. Predictions
-            const pRes = await fetch("/api/predictions/1");
+            // 1. Predictions (BiLSTM Sensor Forecast)
+            const pUrl = forceRefresh ? "/api/predictions/1?refresh=1" : "/api/predictions/1";
+            const pRes = await fetch(pUrl);
             if (pRes.ok) {
                 const pData = await pRes.json();
                 if (pData.forecast) setForecastData(pData.forecast);
+                setForecastMeta({
+                    lastHistoryTime: pData.last_history_time_formatted || "Data Terkini WIB",
+                    source: pData.source || "BiLSTM Neural Network (.keras)",
+                    generatedAt: pData.generated_at || new Date().toLocaleTimeString("id-ID"),
+                });
             }
 
             // 2. AI Insight
@@ -89,11 +104,12 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
             // Use defaults
         } finally {
             setIsLoadingInsight(false);
+            setIsLoadingForecast(false);
         }
     };
 
     useEffect(() => {
-        fetchAiData();
+        fetchAiData(false);
     }, [currentData?.pH]);
 
     // Correlation Selector state
@@ -169,13 +185,13 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
             {/* Title Block */}
             <div className="db-heading-area" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
                 <div>
-                    <h2 className="db-title">Predictions & Analysis</h2>
-                    <p className="db-subtitle">AI-generated 24-hour forecast & DeepSeek Multimodal reasoning for catfish ponds</p>
+                    <h2 className="db-title">Predictions & Sensor Analysis</h2>
+                    <p className="db-subtitle">24-hour BiLSTM Sensor Forecast (Terpisah dari Risk Score) & DeepSeek Reasoning</p>
                 </div>
                 <button
                     type="button"
-                    onClick={fetchAiData}
-                    disabled={isLoadingInsight}
+                    onClick={() => fetchAiData(true)}
+                    disabled={isLoadingInsight || isLoadingForecast}
                     style={{
                         display: "flex",
                         alignItems: "center",
@@ -187,36 +203,110 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
                         borderRadius: "8px",
                         fontSize: "13px",
                         fontWeight: 700,
-                        cursor: isLoadingInsight ? "not-allowed" : "pointer",
+                        cursor: isLoadingInsight || isLoadingForecast ? "not-allowed" : "pointer",
                         boxShadow: "0 4px 12px rgba(14, 165, 233, 0.25)",
                     }}
                 >
-                    <RefreshCw size={14} className={isLoadingInsight ? "spin" : ""} />
-                    <span>{isLoadingInsight ? "Menghitung AI..." : "Update Analisis AI"}</span>
+                    <RefreshCw size={14} className={isLoadingInsight || isLoadingForecast ? "spin" : ""} />
+                    <span>{isLoadingInsight || isLoadingForecast ? "Menghitung AI..." : "Update Prediksi BiLSTM"}</span>
                 </button>
             </div>
 
             {/* Upper Grid Panels */}
             <div className="db-main-grid">
                 {/* Left Panel: 24-Hour Forecast Chart */}
-                <div className="db-panel-card" style={{ height: "450px" }}>
-                    <div className="db-panel-header">
+                <div className="db-panel-card" style={{ height: "490px" }}>
+                    <div className="db-panel-header" style={{ flexWrap: "wrap", gap: "10px" }}>
                         <div className="db-panel-title">
                             <TrendingUp size={18} color="#0ea5e9" />
                             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
                                 <span style={{ fontSize: "16px", fontWeight: 700 }}>24-Hour BiLSTM Forecast</span>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 500 }}>Time-Series Deep Learning Model</span>
+                                <span style={{ fontSize: "11px", color: "#0ea5e9", fontWeight: 700 }}>
+                                    Histori Terakhir Web: <strong>{forecastMeta.lastHistoryTime}</strong>
+                                </span>
                             </div>
+                        </div>
+
+                        {/* Metric Selector Tabs */}
+                        <div style={{ display: "flex", gap: "6px", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "8px" }}>
+                            <button
+                                type="button"
+                                onClick={() => setActiveChartMetric("temp_ph")}
+                                style={{
+                                    padding: "4px 10px",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    border: "none",
+                                    cursor: "pointer",
+                                    backgroundColor: activeChartMetric === "temp_ph" ? "#ffffff" : "transparent",
+                                    color: activeChartMetric === "temp_ph" ? "#0ea5e9" : "#64748b",
+                                    boxShadow: activeChartMetric === "temp_ph" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                                }}
+                            >
+                                Suhu & pH
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveChartMetric("turbidity")}
+                                style={{
+                                    padding: "4px 10px",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    border: "none",
+                                    cursor: "pointer",
+                                    backgroundColor: activeChartMetric === "turbidity" ? "#ffffff" : "transparent",
+                                    color: activeChartMetric === "turbidity" ? "#d97706" : "#64748b",
+                                    boxShadow: activeChartMetric === "turbidity" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                                }}
+                            >
+                                Turbidity
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveChartMetric("tds_level")}
+                                style={{
+                                    padding: "4px 10px",
+                                    borderRadius: "6px",
+                                    fontSize: "11px",
+                                    fontWeight: 700,
+                                    border: "none",
+                                    cursor: "pointer",
+                                    backgroundColor: activeChartMetric === "tds_level" ? "#ffffff" : "transparent",
+                                    color: activeChartMetric === "tds_level" ? "#8b5cf6" : "#64748b",
+                                    boxShadow: activeChartMetric === "tds_level" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                                }}
+                            >
+                                TDS & Air
+                            </button>
                         </div>
                     </div>
 
-                    <div className="db-panel-body" style={{ height: "350px", position: "relative", padding: "16px 8px 8px 0" }}>
+                    <div className="db-panel-body" style={{ height: "370px", position: "relative", padding: "16px 8px 8px 0" }}>
                         <ResponsiveContainer width="100%" height="85%">
                             <LineChart data={forecastData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
-                                <YAxis yAxisId="left" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[22, 32]} />
-                                <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[5.5, 8.5]} />
+                                
+                                {activeChartMetric === "temp_ph" && (
+                                    <>
+                                        <YAxis yAxisId="left" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[20, 35]} />
+                                        <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[5.0, 9.0]} />
+                                    </>
+                                )}
+
+                                {activeChartMetric === "turbidity" && (
+                                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[0, 'auto']} />
+                                )}
+
+                                {activeChartMetric === "tds_level" && (
+                                    <>
+                                        <YAxis yAxisId="left" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[300, 600]} />
+                                        <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} domain={[10, 40]} />
+                                    </>
+                                )}
+
                                 <Tooltip
                                     contentStyle={{
                                         backgroundColor: "#0f172a",
@@ -226,26 +316,68 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
                                         fontSize: "12px",
                                     }}
                                 />
-                                <Line
-                                    yAxisId="left"
-                                    type="monotone"
-                                    dataKey="temperature"
-                                    name="Suhu (°C)"
-                                    stroke="#0ea5e9"
-                                    strokeWidth={3}
-                                    dot={{ r: 3, fill: "#0ea5e9" }}
-                                    activeDot={{ r: 6, strokeWidth: 0 }}
-                                />
-                                <Line
-                                    yAxisId="right"
-                                    type="monotone"
-                                    dataKey="pH"
-                                    name="pH Air"
-                                    stroke="#10b981"
-                                    strokeWidth={3}
-                                    dot={{ r: 3, fill: "#10b981" }}
-                                    activeDot={{ r: 6, strokeWidth: 0 }}
-                                />
+
+                                {activeChartMetric === "temp_ph" && (
+                                    <>
+                                        <Line
+                                            yAxisId="left"
+                                            type="monotone"
+                                            dataKey="temperature"
+                                            name="Suhu (°C)"
+                                            stroke="#0ea5e9"
+                                            strokeWidth={3}
+                                            dot={{ r: 3, fill: "#0ea5e9" }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                        <Line
+                                            yAxisId="right"
+                                            type="monotone"
+                                            dataKey="ph"
+                                            name="pH Air"
+                                            stroke="#10b981"
+                                            strokeWidth={3}
+                                            dot={{ r: 3, fill: "#10b981" }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                    </>
+                                )}
+
+                                {activeChartMetric === "turbidity" && (
+                                    <Line
+                                        type="monotone"
+                                        dataKey="turbidity"
+                                        name="Turbidity (NTU)"
+                                        stroke="#f59e0b"
+                                        strokeWidth={3}
+                                        dot={{ r: 3, fill: "#f59e0b" }}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
+                                    />
+                                )}
+
+                                {activeChartMetric === "tds_level" && (
+                                    <>
+                                        <Line
+                                            yAxisId="left"
+                                            type="monotone"
+                                            dataKey="tds"
+                                            name="TDS (ppm)"
+                                            stroke="#8b5cf6"
+                                            strokeWidth={3}
+                                            dot={{ r: 3, fill: "#8b5cf6" }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                        <Line
+                                            yAxisId="right"
+                                            type="monotone"
+                                            dataKey="water_level"
+                                            name="Tinggi Air (cm)"
+                                            stroke="#06b6d4"
+                                            strokeWidth={3}
+                                            dot={{ r: 3, fill: "#06b6d4" }}
+                                            activeDot={{ r: 6, strokeWidth: 0 }}
+                                        />
+                                    </>
+                                )}
                             </LineChart>
                         </ResponsiveContainer>
 
@@ -261,14 +393,36 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
                                 marginTop: "-10px"
                             }}
                         >
-                            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <span style={{ width: "12px", height: "3px", backgroundColor: "#0ea5e9", display: "inline-block", borderRadius: "2px" }}></span>
-                                Suhu Air (°C)
-                            </span>
-                            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <span style={{ width: "12px", height: "3px", backgroundColor: "#10b981", display: "inline-block", borderRadius: "2px" }}></span>
-                                Derajat pH
-                            </span>
+                            {activeChartMetric === "temp_ph" && (
+                                <>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span style={{ width: "12px", height: "3px", backgroundColor: "#0ea5e9", display: "inline-block", borderRadius: "2px" }}></span>
+                                        Suhu Air (°C)
+                                    </span>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span style={{ width: "12px", height: "3px", backgroundColor: "#10b981", display: "inline-block", borderRadius: "2px" }}></span>
+                                        Derajat pH
+                                    </span>
+                                </>
+                            )}
+                            {activeChartMetric === "turbidity" && (
+                                <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <span style={{ width: "12px", height: "3px", backgroundColor: "#f59e0b", display: "inline-block", borderRadius: "2px" }}></span>
+                                    Turbidity / Kekeruhan (NTU)
+                                </span>
+                            )}
+                            {activeChartMetric === "tds_level" && (
+                                <>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span style={{ width: "12px", height: "3px", backgroundColor: "#8b5cf6", display: "inline-block", borderRadius: "2px" }}></span>
+                                        TDS (ppm)
+                                    </span>
+                                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span style={{ width: "12px", height: "3px", backgroundColor: "#06b6d4", display: "inline-block", borderRadius: "2px" }}></span>
+                                        Tinggi Air (cm)
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
