@@ -17,7 +17,7 @@ for f in glob.glob(os.path.join(CAND_DIR, "*.txt")):
         pass
 
 img_files = glob.glob(os.path.join(IMG_DIR, "*.jpg")) + glob.glob(os.path.join(IMG_DIR, "*.png"))
-print(f"Starting Micro-Bubble & Yellow Leaf Free Detector for {len(img_files)} images...")
+print(f"Starting Spherical Round Bubble Detector (Leaf & Shadow Exclusion) for {len(img_files)} images...")
 
 total_candidates = 0
 processed_images = 0
@@ -37,22 +37,22 @@ for img_path in img_files:
     h, w = img.shape[:2]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # 1. CLAHE Contrast Enhancement for murky/dark water
+    # 1. CLAHE Contrast Enhancement
     enhanced = clahe.apply(gray)
 
-    # 2. Morphological Top-Hat Transform (isolates bright micro-bubbles on dark/murky water)
+    # 2. Morphological Top-Hat Transform
     tophat = cv2.morphologyEx(enhanced, cv2.MORPH_TOPHAT, kernel_tophat)
 
     # 3. Thresholding for micro-bubbles
     blur_th = cv2.GaussianBlur(tophat, (3, 3), 0)
-    _, thresh = cv2.threshold(blur_th, 22, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(blur_th, 24, 255, cv2.THRESH_BINARY)
 
-    # Mask outer container border (top, bottom, left, right)
+    # Mask outer container border (20px around edges)
     mask = np.ones((h, w), dtype=np.uint8) * 255
-    mask[0:15, :] = 0
-    mask[h-15:, :] = 0
-    mask[:, 0:15] = 0
-    mask[:, w-15:] = 0
+    mask[0:20, :] = 0
+    mask[h-20:, :] = 0
+    mask[:, 0:20] = 0
+    mask[:, w-20:] = 0
     thresh = cv2.bitwise_and(thresh, thresh, mask=mask)
 
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -61,42 +61,46 @@ for img_path in img_files:
 
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        bx, by, bw, bh = cv2.boundingRect(cnt)
+        if area < 25 or area > 3000:
+            continue
 
+        bx, by, bw, bh = cv2.boundingRect(cnt)
         norm_bw = bw / float(w)
         norm_bh = bh / float(h)
         xc = (bx + bw / 2.0) / float(w)
         yc = (by + bh / 2.0) / float(h)
 
-        # A. Micro-Bubble Area & Size Filter (15px to 4000px, max 14% width/height)
-        if area < 15 or area > 4000 or norm_bw > 0.14 or norm_bh > 0.14:
+        # A. Container Edge Guard (4% outer border)
+        if xc < 0.04 or xc > 0.96 or yc < 0.04 or yc > 0.96:
             continue
 
-        # B. Container Border Edge Guard
-        if xc < 0.02 or xc > 0.98 or yc < 0.03 or yc > 0.97:
+        # B. Round Spherical Circularity Guard (Must be round! Leaves & shadow lines have circ < 0.38)
+        perimeter = cv2.arcLength(cnt, True)
+        circ = (4.0 * np.pi * area / (perimeter * perimeter)) if perimeter > 0 else 0
+        if circ < 0.38:
             continue
 
-        # C. Yellow Leaf RGB Color Test (Leaf has strong yellow pigment: G > B + 25 and R > B + 25)
+        # C. Aspect Ratio Guard: 0.58 <= BW/BH <= 1.65 (Compact round/spherical shape only!)
+        aspect_ratio = norm_bw / norm_bh
+        if aspect_ratio < 0.58 or aspect_ratio > 1.65:
+            continue
+
+        # D. Yellow/Green Leaf Exclusion Test (G - B > 22 and R - B > 35)
         roi_bgr = img[by:by+bh, bx:bx+bw]
         mean_b = np.mean(roi_bgr[:, :, 0])
         mean_g = np.mean(roi_bgr[:, :, 1])
         mean_r = np.mean(roi_bgr[:, :, 2])
-        if (mean_g - mean_b > 25.0) and (mean_r - mean_b > 25.0):
+        if (mean_g - mean_b > 22.0) and (mean_r - mean_b > 35.0):
             continue
 
-        # D. Aspect Ratio Filter: 0.35 <= BW/BH <= 2.80 (Eliminates long vertical shadows & streaks)
-        aspect_ratio = norm_bw / norm_bh
-        if aspect_ratio < 0.35 or aspect_ratio > 2.80:
-            continue
-
-        # Compute confidence based on area & contrast
-        conf = min(0.95, max(0.60, (area / 100.0) * 0.35 + 0.55))
+        # Compute confidence based on circularity & area
+        conf = min(0.95, max(0.65, circ * 0.50 + (area / 100.0) * 0.30 + 0.20))
 
         candidates.append((0, xc, yc, norm_bw, norm_bh, conf))
 
-    # Keep top 4 micro-bubble candidates per image sorted by confidence
+    # Keep top 3 round bubble candidates per image sorted by confidence
     candidates.sort(key=lambda c: c[5], reverse=True)
-    top_candidates = candidates[:4]
+    top_candidates = candidates[:3]
 
     # Save to candidate file
     with open(out_txt, "w") as f:
@@ -109,7 +113,7 @@ for img_path in img_files:
     processed_images += 1
 
 print(f"==================================================")
-print(f"Micro-Bubble & Yellow Leaf Free Auto-Labeling Complete!")
+print(f"Spherical Round Bubble Auto-Labeling Complete!")
 print(f"Processed Images : {processed_images}")
 print(f"Images with Bubble Candidates : {images_with_bubbles} / {processed_images}")
 print(f"Total Candidates Kept : {total_candidates}")
