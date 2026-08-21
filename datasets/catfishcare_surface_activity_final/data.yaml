@@ -1,0 +1,7 @@
+path: e:\lele dumbo\Aqua-Intelligence-OLIVIA\datasets\catfishcare_surface_activity_final
+train: train/images
+val: val/images
+test: test/images
+
+names:
+  0: surface_activity
