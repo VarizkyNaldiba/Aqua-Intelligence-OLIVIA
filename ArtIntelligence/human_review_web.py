@@ -224,6 +224,8 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
             return
 
     def get_items(self, batch, status_filter="all", reviewer="all"):
+        if len(ALL_DATASET_ITEMS) == 0:
+            init_dataset_cache()
         all_raw = ALL_DATASET_ITEMS[:]
 
         # Partition dataset among 3 Team Members if requested (iir, variz, gopar)
@@ -396,6 +398,17 @@ APP_HTML = """<!DOCTYPE html>
     let currentStatus = 'pending';
     let currentReviewer = 'Iir';
 
+    // Auto detect ?user=Iir / ?user=Variz / ?user=Gopar from URL query params
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        let userParam = urlParams.get('user') || urlParams.get('reviewer');
+        if (userParam) {
+            currentReviewer = userParam;
+        }
+    } catch(err) {
+        console.log("URL param parse error:", err);
+    }
+
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
 
@@ -561,15 +574,19 @@ APP_HTML = """<!DOCTYPE html>
                     <span style="color:#cbd5e1; font-size:11px; margin-left:2px;">(conf: ${confStr})</span>
                     <div style="color:#64748b; font-size:10px;">Ukuran: ${Math.round(bw)} &times; ${Math.round(bh)} px</div>
                 </div>
-                <button class="btn-del-box" onclick="deleteSingleBox(${idx})" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
+                <button class="btn-del-box" onclick="deleteSingleBox(event, ${idx})" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
             `;
             listContainer.appendChild(div);
         });
     }
 
-    function deleteSingleBox(idx) {
+    function deleteSingleBox(e, idx) {
+        if (e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+        }
         activeBBoxes.splice(idx, 1);
-        render();
+        render(-1);
     }
 
     function clearAllBBoxes() {
@@ -651,7 +668,10 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
 def run(port=5055):
-    init_dataset_cache()
+    import threading
+    print("[Server] Building RAM dataset cache in background...")
+    threading.Thread(target=init_dataset_cache, daemon=True).start()
+    
     server = ThreadedHTTPServer(('0.0.0.0', port), HumanReviewHandler)
     print(f"==================================================")
     print(f"CatfishCare Review Studio Running at http://127.0.0.1:{port}")
