@@ -17,10 +17,14 @@ for f in glob.glob(os.path.join(CAND_DIR, "*.txt")):
         pass
 
 img_files = glob.glob(os.path.join(IMG_DIR, "*.jpg")) + glob.glob(os.path.join(IMG_DIR, "*.png"))
-print(f"Starting High-Precision Auto-Labeling for {len(img_files)} images in dataset-1500...")
+print(f"Starting Enhanced Murky Water Auto-Labeling for {len(img_files)} images...")
 
 total_candidates = 0
 processed_images = 0
+
+clahe = cv2.createCLAHE(clipLimit=3.5, tileGridSize=(8, 8))
+kernel_tophat = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
+kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 
 for img_path in img_files:
     base_name = os.path.splitext(os.path.basename(img_path))[0]
@@ -32,29 +36,26 @@ for img_path in img_files:
 
     h, w = img.shape[:2]
 
-    # Convert to Grayscale & LAB color space for glare vs bubble detection
+    # Convert to Grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    l_channel, a_channel, b_channel = cv2.split(lab)
 
-    # 1. Mask top wall border region (Y < 50px)
+    # 1. CLAHE Contrast Enhancement for murky/dark water
+    enhanced = clahe.apply(gray)
+
+    # 2. Morphological Top-Hat Transform (isolates bright bubbles on murky/dark backgrounds)
+    tophat = cv2.morphologyEx(enhanced, cv2.MORPH_TOPHAT, kernel_tophat)
+
+    # 3. Adaptive Thresholding on Top-Hat
+    blur_th = cv2.GaussianBlur(tophat, (3, 3), 0)
+    _, thresh = cv2.threshold(blur_th, 20, 255, cv2.THRESH_BINARY)
+
+    # Mask container outer border (Y < 12px and edges)
     mask_region = np.ones((h, w), dtype=np.uint8) * 255
-    mask_region[0:50, :] = 0
-
-    # 2. Adaptive Gaussian Thresholding for bubble clusters & water ripples
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(
-        blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 19, 3
-    )
-
-    # Apply top wall exclusion mask
+    mask_region[0:12, :] = 0
     thresh = cv2.bitwise_and(thresh, thresh, mask=mask_region)
 
-    # Morphological Close & Open to unite bubble clusters & remove speckle noise
-    kernel_small = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    kernel_med = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    cleaned = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel_small)
-    cleaned = cv2.morphologyEx(cleaned, cv2.MORPH_CLOSE, kernel_med)
+    # Morphological Close to merge bubble cluster droplets
+    cleaned = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close)
 
     contours, _ = cv2.findContours(cleaned, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -63,50 +64,44 @@ for img_path in img_files:
     for cnt in contours:
         area = cv2.contourArea(cnt)
         
-        # Area filter: Exclude tiny noise/speckles (< 120px) and huge static glare/reflections (> 12000px)
-        if area < 120 or area > 12000:
+        # Area filter for bubble clusters in murky water
+        if area < 60 or area > 18000:
             continue
 
         bx, by, bw, bh = cv2.boundingRect(cnt)
         if bw == 0 or bh == 0:
             continue
 
-        # Top Y center guard (YC < 0.14 is top wall)
         yc = (by + bh / 2.0) / float(h)
         xc = (bx + bw / 2.0) / float(w)
-        if yc < 0.14:
+        
+        # Ignore outer container frame border
+        if xc < 0.015 or xc > 0.985 or yc < 0.02 or yc > 0.98:
             continue
 
-        # Aspect Ratio Filter: Exclude glare lines & long horizontal light streaks
+        # Ignore container top border glare line
+        if yc < 0.05 and (bw / float(w)) > 0.50:
+            continue
+
         aspect_ratio = float(bw) / float(bh)
-        if aspect_ratio < 0.40 or aspect_ratio > 2.40:
+        if aspect_ratio < 0.20 or aspect_ratio > 4.5:
             continue
 
-        # Circularity Filter: Exclude non-circular light streaks & hardware shadows
         perimeter = cv2.arcLength(cnt, True)
         if perimeter == 0:
             continue
         circularity = 4.0 * np.pi * area / (perimeter * perimeter)
-        if circularity < 0.40:
+        if circularity < 0.06:
             continue
 
-        # Intensity Variance & Glare Filter: Exclude solid bright white glare without bubble texture
-        roi_gray = gray[by:by+bh, bx:bx+bw]
-        std_dev = np.std(roi_gray)
-        mean_val = np.mean(roi_gray)
-
-        # Pure white glare has high mean (> 235) and low std_dev (< 12) -> Skip
-        if mean_val > 235 and std_dev < 12:
-            continue
-
-        # Compute candidate confidence
+        # Confidence metric
         norm_bw = bw / float(w)
         norm_bh = bh / float(h)
-        conf = min(0.95, max(0.50, circularity * 0.70 + (std_dev / 50.0) * 0.30))
+        conf = min(0.95, max(0.50, circularity * 0.40 + (area / 1000.0) * 0.30 + 0.30))
 
         candidates.append((0, xc, yc, norm_bw, norm_bh, conf))
 
-    # Save candidates to file
+    # Save candidates
     with open(out_txt, "w") as f:
         for c in candidates:
             f.write(f"{c[0]} {c[1]:.6f} {c[2]:.6f} {c[3]:.6f} {c[4]:.6f} {c[5]:.4f}\n")
@@ -115,7 +110,7 @@ for img_path in img_files:
     processed_images += 1
 
 print(f"==================================================")
-print(f"Auto-Labeling Complete for dataset-1500/catfishcare_dataset_1787243240!")
+print(f"Murky Water Bubble Auto-Labeling Complete!")
 print(f"Processed Images : {processed_images}")
 print(f"Total Candidates Generated : {total_candidates}")
 print(f"Average Candidates per Image : {total_candidates / max(1, processed_images):.2f}")
