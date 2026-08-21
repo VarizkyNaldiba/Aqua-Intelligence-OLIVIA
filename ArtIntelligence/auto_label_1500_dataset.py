@@ -17,7 +17,7 @@ for f in glob.glob(os.path.join(CAND_DIR, "*.txt")):
         pass
 
 img_files = glob.glob(os.path.join(IMG_DIR, "*.jpg")) + glob.glob(os.path.join(IMG_DIR, "*.png"))
-print(f"Starting Strict Bubble Detector (Excluding Shadows, Glare & Noise) for {len(img_files)} images...")
+print(f"Starting Strict Bubble & Yellow Leaf Filter Auto-Labeling for {len(img_files)} images...")
 
 total_candidates = 0
 processed_images = 0
@@ -37,6 +37,7 @@ for img_path in img_files:
 
     h, w = img.shape[:2]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # 1. CLAHE Contrast Enhancement
     enhanced = clahe.apply(gray)
@@ -85,9 +86,16 @@ for img_path in img_files:
         if aspect_ratio < 0.55 or aspect_ratio > 1.80:
             continue
 
-        # D. Laplacian Edge Variance Filter: Pure shadows/water have low variance (< 25.0)
-        roi = gray[by:by+bh, bx:bx+bw]
-        lap_var = cv2.Laplacian(roi, cv2.CV_64F).var()
+        # D. Yellow/Green Leaf Exclusion Filter (HSV Color Saturation & Hue)
+        roi_hsv = hsv[by:by+bh, bx:bx+bw]
+        sat_mean = np.mean(roi_hsv[:, :, 1])
+        hue_mean = np.mean(roi_hsv[:, :, 0])
+        if sat_mean > 32.0 and (12.0 <= hue_mean <= 85.0):
+            continue
+
+        # E. Laplacian Edge Variance Filter: Pure shadows/water have low variance (< 25.0)
+        roi_gray = gray[by:by+bh, bx:bx+bw]
+        lap_var = cv2.Laplacian(roi_gray, cv2.CV_64F).var()
         if lap_var < 25.0:
             continue
 
@@ -113,7 +121,7 @@ for img_path in img_files:
     processed_images += 1
 
 print(f"==================================================")
-print(f"Strict Bubble Auto-Labeling Complete!")
+print(f"Yellow Leaf & Shadow Free Bubble Auto-Labeling Complete!")
 print(f"Processed Images : {processed_images}")
 print(f"Images with Bubble Candidates : {images_with_bubbles} / {processed_images}")
 print(f"Total Candidates Kept : {total_candidates}")
