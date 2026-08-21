@@ -47,11 +47,9 @@ ALL_DATASET_ITEMS = []
 
 def init_dataset_cache():
     global ALL_DATASET_ITEMS
-    folders = [f for f in os.listdir(DATASETS_DIR) if f.startswith("catfishcare_dataset_")]
+    folders = ["catfishcare_dataset_1787196851"]
     folder_splits = {
-        "catfishcare_dataset_1787213105": "train",
-        "catfishcare_dataset_1787196851": "val",
-        "catfishcare_dataset_1787199872": "test"
+        "catfishcare_dataset_1787196851": "val"
     }
     state = load_state()
     items = []
@@ -333,9 +331,9 @@ APP_HTML = """<!DOCTYPE html>
         <h1>🐟 CatfishCare Review Studio <span style="font-size:12px; font-weight:normal; color:#64748b;">(Class 0: surface_activity)</span></h1>
         <div style="display:flex; gap:6px; margin-top:6px; align-items:center;">
             <span style="font-size:12px; font-weight:bold; color:#38bdf8;">Tim Reviewer:</span>
-            <button class="btn active" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #4803)</button>
-            <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#4804 - #9605)</button>
-            <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#9606 - #14407)</button>
+            <button class="btn active" id="btn-user-iir" onclick="setReviewer('Iir')">👤 Iir (#1 - #508)</button>
+            <button class="btn" id="btn-user-variz" onclick="setReviewer('Variz')">👤 Variz (#509 - #1016)</button>
+            <button class="btn" id="btn-user-gopar" onclick="setReviewer('Gopar')">👤 Gopar (#1017 - #1523)</button>
         </div>
     </div>
     
@@ -589,29 +587,51 @@ APP_HTML = """<!DOCTYPE html>
             `;
             let delBtn = div.querySelector('.btn-del-box');
             delBtn.onclick = function(e) {
-                if (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
-                activeBBoxes.splice(idx, 1);
-                render(-1);
+                deleteSingleBox(e, idx);
             };
             listContainer.appendChild(div);
         });
     }
+
+    canvas.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        let c = getCoords(e);
+        let clickedIdx = -1;
+        for (let i = activeBBoxes.length - 1; i >= 0; i--) {
+            let b = activeBBoxes[i];
+            let bw = b.bw * 640, bh = b.bh * 360;
+            let bx = (b.xc * 640) - (bw / 2);
+            let by = (b.yc * 360) - (bh / 2);
+            if (c.x >= bx && c.x <= bx + bw && c.y >= by && c.y <= by + bh) {
+                clickedIdx = i;
+                break;
+            }
+        }
+        if (clickedIdx !== -1) {
+            deleteSingleBox(null, clickedIdx);
+        }
+    });
 
     function deleteSingleBox(e, idx) {
         if (e) {
             if (e.stopPropagation) e.stopPropagation();
             if (e.preventDefault) e.preventDefault();
         }
-        activeBBoxes.splice(idx, 1);
-        render(-1);
+        if (idx >= 0 && idx < activeBBoxes.length) {
+            activeBBoxes.splice(idx, 1);
+            if (items.length > 0 && items[currentIndex]) {
+                items[currentIndex].bboxes = JSON.parse(JSON.stringify(activeBBoxes));
+            }
+            render(-1);
+        }
     }
     window.deleteSingleBox = deleteSingleBox;
 
     function clearAllBBoxes() {
         activeBBoxes = [];
+        if (items.length > 0 && items[currentIndex]) {
+            items[currentIndex].bboxes = [];
+        }
         render(-1);
     }
 
