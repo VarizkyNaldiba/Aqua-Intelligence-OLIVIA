@@ -41,6 +41,7 @@ Route::get('/telemetry/history/{kolam_id?}', [TelemetryController::class, 'getTe
 Route::get('/actuators/status/{kolam_id?}', [ActuatorController::class, 'getStatus'])->name('api.actuators.status');
 Route::post('/actuators/water-exchange/trigger', [ActuatorController::class, 'triggerWaterExchange'])->name('api.actuators.water_exchange');
 Route::post('/actuators/aerator/toggle', [ActuatorController::class, 'toggleAerator'])->name('api.actuators.aerator');
+Route::post('/actuators/manual', [ActuatorController::class, 'manualControl'])->name('api.actuators.manual');
 
 // Dynamic Pond Thresholds API
 use App\Http\Controllers\PondThresholdController;

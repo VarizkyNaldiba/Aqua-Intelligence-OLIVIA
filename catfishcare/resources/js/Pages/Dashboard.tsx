@@ -36,6 +36,7 @@ import AnalyticsTab from "@/Pages/Analytics";
 import ProfileTab from "@/Pages/Profile";
 import NotificationsTab from "@/Pages/Notifications";
 import DatasetStudioTab from "@/Pages/DatasetStudio";
+import ActuatorsTab from "@/Pages/Actuators";
 import Auth from "@/Pages/Login";
 
 type TodoItem = {
@@ -66,7 +67,7 @@ export default function Dashboard() {
         if (typeof window !== "undefined") {
             const params = new URLSearchParams(window.location.search);
             const tab = params.get("tab") as TabName;
-            if (tab && ["dashboard", "home", "ponds", "analytics", "profile", "notifications"].includes(tab)) {
+            if (tab && ["dashboard", "home", "ponds", "analytics", "profile", "notifications", "dataset", "actuators"].includes(tab)) {
                 return tab;
             }
         }
@@ -1970,6 +1971,8 @@ export default function Dashboard() {
                         setActiveTab={setActiveTab}
                     />
                 );
+            case "actuators":
+                return <ActuatorsTab selectedPondId={selectedPondId} />;
             case "dashboard":
             default:
                 return renderDashboardContent();
@@ -1990,6 +1993,8 @@ export default function Dashboard() {
                 return "Settings";
             case "notifications":
                 return "History";
+            case "actuators":
+                return "Water Pump Control";
             case "dashboard":
             default:
                 return "Real-Time Dashboard";

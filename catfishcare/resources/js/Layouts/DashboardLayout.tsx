@@ -48,6 +48,8 @@ export default function DashboardLayout({
                 return "History > Data Reports";
             case "dataset":
                 return "AI Studio > Pengumpulan Data Training Lele";
+            case "actuators":
+                return "Actuators > Water Pump Control";
             case "dashboard":
             default:
                 return "Dashboard > Real-Time";

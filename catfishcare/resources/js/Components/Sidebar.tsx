@@ -1,4 +1,4 @@
-import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight, Database } from "lucide-react";
+import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight, Database, Droplets } from "lucide-react";
 import { router } from "@inertiajs/react";
 import type { TabName } from "../Types";
 
@@ -19,6 +19,7 @@ const Sidebar = ({
 }: SidebarProps) => {
     const menuItems = [
         { id: "dashboard", icon: LayoutGrid, label: "Dashboard" },
+        { id: "actuators", icon: Droplets, label: "Water Pump" },
         { id: "analytics", icon: TrendingUp, label: "Predictions" },
         { id: "ponds", icon: Fish, label: "Pond Management" },
         { id: "dataset", icon: Database, label: "Studio Dataset" },
