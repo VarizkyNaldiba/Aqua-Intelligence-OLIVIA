@@ -546,12 +546,8 @@ APP_HTML = """<!DOCTYPE html>
         currentImg.src = '/img/' + item.rel_path;
     }
 
-    function render(highlightIdx = -1) {
+    function drawCanvas(highlightIdx = -1) {
         ctx.drawImage(currentImg, 0, 0, 640, 360);
-        let listContainer = document.getElementById('bbox-list-container');
-        listContainer.innerHTML = '';
-        document.getElementById('box-count').innerText = activeBBoxes.length;
-
         activeBBoxes.forEach((b, idx) => {
             let w = 640, h = 360;
             let bw = b.bw * w, bh = b.bh * h;
@@ -575,14 +571,32 @@ APP_HTML = """<!DOCTYPE html>
 
             ctx.fillStyle = '#0f172a';
             ctx.fillText(labelText, bx + 3, Math.max(12, by - 3));
+        });
+    }
 
-            // Render matching list item in sidebar
+    function renderSidebarList() {
+        let listContainer = document.getElementById('bbox-list-container');
+        listContainer.innerHTML = '';
+        document.getElementById('box-count').innerText = activeBBoxes.length;
+
+        activeBBoxes.forEach((b, idx) => {
+            let w = 640, h = 360;
+            let bw = b.bw * w, bh = b.bh * h;
+            let confStr = b.conf ? b.conf.toFixed(2) : '1.0';
+            let color = (b.conf >= 0.75 ? '#10b981' : (b.conf >= 0.45 ? '#f59e0b' : '#ef4444'));
+
             let div = document.createElement('div');
             div.className = 'bbox-item';
             div.style.borderLeft = `4px solid ${color}`;
-            if (isHighlighted) div.style.borderColor = '#38bdf8';
-            div.onmouseenter = function() { render(idx); };
-            div.onmouseleave = function() { render(-1); };
+            
+            div.onmouseenter = function() { 
+                div.style.borderLeft = `4px solid #38bdf8`;
+                drawCanvas(idx); 
+            };
+            div.onmouseleave = function() { 
+                div.style.borderLeft = `4px solid ${color}`;
+                drawCanvas(-1); 
+            };
 
             div.innerHTML = `
                 <div>
@@ -592,12 +606,23 @@ APP_HTML = """<!DOCTYPE html>
                 </div>
                 <button class="btn-del-box" style="cursor:pointer;" title="Hapus Kotak #${idx + 1}">🗑 Hapus</button>
             `;
+
             let delBtn = div.querySelector('.btn-del-box');
             delBtn.onclick = function(e) {
+                if (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
                 deleteSingleBox(e, idx);
             };
+
             listContainer.appendChild(div);
         });
+    }
+
+    function render(highlightIdx = -1) {
+        drawCanvas(highlightIdx);
+        renderSidebarList();
     }
 
     canvas.addEventListener('contextmenu', function(e) {
