@@ -23,12 +23,23 @@ def load_state():
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
-                return json.load(f)
+                state = json.load(f)
+                # Normalize all review keys to POSIX slashes
+                norm_reviews = {}
+                for k, v in state.get("reviews", {}).items():
+                    norm_reviews[k.replace("\\", "/")] = v
+                state["reviews"] = norm_reviews
+                return state
         except Exception:
             pass
-    return {"reviews": {}, "stats": {"approved": 0, "rejected": 0, "edited": 0, "total_reviewed": 0}}
+    return {"reviews": {}, "stats": {"approved": 0, "rejected": 0, "edited": 0, "total_reviewed": 0}, "last_rel_path": ""}
 
 def save_state(state):
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+    norm_reviews = {}
+    for k, v in state.get("reviews", {}).items():
+        norm_reviews[k.replace("\\", "/")] = v
+    state["reviews"] = norm_reviews
     with open(STATE_FILE, "w") as f:
         json.dump(state, f, indent=2)
 
@@ -53,7 +64,7 @@ def init_dataset_cache():
         img_files = glob.glob(os.path.join(img_dir, "*.jpg")) + glob.glob(os.path.join(img_dir, "*.png"))
 
         for img_path in img_files:
-            rel_path = os.path.relpath(img_path, DATASETS_DIR)
+            rel_path = os.path.relpath(img_path, DATASETS_DIR).replace("\\", "/")
             base_name = os.path.splitext(os.path.basename(img_path))[0]
             cand_txt = os.path.join(cand_dir, base_name + ".txt")
 
@@ -144,7 +155,7 @@ class HumanReviewHandler(SimpleHTTPRequestHandler):
         
         if self.path == "/api/save":
             payload = json.loads(post_bytes.decode("utf-8"))
-            rel_path = payload.get("rel_path")
+            rel_path = payload.get("rel_path", "").replace("\\", "/")
             action = payload.get("action") # APPROVED, REJECTED, EDITED
             bboxes = payload.get("bboxes", [])
             split = payload.get("split", "train")
