@@ -283,8 +283,8 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
                         </div>
                     </div>
 
-                    <div className="db-panel-body" style={{ height: "370px", position: "relative", padding: "16px 8px 8px 0" }}>
-                        <ResponsiveContainer width="100%" height="85%">
+                    <div className="db-panel-body" style={{ minHeight: "370px", position: "relative", padding: "16px 8px 8px 0" }}>
+                        <ResponsiveContainer width="100%" height={300} minHeight={280}>
                             <LineChart data={forecastData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />

@@ -143,6 +143,7 @@ class TelemetryController extends Controller
         }
 
         $kolamId = (int) $request->input('kolam_id', $payload['kolam_id'] ?? 1);
+        $userId = (int) $request->input('user_id', $payload['user_id'] ?? ($request->user()?->id ?? 1));
         $suhu = (float) $request->input('suhu', $payload['suhu'] ?? 27.5);
         $ph = (float) $request->input('ph', $payload['ph'] ?? 7.2);
         $kekeruhan = (float) $request->input('kekeruhan', $payload['kekeruhan'] ?? 18.0);
@@ -157,6 +158,7 @@ class TelemetryController extends Controller
         $assessment = self::computeRiskScore($ph, $suhu, $kekeruhan, $tds, $levelDev, $sfr, $kolamId);
 
         $telemetryData = [
+            'user_id' => $userId,
             'kolam_id' => $kolamId,
             'suhu' => $suhu,
             'ph' => $ph,
@@ -199,6 +201,7 @@ class TelemetryController extends Controller
         }
         Cache::put($historyKey, $history, 3600);
 
+
         // Save into log_sensor database table if available
         try {
             DB::table('log_sensor')->insert([
@@ -212,6 +215,14 @@ class TelemetryController extends Controller
             ]);
         } catch (\Throwable $e) {
             // Non-blocking log if DB schema is in-memory or not seeded
+        }
+
+        // Save 24/7 telemetry history into Google Cloud Firestore (throttled 1x per minute per pond)
+        try {
+            $firestore = new \App\Services\FirestoreService();
+            $firestore->logTelemetryHistory($telemetryData);
+        } catch (\Throwable $e) {
+            // Non-blocking catch to ensure hardware responsiveness
         }
 
         // Check if there is a pending actuator action commanded from the web
@@ -339,46 +350,50 @@ class TelemetryController extends Controller
     /**
      * Get dynamic rolling time-series telemetry history for charts.
      */
-    public function getTelemetryHistory(int $kolamId = 1): JsonResponse
+    public function getTelemetryHistory(int $kolamId = 9): JsonResponse
     {
-        $historyKey = "kolam_{$kolamId}_telemetry_history";
-        $history = Cache::get($historyKey, []);
+        $history = [];
+        try {
+            $firestore = new \App\Services\FirestoreService();
+            $history = $firestore->getHistoryFromFirestore($kolamId, 100);
+        } catch (\Throwable $e) {
+            $history = [];
+        }
 
+        // If Firestore is empty or offline, fallback to local memory rolling cache
         if (empty($history)) {
-            // Provide realistic baseline time-series history
+            $historyKey = "kolam_{$kolamId}_telemetry_history";
+            $history = Cache::get($historyKey, []);
+        } else {
+            // Append latest cached live telemetry if newer than last Firestore entry
             $latest = Cache::get("kolam_{$kolamId}_latest_telemetry");
-            $baseTemp = $latest['suhu'] ?? 27.5;
-            $basePh = $latest['ph'] ?? 7.2;
-            $baseTurb = $latest['kekeruhan'] ?? 18.0;
-            $baseTds = $latest['tds'] ?? 420.0;
-            $baseLevel = $latest['tinggi_air'] ?? 25.0;
-            $baseSfr = $latest['sfr'] ?? 0.05;
-
-            $now = Carbon::now();
-            for ($i = 15; $i >= 0; $i--) {
-                $time = $now->copy()->subSeconds($i * 10);
-                $history[] = [
-                    'created_at' => $time->toIso8601String(),
-                    'entry_id' => 'init-' . $kolamId . '-' . $time->timestamp,
-                    'TEMPERATURE' => round($baseTemp + sin($i * 0.5) * 0.15, 2),
-                    'TURBIDITY' => round($baseTurb + cos($i * 0.4) * 0.8, 1),
-                    'pH' => round($basePh + sin($i * 0.3) * 0.05, 2),
-                    'NITRATE' => round($baseTds + sin($i * 0.2) * 3, 0),
-                    'Population' => 1000,
-                    'Length' => round($baseLevel + cos($i * 0.2) * 0.1, 1),
-                    'Weight' => $baseSfr,
-                    'risk_score' => 15,
-                    'risk_status' => 'Low',
-                    'wqs' => 92,
-                ];
+            if ($latest && !empty($latest['updated_at'])) {
+                $lastFsTime = end($history)['created_at'] ?? '';
+                if ($latest['updated_at'] > $lastFsTime) {
+                    $history[] = [
+                        'created_at' => $latest['updated_at'],
+                        'entry_id' => 'live-' . $kolamId . '-' . time(),
+                        'TEMPERATURE' => $latest['suhu'],
+                        'TURBIDITY' => $latest['kekeruhan'],
+                        'pH' => $latest['ph'],
+                        'NITRATE' => $latest['tds'],
+                        'Population' => 1000,
+                        'Length' => $latest['tinggi_air'],
+                        'Weight' => $latest['sfr'],
+                        'risk_score' => $latest['risk_score'],
+                        'risk_status' => $latest['risk_status'],
+                        'wqs' => $latest['wqs'],
+                    ];
+                }
             }
-            Cache::put($historyKey, $history, 3600);
         }
 
         return response()->json([
             'kolam_id' => $kolamId,
-            'pond_name' => 'Kolam TFS 1',
+            'pond_name' => "Kolam TFS {$kolamId}",
             'history' => $history,
         ]);
     }
+
+
 }

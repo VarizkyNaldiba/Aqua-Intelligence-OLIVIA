@@ -17,15 +17,8 @@ import {
     EyeOff,
     Layers,
     Activity,
-    Droplets,
-    Thermometer,
-    Minimize2,
-    Download,
-    Database,
-    HardDrive,
-    CircleDot,
 } from "lucide-react";
-import type { TabName, MetricType, AppUser, SensorRow } from "@/Types";
+import type { TabName, AppUser } from "@/Types";
 import { useSensorData } from "@/Hooks/useSensorData";
 import { useTheme } from "@/Hooks/useTheme";
 
@@ -76,8 +69,6 @@ export default function Dashboard() {
 
     const [selectedPondId, setSelectedPondId] = useState(1);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [currentMetricType, setCurrentMetricType] =
-        useState<MetricType>("TEMPERATURE");
 
     const { theme } = useTheme();
 
@@ -118,6 +109,17 @@ export default function Dashboard() {
         setUseDemoFallback(false);
         setStreamKey((k) => k + 1);
     };
+
+    // Auto-timeout camera connection after 5 seconds if IP is unreachable
+    useEffect(() => {
+        if (streamStatus === "loading" && !useDemoFallback) {
+            const timer = setTimeout(() => {
+                setStreamStatus((prev) => (prev === "loading" ? "error" : prev));
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [streamKey, streamStatus, useDemoFallback]);
+
 
     const handleCaptureSnapshot = (pondName: string) => {
         setIsSnapshotting(true);
@@ -226,7 +228,9 @@ export default function Dashboard() {
 
     // Sparkline SVG points generator
     const getSparklinePoints = (data: number[], width = 120, height = 30) => {
-        if (data.length < 2) return "";
+        if (!data || data.length < 2) {
+            return `M 0,${(height / 2).toFixed(1)} L ${width},${(height / 2).toFixed(1)}`;
+        }
         const min = Math.min(...data);
         const max = Math.max(...data);
         const range = max - min === 0 ? 1 : max - min;
@@ -372,7 +376,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Custom Scrollable Selector */}
-                {/* IoT Live Status Badge */}
+                    {/* IoT Live Status Badge */}
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <span style={{
                             display: "inline-flex",
@@ -615,7 +619,7 @@ export default function Dashboard() {
                                 <path
                                     d={`${getSparklinePoints(tdsHistory)} L 120,30 L 0,30 Z`}
                                     fill="url(#tdsGrad)"
-                                    />
+                                />
                                 <path
                                     d={getSparklinePoints(tdsHistory)}
                                     fill="none"
@@ -781,10 +785,10 @@ export default function Dashboard() {
                                             useDemoFallback
                                                 ? "#475569"
                                                 : streamStatus === "online"
-                                                ? "#ef4444"
-                                                : streamStatus === "loading"
-                                                ? "#eab308"
-                                                : "#dc2626",
+                                                    ? "#ef4444"
+                                                    : streamStatus === "loading"
+                                                        ? "#eab308"
+                                                        : "#dc2626",
                                     }}
                                 >
                                     <span
@@ -803,10 +807,10 @@ export default function Dashboard() {
                                     {useDemoFallback
                                         ? "DEMO MODE"
                                         : streamStatus === "online"
-                                        ? "LIVE"
-                                        : streamStatus === "loading"
-                                        ? "CONNECTING..."
-                                        : "OFFLINE"}
+                                            ? "LIVE"
+                                            : streamStatus === "loading"
+                                                ? "CONNECTING..."
+                                                : "OFFLINE"}
                                 </div>
                                 <div className="db-camera-time">{currentTime}</div>
 
@@ -938,10 +942,10 @@ export default function Dashboard() {
                                             useDemoFallback
                                                 ? "#64748b"
                                                 : streamStatus === "online"
-                                                ? "#10b981"
-                                                : streamStatus === "loading"
-                                                ? "#f59e0b"
-                                                : "#ef4444",
+                                                    ? "#10b981"
+                                                    : streamStatus === "loading"
+                                                        ? "#f59e0b"
+                                                        : "#ef4444",
                                         display: "flex",
                                         alignItems: "center",
                                         gap: "6px",
@@ -957,20 +961,20 @@ export default function Dashboard() {
                                                 useDemoFallback
                                                     ? "#64748b"
                                                     : streamStatus === "online"
-                                                    ? "#10b981"
-                                                    : streamStatus === "loading"
-                                                    ? "#f59e0b"
-                                                    : "#ef4444",
+                                                        ? "#10b981"
+                                                        : streamStatus === "loading"
+                                                            ? "#f59e0b"
+                                                            : "#ef4444",
                                             borderRadius: "50%",
                                         }}
                                     ></span>
                                     {useDemoFallback
                                         ? "Demo Preview"
                                         : streamStatus === "online"
-                                        ? "Live Streaming"
-                                        : streamStatus === "loading"
-                                        ? "Connecting..."
-                                        : "Offline"}
+                                            ? "Live Streaming"
+                                            : streamStatus === "loading"
+                                                ? "Connecting..."
+                                                : "Offline"}
                                 </span>
                             </div>
                         </div>
@@ -1449,8 +1453,8 @@ export default function Dashboard() {
                                                 useDemoFallback
                                                     ? "rgba(71, 85, 105, 0.85)"
                                                     : streamStatus === "online"
-                                                    ? "rgba(220, 38, 38, 0.9)"
-                                                    : "rgba(234, 88, 12, 0.9)",
+                                                        ? "rgba(220, 38, 38, 0.9)"
+                                                        : "rgba(234, 88, 12, 0.9)",
                                             color: "#ffffff",
                                             padding: "6px 14px",
                                             borderRadius: "100px",
@@ -1477,8 +1481,8 @@ export default function Dashboard() {
                                             {useDemoFallback
                                                 ? "DEMO FEED"
                                                 : streamStatus === "online"
-                                                ? "● REC LIVE"
-                                                : "STREAM OFFLINE"}
+                                                    ? "● REC LIVE"
+                                                    : "STREAM OFFLINE"}
                                         </span>
                                     </div>
 
@@ -1942,8 +1946,8 @@ export default function Dashboard() {
                     <ProfileTab
                         theme={theme}
                         themeSetting="system"
-                        onChangeThemeSetting={() => {}}
-                        toggleTheme={() => {}}
+                        onChangeThemeSetting={() => { }}
+                        toggleTheme={() => { }}
                         currentUser={currentUser}
                         onLogout={handleLogout}
                         onProfileUpdate={(updatedUser: AppUser) => {
@@ -1962,6 +1966,7 @@ export default function Dashboard() {
                     <NotificationsTab
                         currentData={currentData}
                         rawData={rawData}
+                        selectedPondId={selectedPondId}
                     />
                 );
             case "dataset":
