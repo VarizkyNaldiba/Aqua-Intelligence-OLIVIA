@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     User,
     Bell,
@@ -15,9 +15,12 @@ import {
 import type { AppUser, Theme } from "@/Types";
 
 interface ProfileTabProps {
-    theme: Theme;
+    theme?: Theme;
+    themeSetting?: string;
+    onChangeThemeSetting?: (setting: any) => void;
+    toggleTheme?: () => void;
     currentUser: AppUser | null;
-    onLogout: () => void;
+    onLogout?: () => void;
     onProfileUpdate: (user: AppUser) => void;
 }
 

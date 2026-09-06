@@ -3,7 +3,7 @@ import {
     Database, Pencil, Trash2, X, Waves, Info, 
     Thermometer, Droplet, ShieldCheck, Wifi, Calendar, Fish 
 } from "lucide-react";
-import type { TabName } from "@/Types";
+import type { TabName, SensorRow } from "@/Types";
 
 interface PondItem {
     id: number;
@@ -20,12 +20,14 @@ interface PondItem {
 }
 
 interface PondsTabProps {
+    currentData?: SensorRow | null;
     selectedPondId: number;
     setSelectedPondId: (id: number) => void;
     setActiveTab: (tab: TabName) => void;
 }
 
 const PondsTab = ({
+    currentData: _currentData,
     selectedPondId: _selectedPondId,
     setSelectedPondId: _setSelectedPondId,
 }: PondsTabProps) => {
