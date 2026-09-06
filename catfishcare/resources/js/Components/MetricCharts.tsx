@@ -81,7 +81,7 @@ const MetricCharts = ({
             <div className="card card-donut">
                 <h3>Proporsi Kesehatan Kolam</h3>
                 <div className="donut-chart-container">
-                    <ResponsiveContainer width="100%" height={160}>
+                    <ResponsiveContainer width="100%" height={160} minHeight={160}>
                         <PieChart>
                             <Pie
                                 data={pieData}
@@ -168,8 +168,8 @@ const MetricCharts = ({
                     </select>
                 </div>
 
-                <div className="line-chart-container">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="line-chart-container" style={{ minHeight: "220px", width: "100%" }}>
+                    <ResponsiveContainer width="100%" height={220} minHeight={200}>
                         <AreaChart
                             data={lineChartData}
                             margin={{ top: 5, right: 5, left: -25, bottom: 5 }}

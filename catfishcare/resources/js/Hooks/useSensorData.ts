@@ -24,28 +24,16 @@ export const useSensorData = (selectedPondId: number = 1) => {
                     setCurrentIndex(data.history.length - 1);
                     const latest = data.history[data.history.length - 1];
                     setLiveData(latest);
+                } else if (isMounted) {
+                    setRawData([]);
                 }
             })
             .catch(() => {
-                // Fallback initial baseline
-                const now = new Date();
-                const baseline: SensorRow[] = Array.from({ length: 15 }, (_, i) => ({
-                    created_at: new Date(now.getTime() - (15 - i) * 10000).toISOString(),
-                    entry_id: `init-${selectedPondId}-${i}`,
-                    TEMPERATURE: 27.5,
-                    TURBIDITY: 18.0,
-                    pH: 7.2,
-                    NITRATE: 420.0,
-                    Population: 1000,
-                    Length: 25.0,
-                    Weight: 0.05,
-                }));
                 if (isMounted) {
-                    setRawData(baseline);
-                    setCurrentIndex(baseline.length - 1);
-                    setLiveData(baseline[baseline.length - 1]);
+                    setRawData([]);
                 }
             });
+
 
         return () => {
             isMounted = false;
@@ -83,8 +71,8 @@ export const useSensorData = (selectedPondId: number = 1) => {
                         setLiveData(newRow);
                         setIsLiveActive(!telem.is_simulated);
 
-                        // Only append to chart history if this is genuinely newer data
-                        if (updatedAtMs > lastTimestampRef.current) {
+                        // Only append to chart history if this is genuinely REAL data from hardware/API (not simulated offline fallback)
+                        if (!telem.is_simulated && updatedAtMs > lastTimestampRef.current) {
                             lastTimestampRef.current = updatedAtMs;
                             setRawData((prev) => {
                                 const next = [...prev, newRow];
@@ -92,6 +80,7 @@ export const useSensorData = (selectedPondId: number = 1) => {
                             });
                             setCurrentIndex((prev) => prev + 1);
                         }
+
                     }
                 }
             } catch {

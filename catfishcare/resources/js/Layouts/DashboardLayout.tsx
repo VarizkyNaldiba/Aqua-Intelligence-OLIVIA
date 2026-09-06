@@ -94,6 +94,9 @@ export default function DashboardLayout({
                                     src="/avatar_ade_bassey.png"
                                     alt="Adé Bassey avatar"
                                     className="db-avatar"
+                                    onError={(e) => {
+                                        e.currentTarget.src = "https://ui-avatars.com/api/?name=Ade+Bassey&background=0ea5e9&color=fff";
+                                    }}
                                 />
                                 <div className="db-profile-info">
                                     <div className="db-profile-name">Adé Bassey</div>
