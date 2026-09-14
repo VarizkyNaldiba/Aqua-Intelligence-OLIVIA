@@ -98,8 +98,9 @@ class FirestoreService
     {
         $kolamId = $data['kolam_id'] ?? 1;
         $throttleKey = "firestore_last_log_kolam_{$kolamId}";
+        $throttleSeconds = (int)env('FIRESTORE_WRITE_INTERVAL', 10);
 
-        // Enforce 5-second throttle matching ESP32 median filter interval
+        // Enforce 10-second throttle per pond to preserve Firebase free-tier quota (~8,640 writes/day)
         if (!$force && Cache::has($throttleKey)) {
             return false;
         }
@@ -135,8 +136,8 @@ class FirestoreService
                 ]);
 
             if ($response->successful()) {
-                // Set 5-second throttle flag for this pond (matching ESP32 median filter interval)
-                Cache::put($throttleKey, true, 5);
+                // Set 10-second throttle flag for this pond (quota ~8,640 writes/day)
+                Cache::put($throttleKey, true, $throttleSeconds);
                 Log::info("[FirestoreService] Sensor history document successfully written to Firestore for pond {$kolamId}.");
                 return true;
             }
