@@ -283,5 +283,53 @@ class FirestoreService
             return [];
         }
     }
+
+    /**
+     * Delete documents from 'sensor_history' collection older than specified hours.
+     */
+    public function deleteOldTelemetryDocuments(int $hours = 12): int
+    {
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return 0;
+
+        $cutoffIso = Carbon::now()->subHours($hours)->toIso8601String();
+        $queryUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents:runQuery";
+
+        $deletedCount = 0;
+        try {
+            // Query documents with timestamp < cutoffIso
+            $response = Http::withToken($accessToken)->post($queryUrl, [
+                'structuredQuery' => [
+                    'from' => [['collectionId' => 'sensor_history']],
+                    'where' => [
+                        'fieldFilter' => [
+                            'field' => ['fieldPath' => 'timestamp'],
+                            'op' => 'LESS_THAN',
+                            'value' => ['timestampValue' => $cutoffIso]
+                        ]
+                    ],
+                    'limit' => 500,
+                ]
+            ]);
+
+            if ($response->successful() && is_array($response->json())) {
+                $docs = $response->json();
+                foreach ($docs as $docItem) {
+                    if (!isset($docItem['document']['name'])) continue;
+                    $docName = $docItem['document']['name'];
+                    $deleteUrl = "https://firestore.googleapis.com/v1/{$docName}";
+                    $delRes = Http::withToken($accessToken)->delete($deleteUrl);
+                    if ($delRes->successful()) {
+                        $deletedCount++;
+                    }
+                }
+            }
+            Log::info("[FirestoreService] Purged {$deletedCount} documents older than {$hours}h from Firestore.");
+        } catch (\Throwable $e) {
+            Log::error("[FirestoreService] Exception purging old documents: " . $e->getMessage());
+        }
+
+        return $deletedCount;
+    }
 }
 
