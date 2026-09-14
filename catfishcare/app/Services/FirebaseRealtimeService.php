@@ -15,7 +15,7 @@ class FirebaseRealtimeService
 
     public function __construct()
     {
-        $this->projectId = env('FIREBASE_PROJECT_ID', 'catfishcare-2daa2');
+        $this->projectId = env('FIREBASE_PROJECT_ID', 'explora-be1a0');
         $defaultUrl = env('FIREBASE_RTDB_URL', "https://{$this->projectId}-default-rtdb.firebaseio.com");
         $this->rtdbUrl = rtrim($defaultUrl, '/');
         $this->credentialsPath = base_path(env('FIREBASE_CREDENTIALS', 'storage/app/firebase-credentials.json'));

@@ -584,7 +584,7 @@ class TelemetryController extends Controller
             // 3. Firebase Realtime Database info
             $rtdbStats = [
                 'connected' => true,
-                'url' => env('FIREBASE_RTDB_URL', 'https://catfishcare-2daa2-default-rtdb.firebaseio.com'),
+                'url' => env('FIREBASE_RTDB_URL', 'https://explora-be1a0-default-rtdb.firebaseio.com'),
                 'storage_quota' => '1 GB (Spark Plan)',
                 'bandwidth_quota' => '10 GB / bulan',
                 'active_nodes' => [

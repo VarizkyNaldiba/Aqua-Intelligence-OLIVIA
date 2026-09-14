@@ -393,7 +393,7 @@ export default function StorageUsageCard() {
                 >
                     <div style={{ fontWeight: 800, fontSize: "13px", color: "#0f172a", marginBottom: "12px", display: "flex", alignItems: "center", gap: "6px" }}>
                         <CheckCircle2 size={16} color="#10b981" />
-                        <span>Rincian Kuota & Konfigurasi Google Cloud Firebase (Project: {firestore?.project_id || "catfishcare-2daa2"})</span>
+                        <span>Rincian Kuota & Konfigurasi Google Cloud Firebase (Project: {firestore?.project_id || "explora-be1a0"})</span>
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>

@@ -35,7 +35,7 @@ export interface RealtimeActuators {
 export function subscribeRealtimeTelemetry(
   kolamId: number = 1,
   onData: (data: RealtimeTelemetry) => void,
-  rtdbUrl: string = 'https://catfishcare-2daa2-default-rtdb.firebaseio.com'
+  rtdbUrl: string = 'https://explora-be1a0-default-rtdb.firebaseio.com'
 ): () => void {
   const nodeUrl = `${rtdbUrl.replace(/\/$/, '')}/telemetry/kolam_${kolamId}.json`;
   let eventSource: EventSource | null = null;

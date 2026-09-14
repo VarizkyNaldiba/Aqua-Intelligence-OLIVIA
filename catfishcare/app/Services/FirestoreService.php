@@ -14,7 +14,7 @@ class FirestoreService
 
     public function __construct()
     {
-        $this->projectId = env('FIREBASE_PROJECT_ID', 'catfishcare-2daa2');
+        $this->projectId = env('FIREBASE_PROJECT_ID', 'explora-be1a0');
         $this->credentialsPath = base_path(env('FIREBASE_CREDENTIALS', 'storage/app/firebase-credentials.json'));
     }
 
