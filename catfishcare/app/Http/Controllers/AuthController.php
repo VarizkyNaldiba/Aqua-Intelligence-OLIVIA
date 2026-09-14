@@ -25,9 +25,16 @@ class AuthController extends Controller
         // Allow entering either 'pakfii' or 'pakfii@gmail.com'
         $extractedUsername = str_contains($inputUsername, '@') ? explode('@', $inputUsername)[0] : $inputUsername;
 
-        $user = User::where('username', $inputUsername)
-            ->orWhere('username', $extractedUsername)
-            ->first();
+        try {
+            $user = User::where('username', $inputUsername)
+                ->orWhere('username', $extractedUsername)
+                ->first();
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Gagal terhubung ke database server: ' . $e->getMessage(),
+                'error' => 'Database query error',
+            ], 500);
+        }
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
