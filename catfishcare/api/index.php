@@ -11,6 +11,7 @@ $tmpDirs = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
     '/tmp/storage/framework/cache',
+    '/tmp/storage/framework/cache/data',
     '/tmp/storage/logs',
 ];
 
@@ -36,10 +37,13 @@ putenv('APP_SERVICES_CACHE=/tmp/services.php');
 
 putenv('CACHE_STORE=file');
 putenv('CACHE_DRIVER=file');
+putenv('CACHE_PATH=/tmp/storage/framework/cache/data');
 $_ENV['CACHE_STORE'] = 'file';
 $_ENV['CACHE_DRIVER'] = 'file';
+$_ENV['CACHE_PATH'] = '/tmp/storage/framework/cache/data';
 $_SERVER['CACHE_STORE'] = 'file';
 $_SERVER['CACHE_DRIVER'] = 'file';
+$_SERVER['CACHE_PATH'] = '/tmp/storage/framework/cache/data';
 
 putenv('SESSION_DRIVER=cookie');
 putenv('SESSION_FILE_PATH=/tmp/storage/framework/sessions');
