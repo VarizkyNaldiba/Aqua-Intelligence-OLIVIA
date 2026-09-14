@@ -348,72 +348,92 @@ class TelemetryController extends Controller
     }
 
     /**
-     * Get dynamic rolling time-series telemetry history for charts.
+     * Get dynamic rolling time-series telemetry history for charts and monitoring table.
      */
     public function getTelemetryHistory(int $kolamId = 1): JsonResponse
     {
         $history = [];
+        $seenKeys = [];
+
+        // 1. Primary: Fetch latest real-time entries from SQLite log_sensor DB table
+        try {
+            $rows = DB::table('log_sensor')
+                ->where('kolam_id', $kolamId)
+                ->orderBy('created_at', 'desc')
+                ->limit(50)
+                ->get();
+
+            foreach ($rows as $r) {
+                $ts = Carbon::parse($r->created_at)->toIso8601String();
+                $key = "db-{$r->id}";
+                $seenKeys[$key] = true;
+
+                $assessment = self::computeRiskScore((float)$r->ph, (float)$r->suhu, (float)$r->kekeruhan, 420.0, abs(25.0 - (float)$r->tinggi_air), 0.05, $kolamId);
+
+                $history[] = [
+                    'created_at' => $ts,
+                    'entry_id' => $key,
+                    'TEMPERATURE' => (float)$r->suhu,
+                    'TURBIDITY' => (float)$r->kekeruhan,
+                    'pH' => (float)$r->ph,
+                    'NITRATE' => 420.0,
+                    'Population' => 1000,
+                    'Length' => (float)$r->tinggi_air,
+                    'Weight' => 0.05,
+                    'risk_score' => $assessment['risk_score'],
+                    'risk_status' => $assessment['risk_status'],
+                    'wqs' => $assessment['wqs'],
+                ];
+            }
+        } catch (\Throwable $e) {}
+
+        // 2. Secondary: Fetch from Google Cloud Firestore
         try {
             $firestore = new \App\Services\FirestoreService();
-            $history = $firestore->getHistoryFromFirestore($kolamId, 100);
-        } catch (\Throwable $e) {
-            $history = [];
-        }
+            $fsHistory = $firestore->getHistoryFromFirestore($kolamId, 50);
+            foreach ($fsHistory as $fsItem) {
+                $key = $fsItem['entry_id'] ?? ('fs-' . ($fsItem['created_at'] ?? ''));
+                if (!isset($seenKeys[$key])) {
+                    $seenKeys[$key] = true;
+                    $history[] = $fsItem;
+                }
+            }
+        } catch (\Throwable $e) {}
 
-        // If Firestore is empty or offline, fallback to local memory rolling cache or DB log_sensor
+        // 3. Fallback: Local Cache rolling history
         if (empty($history)) {
             $historyKey = "kolam_{$kolamId}_telemetry_history";
             $history = Cache::get($historyKey, []);
-
-            if (empty($history)) {
-                try {
-                    $rows = DB::table('log_sensor')
-                        ->orderBy('created_at', 'desc')
-                        ->limit(40)
-                        ->get();
-
-                    foreach ($rows as $r) {
-                        $assessment = self::computeRiskScore((float)$r->ph, (float)$r->suhu, (float)$r->kekeruhan, 420.0, abs(25.0 - (float)$r->tinggi_air), 0.05, $r->kolam_id ?? 1);
-                        $history[] = [
-                            'created_at' => Carbon::parse($r->created_at)->toIso8601String(),
-                            'entry_id' => 'db-' . $r->id,
-                            'TEMPERATURE' => (float)$r->suhu,
-                            'TURBIDITY' => (float)$r->kekeruhan,
-                            'pH' => (float)$r->ph,
-                            'NITRATE' => 420.0,
-                            'Population' => 1000,
-                            'Length' => (float)$r->tinggi_air,
-                            'Weight' => 0.05,
-                            'risk_score' => $assessment['risk_score'],
-                            'risk_status' => $assessment['risk_status'],
-                            'wqs' => $assessment['wqs'],
-                        ];
-                    }
-                } catch (\Throwable $e) {}
-            }
         }
 
-        // Append latest cached live telemetry if newer than last entry
+        // 4. Live telemetry overlay from cache
         $latest = Cache::get("kolam_{$kolamId}_latest_telemetry");
         if ($latest && !empty($latest['updated_at'])) {
-            $lastFsTime = !empty($history) ? (end($history)['created_at'] ?? '') : '';
-            if (empty($lastFsTime) || $latest['updated_at'] > $lastFsTime) {
+            $liveKey = "live-{$kolamId}-" . $latest['updated_at'];
+            if (!isset($seenKeys[$liveKey])) {
                 $history[] = [
                     'created_at' => $latest['updated_at'],
-                    'entry_id' => 'live-' . $kolamId . '-' . time(),
-                    'TEMPERATURE' => $latest['suhu'],
-                    'TURBIDITY' => $latest['kekeruhan'],
-                    'pH' => $latest['ph'],
-                    'NITRATE' => $latest['tds'],
+                    'entry_id' => $liveKey,
+                    'TEMPERATURE' => (float)$latest['suhu'],
+                    'TURBIDITY' => (float)$latest['kekeruhan'],
+                    'pH' => (float)$latest['ph'],
+                    'NITRATE' => (float)$latest['tds'],
                     'Population' => 1000,
-                    'Length' => $latest['tinggi_air'],
-                    'Weight' => $latest['sfr'],
-                    'risk_score' => $latest['risk_score'],
-                    'risk_status' => $latest['risk_status'],
-                    'wqs' => $latest['wqs'],
+                    'Length' => (float)$latest['tinggi_air'],
+                    'Weight' => (float)$latest['sfr'],
+                    'risk_score' => (float)$latest['risk_score'],
+                    'risk_status' => (string)$latest['risk_status'],
+                    'wqs' => (float)$latest['wqs'],
                 ];
             }
         }
+
+        // Sort strictly newest-first (created_at DESCENDING)
+        usort($history, function ($a, $b) {
+            $timeA = isset($a['created_at']) ? strtotime($a['created_at']) : 0;
+            $timeB = isset($b['created_at']) ? strtotime($b['created_at']) : 0;
+            return $timeB <=> $timeA;
+        });
 
         return response()->json([
             'kolam_id' => $kolamId,
@@ -421,6 +441,7 @@ class TelemetryController extends Controller
             'history' => array_values($history),
         ]);
     }
+
 
 
 }
