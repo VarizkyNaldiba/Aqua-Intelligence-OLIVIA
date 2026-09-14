@@ -350,7 +350,7 @@ class TelemetryController extends Controller
     /**
      * Get dynamic rolling time-series telemetry history for charts.
      */
-    public function getTelemetryHistory(int $kolamId = 9): JsonResponse
+    public function getTelemetryHistory(int $kolamId = 1): JsonResponse
     {
         $history = [];
         try {
@@ -360,38 +360,65 @@ class TelemetryController extends Controller
             $history = [];
         }
 
-        // If Firestore is empty or offline, fallback to local memory rolling cache
+        // If Firestore is empty or offline, fallback to local memory rolling cache or DB log_sensor
         if (empty($history)) {
             $historyKey = "kolam_{$kolamId}_telemetry_history";
             $history = Cache::get($historyKey, []);
-        } else {
-            // Append latest cached live telemetry if newer than last Firestore entry
-            $latest = Cache::get("kolam_{$kolamId}_latest_telemetry");
-            if ($latest && !empty($latest['updated_at'])) {
-                $lastFsTime = end($history)['created_at'] ?? '';
-                if ($latest['updated_at'] > $lastFsTime) {
-                    $history[] = [
-                        'created_at' => $latest['updated_at'],
-                        'entry_id' => 'live-' . $kolamId . '-' . time(),
-                        'TEMPERATURE' => $latest['suhu'],
-                        'TURBIDITY' => $latest['kekeruhan'],
-                        'pH' => $latest['ph'],
-                        'NITRATE' => $latest['tds'],
-                        'Population' => 1000,
-                        'Length' => $latest['tinggi_air'],
-                        'Weight' => $latest['sfr'],
-                        'risk_score' => $latest['risk_score'],
-                        'risk_status' => $latest['risk_status'],
-                        'wqs' => $latest['wqs'],
-                    ];
-                }
+
+            if (empty($history)) {
+                try {
+                    $rows = DB::table('log_sensor')
+                        ->orderBy('created_at', 'desc')
+                        ->limit(40)
+                        ->get();
+
+                    foreach ($rows as $r) {
+                        $assessment = self::computeRiskScore((float)$r->ph, (float)$r->suhu, (float)$r->kekeruhan, 420.0, abs(25.0 - (float)$r->tinggi_air), 0.05, $r->kolam_id ?? 1);
+                        $history[] = [
+                            'created_at' => Carbon::parse($r->created_at)->toIso8601String(),
+                            'entry_id' => 'db-' . $r->id,
+                            'TEMPERATURE' => (float)$r->suhu,
+                            'TURBIDITY' => (float)$r->kekeruhan,
+                            'pH' => (float)$r->ph,
+                            'NITRATE' => 420.0,
+                            'Population' => 1000,
+                            'Length' => (float)$r->tinggi_air,
+                            'Weight' => 0.05,
+                            'risk_score' => $assessment['risk_score'],
+                            'risk_status' => $assessment['risk_status'],
+                            'wqs' => $assessment['wqs'],
+                        ];
+                    }
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        // Append latest cached live telemetry if newer than last entry
+        $latest = Cache::get("kolam_{$kolamId}_latest_telemetry");
+        if ($latest && !empty($latest['updated_at'])) {
+            $lastFsTime = !empty($history) ? (end($history)['created_at'] ?? '') : '';
+            if (empty($lastFsTime) || $latest['updated_at'] > $lastFsTime) {
+                $history[] = [
+                    'created_at' => $latest['updated_at'],
+                    'entry_id' => 'live-' . $kolamId . '-' . time(),
+                    'TEMPERATURE' => $latest['suhu'],
+                    'TURBIDITY' => $latest['kekeruhan'],
+                    'pH' => $latest['ph'],
+                    'NITRATE' => $latest['tds'],
+                    'Population' => 1000,
+                    'Length' => $latest['tinggi_air'],
+                    'Weight' => $latest['sfr'],
+                    'risk_score' => $latest['risk_score'],
+                    'risk_status' => $latest['risk_status'],
+                    'wqs' => $latest['wqs'],
+                ];
             }
         }
 
         return response()->json([
             'kolam_id' => $kolamId,
             'pond_name' => "Kolam TFS {$kolamId}",
-            'history' => $history,
+            'history' => array_values($history),
         ]);
     }
 

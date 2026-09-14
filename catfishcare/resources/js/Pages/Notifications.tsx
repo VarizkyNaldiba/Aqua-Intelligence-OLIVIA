@@ -47,10 +47,10 @@ const POND_OPTIONS = [
 
 export default function NotificationsTab({
     rawData = [],
-    selectedPondId = 9,
+    selectedPondId = 1,
 }: NotificationsTabProps) {
     const [downloading, setDownloading] = useState(false);
-    const [activePondId, setActivePondId] = useState<number>(selectedPondId || 9);
+    const [activePondId, setActivePondId] = useState<number>(selectedPondId || 1);
     const [historyData, setHistoryData] = useState<SensorRow[]>(rawData);
 
     // Sync activePondId if prop changes
