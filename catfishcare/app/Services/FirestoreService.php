@@ -331,5 +331,56 @@ class FirestoreService
 
         return $deletedCount;
     }
+
+    /**
+     * Delete all sensor telemetry documents from Firestore for a specific pond or all ponds.
+     */
+    public function clearPondTelemetryDocuments(int $kolamId = 1): int
+    {
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return 0;
+
+        $queryUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents:runQuery";
+        $deletedCount = 0;
+
+        try {
+            $query = [
+                'from' => [['collectionId' => 'sensor_history']],
+                'limit' => 500,
+            ];
+
+            if ($kolamId > 0) {
+                $query['where'] = [
+                    'fieldFilter' => [
+                        'field' => ['fieldPath' => 'kolam_id'],
+                        'op' => 'EQUAL',
+                        'value' => ['integerValue' => (string)$kolamId]
+                    ]
+                ];
+            }
+
+            $response = Http::withToken($accessToken)->post($queryUrl, [
+                'structuredQuery' => $query
+            ]);
+
+            if ($response->successful() && is_array($response->json())) {
+                $docs = $response->json();
+                foreach ($docs as $docItem) {
+                    if (!isset($docItem['document']['name'])) continue;
+                    $docName = $docItem['document']['name'];
+                    $deleteUrl = "https://firestore.googleapis.com/v1/{$docName}";
+                    $delRes = Http::withToken($accessToken)->delete($deleteUrl);
+                    if ($delRes->successful()) {
+                        $deletedCount++;
+                    }
+                }
+            }
+            Log::info("[FirestoreService] Cleared {$deletedCount} sensor telemetry documents from Firestore for kolam {$kolamId}.");
+        } catch (\Throwable $e) {
+            Log::error("[FirestoreService] Exception clearing Firestore documents: " . $e->getMessage());
+        }
+
+        return $deletedCount;
+    }
 }
 

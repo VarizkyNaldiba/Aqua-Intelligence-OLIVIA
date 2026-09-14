@@ -469,6 +469,78 @@ class TelemetryController extends Controller
         ]);
     }
 
+    /**
+     * Clear sensor telemetry history log for a specific pond (or all ponds).
+     */
+    public function clearTelemetryHistory(Request $request, int $kolamId = 1): JsonResponse
+    {
+        try {
+            // 1. Delete local SQLite DB records
+            if ($kolamId === 0) {
+                DB::table('log_sensor')->truncate();
+            } else {
+                DB::table('log_sensor')->where('kolam_id', $kolamId)->delete();
+            }
 
+            // 2. Clear local application cache
+            Cache::forget("kolam_{$kolamId}_telemetry_history");
+            Cache::forget("kolam_{$kolamId}_latest_telemetry");
 
+            // 3. Clear Google Cloud Firestore remote sensor_history records
+            try {
+                $firestore = new \App\Services\FirestoreService();
+                $firestore->clearPondTelemetryDocuments($kolamId);
+            } catch (\Throwable $e) {}
+
+            // 4. Reset Firebase Realtime Database node
+            try {
+                $firebaseRealtime = new \App\Services\FirebaseRealtimeService();
+                if (method_exists($firebaseRealtime, 'resetLatestTelemetry')) {
+                    $firebaseRealtime->resetLatestTelemetry($kolamId);
+                }
+            } catch (\Throwable $e) {}
+
+            return response()->json([
+                'success' => true,
+                'message' => "Data log sensor berhasil dibersihkan di SQLite DB, Cache, dan Firebase Cloud untuk Kolam #{$kolamId}",
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Gagal membersihkan data sensor: " . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export telemetry log history directly to Google Drive as CSV.
+     */
+    public function exportToGoogleDrive(Request $request, int $kolamId = 1): JsonResponse
+    {
+        try {
+            $rows = DB::table('log_sensor')
+                ->where('kolam_id', $kolamId)
+                ->orderBy('created_at', 'desc')
+                ->limit(500)
+                ->get();
+
+            $csvData = "ID,Waktu,Suhu_C,pH,Kekeruhan_NTU,TinggiAir_cm\n";
+            foreach ($rows as $r) {
+                $csvData .= "{$r.id},{$r.created_at},{$r.suhu},{$r.ph},{$r.kekeruhan},{$r.tinggi_air}\n";
+            }
+
+            $dateStr = Carbon::now()->format('Y-m-d_H-i');
+            $fileName = "CatfishCare_Telemetry_Kolam{$kolamId}_{$dateStr}.csv";
+
+            $driveService = new \App\Services\GoogleDriveService();
+            $result = $driveService->uploadCsvToDrive($fileName, $csvData);
+
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Error uploading to Google Drive: " . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

@@ -207,13 +207,35 @@ class FirebaseRealtimeService
             }
 
             $res = $req->get($url);
-            if ($res->successful() && is_array($res->json())) {
+            if ($res->successful()) {
                 return $res->json();
             }
         } catch (\Throwable $e) {
-            Log::error("[FirebaseRealtimeService] Exception reading RTDB telemetry: " . $e->getMessage());
+            Log::error("[FirebaseRealtimeService] Exception getting RTDB telemetry: " . $e->getMessage());
         }
 
         return null;
+    }
+
+    /**
+     * Clear / reset telemetry node in Firebase Realtime Database.
+     */
+    public function resetLatestTelemetry(int $kolamId = 1): bool
+    {
+        $accessToken = $this->getAccessToken();
+        $url = "{$this->rtdbUrl}/telemetry/kolam_{$kolamId}.json";
+
+        try {
+            $req = Http::timeout(4);
+            if ($accessToken) {
+                $req = $req->withToken($accessToken);
+            }
+            $res = $req->delete($url);
+            return $res->successful();
+        } catch (\Throwable $e) {
+            Log::error("[FirebaseRealtimeService] Exception resetting RTDB telemetry: " . $e->getMessage());
+        }
+
+        return false;
     }
 }
