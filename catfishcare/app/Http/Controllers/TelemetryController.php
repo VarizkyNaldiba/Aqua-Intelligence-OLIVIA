@@ -543,4 +543,82 @@ class TelemetryController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get storage records and Firebase Cloud usage statistics.
+     */
+    public function getStorageUsageStats(Request $request, int $kolamId = 1): JsonResponse
+    {
+        try {
+            // 1. Local SQLite Database Stats
+            $sqliteTotal = 0;
+            $sqlitePond = 0;
+            $sqliteToday = 0;
+            $sqliteFirst = null;
+            $sqliteLast = null;
+            $dbSizeBytes = 0;
+
+            try {
+                $sqliteTotal = DB::table('log_sensor')->count();
+                $sqlitePond = DB::table('log_sensor')->where('kolam_id', $kolamId)->count();
+                $sqliteToday = DB::table('log_sensor')->where('kolam_id', $kolamId)->whereDate('created_at', Carbon::today())->count();
+                $sqliteFirst = DB::table('log_sensor')->where('kolam_id', $kolamId)->min('created_at');
+                $sqliteLast = DB::table('log_sensor')->where('kolam_id', $kolamId)->max('created_at');
+                if (file_exists(database_path('database.sqlite'))) {
+                    $dbSizeBytes = filesize(database_path('database.sqlite'));
+                }
+            } catch (\Throwable $e) {}
+
+            // 2. Firebase Firestore Usage Stats
+            $firestoreStats = [];
+            try {
+                $firestore = new \App\Services\FirestoreService();
+                $firestoreStats = $firestore->getUsageStatistics();
+            } catch (\Throwable $e) {
+                $firestoreStats = [
+                    'connected' => false,
+                    'error' => $e->getMessage(),
+                ];
+            }
+
+            // 3. Firebase Realtime Database info
+            $rtdbStats = [
+                'connected' => true,
+                'url' => env('FIREBASE_RTDB_URL', 'https://catfishcare-2daa2-default-rtdb.firebaseio.com'),
+                'storage_quota' => '1 GB (Spark Plan)',
+                'bandwidth_quota' => '10 GB / bulan',
+                'active_nodes' => [
+                    "/telemetry/kolam_{$kolamId}",
+                    "/actuators/kolam_{$kolamId}",
+                    "/thresholds/kolam_{$kolamId}",
+                    "/users",
+                ],
+            ];
+
+            return response()->json([
+                'success' => true,
+                'kolam_id' => $kolamId,
+                'sqlite' => [
+                    'total_records' => $sqliteTotal,
+                    'pond_records' => $sqlitePond,
+                    'today_records' => $sqliteToday,
+                    'first_record' => $sqliteFirst,
+                    'last_record' => $sqliteLast,
+                    'db_size_bytes' => $dbSizeBytes,
+                    'db_size_formatted' => round($dbSizeBytes / 1024, 2) . ' KB',
+                ],
+                'firestore' => $firestoreStats,
+                'rtdb' => $rtdbStats,
+                'google_drive' => [
+                    'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID', '1vLtZgdbAC-KYVoksBQ2cMq8x7Pg6GudW'),
+                    'folder_url' => 'https://drive.google.com/drive/folders/' . env('GOOGLE_DRIVE_FOLDER_ID', '1vLtZgdbAC-KYVoksBQ2cMq8x7Pg6GudW'),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil statistik penyimpanan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

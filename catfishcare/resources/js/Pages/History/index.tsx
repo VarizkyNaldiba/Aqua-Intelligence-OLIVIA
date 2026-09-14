@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { SensorRow } from "@/Types";
 import LogTable from "./LogTable";
+import StorageUsageCard from "./StorageUsageCard";
 
 interface HistoryIndexProps {
     currentData?: SensorRow | null;
@@ -38,10 +39,14 @@ export default function HistoryIndex({ rawData = [] }: HistoryIndexProps) {
                     History & Telemetry Reports
                 </h2>
                 <p style={{ fontSize: "13px", color: "#64748b", margin: "2px 0 0 0" }}>
-                    Riwayat log data sensor, peringatan bahaya, dan laporan ekspor
+                    Riwayat log data sensor, analisis penyimpanan, kuota Firebase Cloud, dan ekspor laporan
                 </p>
             </div>
 
+            {/* Storage & Firebase Usage Statistics Overview */}
+            <StorageUsageCard />
+
+            {/* Detailed Log Table */}
             <LogTable historyData={historyData} />
         </div>
     );

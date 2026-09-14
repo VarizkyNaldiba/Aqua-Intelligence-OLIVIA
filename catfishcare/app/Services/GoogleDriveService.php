@@ -117,7 +117,7 @@ class GoogleDriveService
                 'Authorization' => "Bearer {$token}",
                 'Content-Type' => 'multipart/related; boundary=' . $boundary,
             ])->withBody($multipartResponseBody, 'multipart/related; boundary=' . $boundary)
-              ->post('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
+              ->post('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true');
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -134,10 +134,24 @@ class GoogleDriveService
                 ];
             }
 
-            Log::error("[GoogleDriveService] Failed upload to Google Drive: " . $response->body());
+            $resBody = $response->body();
+            Log::error("[GoogleDriveService] Failed upload to Google Drive: " . $resBody);
+
+            $folderUrl = "https://drive.google.com/drive/folders/{$folderId}";
+
+            if (str_contains($resBody, 'storageQuotaExceeded') || str_contains($resBody, 'Service Accounts do not have storage quota')) {
+                return [
+                    'success' => false,
+                    'is_quota_error' => true,
+                    'folder_url' => $folderUrl,
+                    'message' => 'Akun Service Account memiliki kuota 0 byte di Personal Google Drive. Gunakan Shared Drive (Drive Bersama) atau unduh CSV lalu masukkan langsung ke folder Drive.',
+                ];
+            }
+
             return [
                 'success' => false,
-                'message' => 'Gagal mengunggah ke Google Drive API: ' . $response->body(),
+                'folder_url' => $folderUrl,
+                'message' => 'Gagal mengunggah ke Google Drive API: ' . $resBody,
             ];
         } catch (\Throwable $e) {
             Log::error("[GoogleDriveService] Exception uploading to Drive: " . $e->getMessage());

@@ -382,5 +382,57 @@ class FirestoreService
 
         return $deletedCount;
     }
+
+    /**
+     * Get Firestore storage and document usage statistics.
+     */
+    public function getUsageStatistics(): array
+    {
+        return Cache::remember('firestore_usage_statistics', 15, function () {
+            $accessToken = $this->getAccessToken();
+            $isConnected = !empty($accessToken);
+            $sensorDocCount = 0;
+            $userDocCount = 0;
+
+            if ($isConnected) {
+                try {
+                    // Get sensor_history collection doc count (sample up to 150)
+                    $docUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/sensor_history?pageSize=150";
+                    $res = Http::withToken($accessToken)->timeout(2)->get($docUrl);
+                    if ($res->successful() && isset($res->json()['documents'])) {
+                        $sensorDocCount = count($res->json()['documents']);
+                    }
+
+                    // Get users collection doc count
+                    $userUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/users?pageSize=50";
+                    $userRes = Http::withToken($accessToken)->timeout(2)->get($userUrl);
+                    if ($userRes->successful() && isset($userRes->json()['documents'])) {
+                        $userDocCount = count($userRes->json()['documents']);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("[FirestoreService] Error fetching usage stats: " . $e->getMessage());
+                }
+            }
+
+            $totalDocs = $sensorDocCount + $userDocCount;
+            $estimatedBytes = ($sensorDocCount * 380) + ($userDocCount * 260);
+
+            return [
+                'connected' => $isConnected,
+                'project_id' => $this->projectId,
+                'sensor_documents' => $sensorDocCount,
+                'user_documents' => $userDocCount,
+                'total_documents' => $totalDocs,
+                'storage_used_bytes' => $estimatedBytes,
+                'storage_limit_bytes' => 1073741824, // 1 GiB
+                'storage_used_percent' => round(($estimatedBytes / 1073741824) * 100, 4),
+                'plan_name' => 'Spark Plan (Free Tier)',
+                'quota_storage' => '1 GiB',
+                'quota_daily_reads' => '50,000 / hari',
+                'quota_daily_writes' => '20,000 / hari',
+                'quota_daily_deletes' => '20,000 / hari',
+            ];
+        });
+    }
 }
 

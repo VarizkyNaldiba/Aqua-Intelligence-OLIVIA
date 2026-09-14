@@ -36,6 +36,7 @@ Route::post('/telemetry', [TelemetryController::class, 'receiveTelemetry'])->nam
 Route::post('/sfr/update', [TelemetryController::class, 'updateSfr'])->name('api.sfr.update');
 Route::get('/telemetry/latest/{kolam_id?}', [TelemetryController::class, 'getLatestTelemetry'])->name('api.telemetry.latest');
 Route::get('/telemetry/history/{kolam_id?}', [TelemetryController::class, 'getTelemetryHistory'])->name('api.telemetry.history');
+Route::get('/telemetry/stats/{kolam_id?}', [TelemetryController::class, 'getStorageUsageStats'])->name('api.telemetry.stats');
 Route::delete('/telemetry/clear/{kolam_id?}', [TelemetryController::class, 'clearTelemetryHistory'])->name('api.telemetry.clear');
 Route::post('/telemetry/export-drive/{kolam_id?}', [TelemetryController::class, 'exportToGoogleDrive'])->name('api.telemetry.export_drive');
 

@@ -54,12 +54,18 @@ export default function LogTable({ historyData }: LogTableProps) {
 
     const handleExportGoogleDrive = async () => {
         setIsUploadingDrive(true);
-        setDriveAlert("Mengunggah log telemetri ke Google Drive...");
+        setDriveAlert("Menghubungkan ke Google Drive...");
         try {
             const res = await fetch("/api/telemetry/export-drive/1", { method: "POST" });
             const data = await res.json();
             if (res.ok && data.success) {
                 setDriveAlert(data.message || "File berhasil disimpan ke Google Drive!");
+            } else if (data.is_quota_error) {
+                // Service Account has 0 quota on Personal My Drive (Google limitation)
+                // Download CSV automatically and open user's Google Drive folder
+                handleExportCSV();
+                window.open("https://drive.google.com/drive/folders/1vLtZgdbAC-KYVoksBQ2cMq8x7Pg6GudW", "_blank");
+                setDriveAlert("Catatan: Google membatasi Service Account kuota 0 byte di Personal My Drive. File CSV otomatis diunduh & tab Google Drive Anda telah dibuka untuk langsung disimpan ke folder.");
             } else {
                 setDriveAlert(data.message || "Gagal mengunggah file ke Google Drive.");
             }
@@ -67,7 +73,7 @@ export default function LogTable({ historyData }: LogTableProps) {
             setDriveAlert("Gagal terhubung ke server Google Drive API.");
         } finally {
             setIsUploadingDrive(false);
-            setTimeout(() => setDriveAlert(""), 5000);
+            setTimeout(() => setDriveAlert(""), 8000);
         }
     };
 
