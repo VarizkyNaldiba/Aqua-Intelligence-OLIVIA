@@ -20,7 +20,11 @@ foreach ($tmpDirs as $dir) {
     }
 }
 
-// Force SQLite database and storage configuration for Vercel
+// Force SQLite database, APP_DEBUG, and storage configuration for Vercel
+putenv('APP_DEBUG=true');
+$_ENV['APP_DEBUG'] = 'true';
+$_SERVER['APP_DEBUG'] = 'true';
+
 putenv('DB_CONNECTION=sqlite');
 putenv('DB_DATABASE=/tmp/database.sqlite');
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
