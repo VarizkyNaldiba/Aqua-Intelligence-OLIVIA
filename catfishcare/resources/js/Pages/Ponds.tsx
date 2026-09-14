@@ -791,7 +791,7 @@ const PondsTab = ({
                                             </button>
                                         </div>
                                     </form>
-                                ) : (
+                                ) : activeModalTab === "thresholds" ? (
                                     /* THRESHOLD CONFIGURATION TAB FORM */
                                     <form onSubmit={handleSaveThresholds}>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
