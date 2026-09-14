@@ -66,6 +66,48 @@ const HomeTab = ({
     selectedPondId,
     setSelectedPondId,
 }: HomeTabProps) => {
+    const [espCount, setEspCount] = useState(1);
+    const [activePondsList, setActivePondsList] = useState<any[]>([
+        {
+            id: 1,
+            name: "Kolam TFS 1",
+            type: "Bioflok IoT Primary",
+            population: "1.000 Ekor",
+            defaultTemp: 27.5,
+            defaultPh: 7.2,
+            defaultTurbidity: 1.2,
+            iotStatus: "Aktif",
+        }
+    ]);
+
+    useEffect(() => {
+        const fetchEspData = async () => {
+            try {
+                const res = await fetch("/api/esp");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        setEspCount(data.length);
+                        const list = data.map((d: any, idx: number) => ({
+                            id: d.id || (idx + 1),
+                            name: d.name || `Kolam TFS ${d.id || (idx + 1)}`,
+                            type: idx === 0 ? "Bioflok IoT Primary" : "Secondary Pond Node",
+                            population: "1.000 Ekor",
+                            defaultTemp: 27.5,
+                            defaultPh: 7.2,
+                            defaultTurbidity: 1.2,
+                            iotStatus: (idx === 0 || d.status === "Connected") ? "Aktif" : "Tidak Aktif",
+                        }));
+                        setActivePondsList(list);
+                    }
+                }
+            } catch {}
+        };
+        fetchEspData();
+    }, []);
+
+    const activeIotCount = activePondsList.filter(p => p.iotStatus === "Aktif").length;
+
     const isPondCritical =
         (currentData?.TEMPERATURE ?? Infinity) < 26 ||
         (currentData?.pH ?? Infinity) < 5.5;
@@ -75,14 +117,14 @@ const HomeTab = ({
 
     const farmStats = [
         {
-            label: "Total Kolam",
-            value: "12 Kolam",
+            label: "Kolam Aktif (IoT)",
+            value: `${activeIotCount} Kolam Aktif`,
             icon: Fish,
             color: "#0284c7",
         },
         {
-            label: "Total Populasi",
-            value: "120.000 Ekor",
+            label: "Perangkat ESP32",
+            value: `${espCount} IoT Terhubung`,
             icon: Fish,
             color: "#0d9488",
         },
@@ -96,7 +138,7 @@ const HomeTab = ({
         },
         {
             label: `Suhu Kolam ${selectedPondId}`,
-            value: `${currentData?.TEMPERATURE.toFixed(1) || "28.5"}°C`,
+            value: `${currentData?.TEMPERATURE.toFixed(1) || "27.5"}°C`,
             icon: Thermometer,
             color: "#d97706",
         },
@@ -261,7 +303,7 @@ const HomeTab = ({
                             </tr>
                         </thead>
                         <tbody>
-                            {ACTIVE_PONDS_LIST.map((pond) => {
+                            {activePondsList.map((pond) => {
                                 const isSelected = pond.id === selectedPondId;
                                 const temp =
                                     isSelected && currentData

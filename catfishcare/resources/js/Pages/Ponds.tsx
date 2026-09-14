@@ -32,11 +32,12 @@ const PondsTab = ({
     setSelectedPondId: _setSelectedPondId,
 }: PondsTabProps) => {
     // Single active dynamic IoT pond
+    // Dynamic IoT Ponds list state
     const [ponds, setPonds] = useState<PondItem[]>([
         {
             id: 1,
             name: "Kolam TFS 1",
-            location: "Kolam Riset IoT TFS",
+            location: "Kolam Riset IoT TFS (ESP32-CATFISHCARE-001)",
             status: "Aman",
             iot: "Aktif",
             capacity: 1000,
@@ -47,34 +48,65 @@ const PondsTab = ({
         },
     ]);
 
-    // Live Telemetry Sync for Pond list
+    // Live Telemetry Sync for Pond list based on active IoT ESP32 devices
     useEffect(function syncPondTelemetry() {
         const syncTelemetry = async () => {
             try {
-                const res = await fetch("/api/telemetry/latest/1");
-                if (res.ok) {
-                    const json = await res.json();
-                    const telem = json.telemetry;
-                    if (telem) {
-                        setPonds((prev) =>
-                            prev.map((p) =>
-                                p.id === 1
-                                    ? {
-                                          ...p,
-                                          temp: Number(telem.suhu ?? 27.5),
-                                          ph: Number(telem.ph ?? 7.2),
-                                          turbidity: Number(telem.kekeruhan ?? 18.0),
-                                          status: telem.risk_status === "High" || telem.risk_status === "Critical"
-                                              ? "Bahaya"
-                                              : telem.risk_status === "Medium"
-                                              ? "Waspada"
-                                              : "Aman",
-                                          iot: telem.is_simulated ? "Tidak Aktif" : "Aktif",
-                                      }
-                                    : p
-                            )
-                        );
+                // 1. Fetch registered ESP devices
+                let espList: any[] = [];
+                try {
+                    const espRes = await fetch("/api/esp");
+                    if (espRes.ok) {
+                        espList = await espRes.json();
                     }
+                } catch {}
+
+                // 2. Fetch latest telemetry for Kolam 1
+                const telemRes = await fetch("/api/telemetry/latest/1");
+                let telem: any = null;
+                if (telemRes.ok) {
+                    const json = await telemRes.json();
+                    telem = json.telemetry;
+                }
+
+                const isPrimaryOnline = telem && !telem.is_simulated;
+
+                if (Array.isArray(espList) && espList.length > 0) {
+                    const updatedPonds: PondItem[] = espList.map((esp: any, idx: number) => {
+                        const pId = esp.id || (idx + 1);
+                        const isOnline = pId === 1 ? isPrimaryOnline : (esp.status === "Connected");
+                        const statusVal = (pId === 1 && telem)
+                            ? (telem.risk_status === "High" || telem.risk_status === "Critical" ? "Bahaya" : telem.risk_status === "Medium" ? "Waspada" : "Aman")
+                            : "Aman";
+
+                        return {
+                            id: pId,
+                            name: esp.name || `Kolam TFS ${pId}`,
+                            location: `Sektor Utama (ESP: ${esp.uuid || 'ESP32-00' + pId})`,
+                            status: statusVal,
+                            iot: isOnline ? "Aktif" : "Tidak Aktif",
+                            capacity: 1000,
+                            lastMaintained: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+                            temp: pId === 1 && telem ? Number(telem.suhu ?? 27.5) : 27.5,
+                            ph: pId === 1 && telem ? Number(telem.ph ?? 7.2) : 7.2,
+                            turbidity: pId === 1 && telem ? Number(telem.kekeruhan ?? 18.0) : 18.0,
+                        };
+                    });
+                    setPonds(updatedPonds);
+                } else {
+                    // Default single active pond if ESP API not populated
+                    setPonds([{
+                        id: 1,
+                        name: "Kolam TFS 1",
+                        location: "Kolam Riset IoT TFS (ESP32-CATFISHCARE-001)",
+                        status: telem ? (telem.risk_status === "High" || telem.risk_status === "Critical" ? "Bahaya" : telem.risk_status === "Medium" ? "Waspada" : "Aman") : "Aman",
+                        iot: isPrimaryOnline ? "Aktif" : "Tidak Aktif",
+                        capacity: 1000,
+                        lastMaintained: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+                        temp: telem ? Number(telem.suhu ?? 27.5) : 27.5,
+                        ph: telem ? Number(telem.ph ?? 7.2) : 7.2,
+                        turbidity: telem ? Number(telem.kekeruhan ?? 18.0) : 18.0,
+                    }]);
                 }
             } catch {
                 // Ignore
