@@ -99,7 +99,7 @@ class FirestoreService
         $kolamId = $data['kolam_id'] ?? 1;
         $throttleKey = "firestore_last_log_kolam_{$kolamId}";
 
-        // Enforce 1 minute throttle unless forced
+        // Enforce 5-second throttle matching ESP32 median filter interval
         if (!$force && Cache::has($throttleKey)) {
             return false;
         }
@@ -135,8 +135,8 @@ class FirestoreService
                 ]);
 
             if ($response->successful()) {
-                // Set 60-second throttle flag for this pond
-                Cache::put($throttleKey, true, 60);
+                // Set 5-second throttle flag for this pond (matching ESP32 median filter interval)
+                Cache::put($throttleKey, true, 5);
                 Log::info("[FirestoreService] Sensor history document successfully written to Firestore for pond {$kolamId}.");
                 return true;
             }

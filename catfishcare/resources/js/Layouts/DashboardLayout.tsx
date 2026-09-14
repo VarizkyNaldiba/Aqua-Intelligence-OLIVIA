@@ -52,6 +52,10 @@ export default function DashboardLayout({
                 return "AI Studio > Pengumpulan Data Training Lele";
             case "actuators":
                 return "Actuators > Water Pump Control";
+            case "user_management":
+                return "Admin > User Management";
+            case "activity_logs":
+                return "Admin > Log Activity Web";
             case "dashboard":
             default:
                 return "Dashboard > Real-Time";
@@ -66,6 +70,7 @@ export default function DashboardLayout({
                 setActiveTab={setActiveTab} 
                 isCollapsed={sidebarCollapsed} 
                 toggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} 
+                currentUser={currentUser}
             />
 
             {/* Main Content Workspace */}
@@ -99,7 +104,7 @@ export default function DashboardLayout({
                                 />
                                 <div className="db-profile-info">
                                     <div className="db-profile-name">{currentUser?.name || currentUser?.username || "Operator Farm"}</div>
-                                    <div className="db-profile-role">Pengelola Akuakultur</div>
+                                    <div className="db-profile-role" style={{ textTransform: "capitalize" }}>{currentUser?.role === "admin" ? "Administrator System" : "User Operator"}</div>
                                 </div>
                             </div>
                         </div>

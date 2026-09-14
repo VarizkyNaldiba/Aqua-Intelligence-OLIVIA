@@ -1,6 +1,6 @@
-import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight, Database, Droplets } from "lucide-react";
+import { LayoutGrid, TrendingUp, Fish, History, Settings, ChevronLeft, ChevronRight, Database, Droplets, Users, Activity } from "lucide-react";
 import { router } from "@inertiajs/react";
-import type { TabName } from "../Types";
+import type { TabName, AppUser } from "../Types";
 
 interface SidebarProps {
     activeTab: TabName;
@@ -8,6 +8,7 @@ interface SidebarProps {
     isCollapsed?: boolean;
     toggleCollapse?: () => void;
     hasDanger?: boolean;
+    currentUser?: AppUser | null;
 }
 
 const Sidebar = ({
@@ -16,15 +17,20 @@ const Sidebar = ({
     isCollapsed = false,
     toggleCollapse,
     hasDanger = true,
+    currentUser,
 }: SidebarProps) => {
+    const isAdmin = currentUser?.role === "admin" || currentUser?.username === "admin";
+
     const menuItems = [
-        { id: "dashboard", icon: LayoutGrid, label: "Dashboard" },
-        { id: "actuators", icon: Droplets, label: "Water Pump" },
-        { id: "analytics", icon: TrendingUp, label: "Predictions" },
-        { id: "ponds", icon: Fish, label: "Pond Management" },
-        { id: "dataset", icon: Database, label: "Studio Dataset" },
-        { id: "notifications", icon: History, label: "History" },
-        { id: "profile", icon: Settings, label: "Settings" },
+        { id: "dashboard", icon: LayoutGrid, label: "Dashboard", adminOnly: false },
+        { id: "actuators", icon: Droplets, label: "Water Pump", adminOnly: false },
+        { id: "analytics", icon: TrendingUp, label: "Predictions", adminOnly: false },
+        { id: "ponds", icon: Fish, label: "Pond Management", adminOnly: false },
+        { id: "dataset", icon: Database, label: "Studio Dataset", adminOnly: false },
+        { id: "notifications", icon: History, label: "History", adminOnly: false },
+        { id: "profile", icon: Settings, label: "Settings", adminOnly: false },
+        { id: "user_management", icon: Users, label: "User Management", adminOnly: true },
+        { id: "activity_logs", icon: Activity, label: "Log Activity Web", adminOnly: true },
     ] as const;
 
     const handleItemClick = (id: TabName) => {
@@ -77,7 +83,7 @@ const Sidebar = ({
 
             {/* Menu List */}
             <nav className="db-sidebar-menu">
-                {menuItems.map((item) => {
+                {menuItems.filter((item) => !item.adminOnly || isAdmin).map((item) => {
                     const IconComponent = item.icon;
                     const isActive = activeTab === item.id;
                     const isDashboard = item.id === "dashboard";

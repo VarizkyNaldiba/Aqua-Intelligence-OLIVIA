@@ -30,6 +30,8 @@ import ProfileTab from "@/Pages/Profile";
 import NotificationsTab from "@/Pages/Notifications";
 import DatasetStudioTab from "@/Pages/DatasetStudio";
 import ActuatorsTab from "@/Pages/Actuators";
+import UserManagement from "@/Pages/UserManagement";
+import ActivityLogsTab from "@/Pages/ActivityLogsTab";
 import Auth from "@/Pages/Login";
 
 type TodoItem = {
@@ -1991,6 +1993,10 @@ export default function Dashboard() {
                 );
             case "actuators":
                 return <ActuatorsTab selectedPondId={selectedPondId} />;
+            case "user_management":
+                return <UserManagement />;
+            case "activity_logs":
+                return <ActivityLogsTab />;
             case "dashboard":
             default:
                 return renderDashboardContent();
@@ -2013,6 +2019,10 @@ export default function Dashboard() {
                 return "History";
             case "actuators":
                 return "Water Pump Control";
+            case "user_management":
+                return "User Management";
+            case "activity_logs":
+                return "Log Activity Web";
             case "dashboard":
             default:
                 return "Real-Time Dashboard";

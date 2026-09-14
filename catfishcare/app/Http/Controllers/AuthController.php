@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -21,12 +21,12 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $inputUsername = trim($request->username);
-        // Allow entering either 'pakfii' or 'pakfii@gmail.com'
-        $extractedUsername = str_contains($inputUsername, '@') ? explode('@', $inputUsername)[0] : $inputUsername;
+        $input = trim($request->username);
+        $extractedUsername = str_contains($input, '@') ? explode('@', $input)[0] : $input;
 
         try {
-            $user = User::where('username', $inputUsername)
+            $user = User::where('email', $input)
+                ->orWhere('username', $input)
                 ->orWhere('username', $extractedUsername)
                 ->first();
         } catch (\Throwable $e) {
@@ -38,16 +38,14 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Username atau kata sandi salah.',
-                'error' => 'Username atau kata sandi salah.',
+                'message' => 'Email/Username atau kata sandi salah.',
+                'error' => 'Email/Username atau kata sandi salah.',
             ], 422);
         }
 
         try {
             Auth::login($user);
-        } catch (\Throwable $e) {
-            // Non-blocking catch for serverless session driver
-        }
+        } catch (\Throwable $e) {}
 
         $token = 'olivia-token-' . $user->id;
         try {
@@ -55,9 +53,19 @@ class AuthController extends Controller
                 $user->tokens()->delete();
                 $token = $user->createToken('olivia-auth-token')->plainTextToken;
             }
-        } catch (\Throwable $e) {
-            // Non-blocking catch for token generation
-        }
+        } catch (\Throwable $e) {}
+
+        // Log login activity
+        try {
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'action' => 'LOGIN',
+                'description' => "User {$user->username} ({$user->role}) berhasil masuk ke sistem.",
+                'ip_address' => $request->ip(),
+                'user_agent' => substr($request->userAgent() ?? '', 0, 255),
+            ]);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'status' => 'success',
@@ -65,6 +73,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'username' => $user->username,
                 'name' => $user->username,
+                'email' => $user->email ?? "{$user->username}@catfishcare.app",
+                'role' => $user->role ?? ($user->jabatan === 'admin' ? 'admin' : 'user'),
             ],
             'token' => $token,
         ]);
@@ -75,9 +85,25 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-        
-        // Also log out from web session guard
+        $user = $request->user();
+
+        if ($user) {
+            try {
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'username' => $user->username,
+                    'action' => 'LOGOUT',
+                    'description' => "User {$user->username} keluar dari sistem.",
+                    'ip_address' => $request->ip(),
+                    'user_agent' => substr($request->userAgent() ?? '', 0, 255),
+                ]);
+            } catch (\Throwable $e) {}
+
+            try {
+                $user->currentAccessToken()?->delete();
+            } catch (\Throwable $e) {}
+        }
+
         Auth::guard('web')->logout();
 
         return response()->json([

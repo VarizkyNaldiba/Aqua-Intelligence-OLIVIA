@@ -63,6 +63,18 @@ Route::post('/ai/insight', [AiInsightController::class, 'generateInsight'])->nam
 Route::post('/dataset/receive', [DatasetController::class, 'receiveFrame'])->name('api.dataset.receive');
 Route::get('/dataset/stats', [DatasetController::class, 'getDatasetStats'])->name('api.dataset.stats');
 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ActivityLogController;
+
+// User Management API
+Route::get('/users', [UserController::class, 'index'])->name('api.users.index');
+Route::post('/users', [UserController::class, 'store'])->name('api.users.store');
+Route::put('/users/{id}', [UserController::class, 'update'])->name('api.users.update');
+Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('api.users.destroy');
+
+// Web Activity Log API
+Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('api.activity_logs.index');
+
 // Protected API routes (require valid Sanctum token)
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');

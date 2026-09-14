@@ -2,7 +2,7 @@
 
 export type ThemeSetting = "system" | "light" | "dark";
 export type Theme = "light" | "dark";
-export type TabName = "dashboard" | "home" | "ponds" | "analytics" | "profile" | "notifications" | "dataset" | "actuators";
+export type TabName = "dashboard" | "home" | "ponds" | "analytics" | "profile" | "notifications" | "dataset" | "actuators" | "user_management" | "activity_logs";
 export type MetricType = "TEMPERATURE" | "pH" | "TURBIDITY";
 
 export type SensorRow = {
@@ -24,8 +24,11 @@ export type TodoItem = {
 };
 
 export type AppUser = {
+    id?: number;
     username: string;
     name?: string;
+    email?: string;
+    role?: "admin" | "user";
     [key: string]: unknown;
 };
 

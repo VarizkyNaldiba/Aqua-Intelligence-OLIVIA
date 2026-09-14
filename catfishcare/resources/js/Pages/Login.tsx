@@ -58,7 +58,9 @@ const Auth = ({ onLoginSuccess }: AuthProps) => {
 
             const user: AppUser = {
                 username: data.user.username,
-                name: data.user.username,
+                name: data.user.name || data.user.username,
+                email: data.user.email,
+                role: data.user.role,
                 id: data.user.id,
             };
 

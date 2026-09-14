@@ -227,7 +227,7 @@ class TelemetryController extends Controller
                 // Non-blocking log if DB schema is in-memory or not seeded
             }
 
-            // Save 24/7 telemetry history into Google Cloud Firestore (throttled 1x per minute per pond)
+            // Save 24/7 telemetry history into Google Cloud Firestore (5-second interval matching ESP32 median filter)
             try {
                 $firestore = new \App\Services\FirestoreService();
                 $firestore->logTelemetryHistory($telemetryData);
