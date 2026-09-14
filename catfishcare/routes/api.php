@@ -37,6 +37,7 @@ Route::post('/sfr/update', [TelemetryController::class, 'updateSfr'])->name('api
 Route::get('/telemetry/latest/{kolam_id?}', [TelemetryController::class, 'getLatestTelemetry'])->name('api.telemetry.latest');
 Route::get('/telemetry/history/{kolam_id?}', [TelemetryController::class, 'getTelemetryHistory'])->name('api.telemetry.history');
 Route::delete('/telemetry/clear/{kolam_id?}', [TelemetryController::class, 'clearTelemetryHistory'])->name('api.telemetry.clear');
+Route::post('/telemetry/export-drive/{kolam_id?}', [TelemetryController::class, 'exportToGoogleDrive'])->name('api.telemetry.export_drive');
 
 // Smart Water Exchange & Actuators API
 Route::get('/actuators/status/{kolam_id?}', [ActuatorController::class, 'getStatus'])->name('api.actuators.status');

@@ -526,7 +526,7 @@ class TelemetryController extends Controller
 
             $csvData = "ID,Waktu,Suhu_C,pH,Kekeruhan_NTU,TinggiAir_cm\n";
             foreach ($rows as $r) {
-                $csvData .= "{$r.id},{$r.created_at},{$r.suhu},{$r.ph},{$r.kekeruhan},{$r.tinggi_air}\n";
+                $csvData .= "{$r->id},{$r->created_at},{$r->suhu},{$r->ph},{$r->kekeruhan},{$r->tinggi_air}\n";
             }
 
             $dateStr = Carbon::now()->format('Y-m-d_H-i');

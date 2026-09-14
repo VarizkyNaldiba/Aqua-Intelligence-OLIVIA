@@ -35,6 +35,9 @@ export default function LogTable({ historyData }: LogTableProps) {
         return filteredRows.slice(start, start + rowsPerPage);
     }, [filteredRows, currentPage]);
 
+    const [isUploadingDrive, setIsUploadingDrive] = useState(false);
+    const [driveAlert, setDriveAlert] = useState("");
+
     const handleExportCSV = () => {
         if (historyData.length === 0) return;
         const headers = "ID,Timestamp,Suhu,pH,Turbidity,TDS,TinggiAir,RiskStatus\n";
@@ -49,15 +52,51 @@ export default function LogTable({ historyData }: LogTableProps) {
         a.click();
     };
 
+    const handleExportGoogleDrive = async () => {
+        setIsUploadingDrive(true);
+        setDriveAlert("Mengunggah log telemetri ke Google Drive...");
+        try {
+            const res = await fetch("/api/telemetry/export-drive/1", { method: "POST" });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setDriveAlert(data.message || "File berhasil disimpan ke Google Drive!");
+            } else {
+                setDriveAlert(data.message || "Gagal mengunggah file ke Google Drive.");
+            }
+        } catch {
+            setDriveAlert("Gagal terhubung ke server Google Drive API.");
+        } finally {
+            setIsUploadingDrive(false);
+            setTimeout(() => setDriveAlert(""), 5000);
+        }
+    };
+
     return (
         <div className="db-panel-card" style={{ padding: "24px", borderRadius: "16px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+            {driveAlert && (
+                <div
+                    style={{
+                        padding: "10px 14px",
+                        marginBottom: "16px",
+                        borderRadius: "8px",
+                        backgroundColor: "#eff6ff",
+                        border: "1px solid #bfdbfe",
+                        color: "#1d4ed8",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                    }}
+                >
+                    {driveAlert}
+                </div>
+            )}
+
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
                 <div>
                     <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#0f172a", margin: 0 }}>
                         Tabel Log Telemetri Ter-Rekam
                     </h3>
                     <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
-                        History log data sensor tersimpan di database
+                        History log data sensor tersimpan di database & terhubung ke Google Drive
                     </p>
                 </div>
 
@@ -109,6 +148,29 @@ export default function LogTable({ historyData }: LogTableProps) {
                     >
                         <Download size={14} />
                         <span>Export CSV</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        disabled={isUploadingDrive}
+                        onClick={handleExportGoogleDrive}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "6px 12px",
+                            backgroundColor: "#0284c7",
+                            color: "#ffffff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontWeight: 700,
+                            fontSize: "12px",
+                            cursor: isUploadingDrive ? "wait" : "pointer",
+                            opacity: isUploadingDrive ? 0.7 : 1,
+                        }}
+                    >
+                        <Download size={14} />
+                        <span>{isUploadingDrive ? "Uploading..." : "Save to Google Drive"}</span>
                     </button>
                 </div>
             </div>
