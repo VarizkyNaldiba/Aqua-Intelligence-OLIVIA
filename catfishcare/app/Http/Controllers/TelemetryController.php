@@ -235,6 +235,14 @@ class TelemetryController extends Controller
                 // Non-blocking catch to ensure hardware responsiveness
             }
 
+            // Sync live telemetry to Firebase Realtime Database
+            try {
+                $rtdb = new \App\Services\FirebaseRealtimeService();
+                $rtdb->updateTelemetry($kolamId, $telemetryData);
+            } catch (\Throwable $e) {
+                // Non-blocking catch
+            }
+
             // Check if there is a pending actuator action commanded from the web
             $pendingAction = Cache::pull("kolam_{$kolamId}_pending_action");
 

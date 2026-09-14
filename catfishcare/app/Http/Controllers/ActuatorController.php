@@ -47,6 +47,10 @@ class ActuatorController extends Controller
         $current['last_exchange'] = Carbon::now()->toIso8601String();
         Cache::put("kolam_{$kolamId}_actuators", $current, 120);
 
+        try {
+            (new \App\Services\FirebaseRealtimeService())->updateActuators($kolamId, $current);
+        } catch (\Throwable $e) {}
+
         return response()->json([
             'status' => 'success',
             'message' => "Smart Water Exchange (Target: {$targetPercent}%) berhasil dipicu untuk Kolam {$kolamId}.",
@@ -60,7 +64,7 @@ class ActuatorController extends Controller
      */
     public function toggleAerator(Request $request): JsonResponse
     {
-        $kolamId = (int) ($request->input('kolam_id', 9));
+        $kolamId = (int) ($request->input('kolam_id', 1));
         $state = (bool) $request->input('state', true);
 
         Cache::put("kolam_{$kolamId}_pending_action", [
@@ -71,6 +75,10 @@ class ActuatorController extends Controller
         $current = Cache::get("kolam_{$kolamId}_actuators", []);
         $current['aerator'] = $state;
         Cache::put("kolam_{$kolamId}_actuators", $current, 3600);
+
+        try {
+            (new \App\Services\FirebaseRealtimeService())->updateActuators($kolamId, $current);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'status' => 'success',
@@ -114,6 +122,10 @@ class ActuatorController extends Controller
         }
         
         Cache::put("kolam_{$kolamId}_actuators", $current, 120);
+
+        try {
+            (new \App\Services\FirebaseRealtimeService())->updateActuators($kolamId, $current);
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'status' => 'success',

@@ -257,13 +257,19 @@ export default function NotificationsTab({
     return (
         <div className="tab-page notifications-page" style={{ padding: "0 8px", width: "100%", display: "flex", flexDirection: "column", gap: "20px" }}>
             {/* Header Title Section */}
-            <div style={{ textAlign: "left", marginTop: "10px" }}>
-                <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#0f172a", letterSpacing: "-0.02em", margin: 0 }}>
-                    Data Reports & History
-                </h1>
-                <p style={{ color: "#64748b", fontSize: "14px", marginTop: "4px", margin: 0 }}>
-                    Analyze historical water quality trends across all ponds
-                </p>
+            <div style={{ textAlign: "left", marginTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "12px" }}>
+                <div>
+                    <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#0f172a", letterSpacing: "-0.02em", margin: 0 }}>
+                        Data Reports & History
+                    </h1>
+                    <p style={{ color: "#64748b", fontSize: "14px", marginTop: "4px", margin: 0 }}>
+                        Analyze historical water quality trends across all ponds
+                    </p>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "6px 14px", borderRadius: "20px" }}>
+                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px #22c55e" }}></span>
+                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#15803d" }}>Firebase Realtime DB & Firestore Active</span>
+                </div>
             </div>
 
             {/* Date Picker, Pond Selector and Download Controls */}

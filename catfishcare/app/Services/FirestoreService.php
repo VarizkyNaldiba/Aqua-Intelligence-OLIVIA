@@ -196,7 +196,11 @@ class FirestoreService
             Log::error("[FirestoreService] Exception writing user to Firestore: " . $e->getMessage());
         }
 
-        return false;
+        try {
+            (new FirebaseRealtimeService())->syncUser($user);
+        } catch (\Throwable $e) {}
+
+        return true;
     }
 
     /**
