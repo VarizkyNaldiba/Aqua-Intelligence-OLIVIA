@@ -17,8 +17,18 @@ class TelemetryController extends Controller
     {
         $cacheKey = "kolam_{$kolamId}_thresholds";
         return Cache::remember($cacheKey, 3600, function () use ($kolamId) {
-            $defaults = \Database\Seeders\PondThresholdSeeder::getDefaultPaperThresholds();
+            $defaults = [
+                'ph' => ['normal_min' => 6.5, 'normal_max' => 8.2, 'warning_min' => 6.0, 'warning_max' => 9.0, 'high_min' => 5.5, 'high_max' => 9.5, 'critical_min' => 0.0, 'critical_max' => 14.0],
+                'suhu' => ['normal_min' => 25.0, 'normal_max' => 30.0, 'warning_min' => 23.0, 'warning_max' => 32.0, 'high_min' => 20.0, 'high_max' => 35.0, 'critical_min' => 0.0, 'critical_max' => 100.0],
+                'turbidity' => ['normal_min' => 0.0, 'normal_max' => 25.0, 'warning_min' => 25.0, 'warning_max' => 50.0, 'high_min' => 50.0, 'high_max' => 100.0, 'critical_min' => 100.0, 'critical_max' => 1000.0],
+                'tds' => ['normal_min' => 0.0, 'normal_max' => 500.0, 'warning_min' => 500.0, 'warning_max' => 800.0, 'high_min' => 800.0, 'high_max' => 1200.0, 'critical_min' => 1200.0, 'critical_max' => 5000.0],
+                'water_level_dev' => ['normal_min' => 0.0, 'normal_max' => 5.0, 'warning_min' => 5.0, 'warning_max' => 10.0, 'high_min' => 10.0, 'high_max' => 20.0, 'critical_min' => 20.0, 'critical_max' => 100.0],
+                'sfr' => ['normal_min' => 0.0, 'normal_max' => 0.10, 'warning_min' => 0.10, 'warning_max' => 0.20, 'high_min' => 0.20, 'high_max' => 0.35, 'critical_min' => 0.35, 'critical_max' => 1.00],
+            ];
             try {
+                if (class_exists('\Database\Seeders\PondThresholdSeeder')) {
+                    $defaults = \Database\Seeders\PondThresholdSeeder::getDefaultPaperThresholds();
+                }
                 $dbThresholds = \App\Models\PondThreshold::where('kolam_id', $kolamId)->get();
                 if ($dbThresholds->isNotEmpty()) {
                     foreach ($dbThresholds as $row) {
@@ -136,113 +146,122 @@ class TelemetryController extends Controller
      */
     public function receiveTelemetry(Request $request): JsonResponse
     {
-        $payload = $request->isJson() ? $request->json()->all() : $request->all();
-        if (empty($payload)) {
-            $raw = json_decode($request->getContent(), true);
-            if (is_array($raw)) $payload = $raw;
-        }
-
-        $kolamId = (int) $request->input('kolam_id', $payload['kolam_id'] ?? 1);
-        $userId = (int) $request->input('user_id', $payload['user_id'] ?? ($request->user()?->id ?? 1));
-        $suhu = (float) $request->input('suhu', $payload['suhu'] ?? 27.5);
-        $ph = (float) $request->input('ph', $payload['ph'] ?? 7.2);
-        $kekeruhan = (float) $request->input('kekeruhan', $payload['kekeruhan'] ?? 18.0);
-        $tds = (float) $request->input('tds', $payload['tds'] ?? 420.0);
-        $tinggiAir = (float) $request->input('tinggi_air', $payload['tinggi_air'] ?? 25.0);
-
-        // Get latest SFR from Cache (sent by Raspberry Pi)
-        $sfrCache = Cache::get("kolam_{$kolamId}_sfr", 0.05);
-        $sfr = $request->has('sfr') ? (float) $request->input('sfr') : (isset($payload['sfr']) ? (float) $payload['sfr'] : (float) $sfrCache);
-
-        $levelDev = abs(25.0 - $tinggiAir);
-        $assessment = self::computeRiskScore($ph, $suhu, $kekeruhan, $tds, $levelDev, $sfr, $kolamId);
-
-        $telemetryData = [
-            'user_id' => $userId,
-            'kolam_id' => $kolamId,
-            'suhu' => $suhu,
-            'ph' => $ph,
-            'kekeruhan' => $kekeruhan,
-            'tds' => $tds,
-            'tinggi_air' => $tinggiAir,
-            'sfr' => $sfr,
-            'risk_score' => $assessment['risk_score'],
-            'risk_status' => $assessment['risk_status'],
-            'wqs' => $assessment['wqs'],
-            'exchange_target_percent' => $assessment['exchange_target_percent'],
-            'drain_pump' => (bool) $request->input('drain_pump', $payload['drain_pump'] ?? false),
-            'fill_pump' => (bool) $request->input('fill_pump', $payload['fill_pump'] ?? false),
-            'aerator' => (bool) $request->input('aerator', $payload['aerator'] ?? false),
-            'updated_at' => Carbon::now()->toIso8601String(),
-        ];
-
-        // Store latest telemetry in Cache for fast web reads (6 hours)
-        Cache::put("kolam_{$kolamId}_latest_telemetry", $telemetryData, now()->addHours(6));
-
-        // Append to rolling time-series history cache for dynamic web charts
-        $historyKey = "kolam_{$kolamId}_telemetry_history";
-        $history = Cache::get($historyKey, []);
-        $history[] = [
-            'created_at' => Carbon::now()->toIso8601String(),
-            'entry_id' => 'live-' . $kolamId . '-' . time(),
-            'TEMPERATURE' => $suhu,
-            'TURBIDITY' => $kekeruhan,
-            'pH' => $ph,
-            'NITRATE' => $tds,
-            'Population' => 1000,
-            'Length' => $tinggiAir,
-            'Weight' => $sfr,
-            'risk_score' => $assessment['risk_score'],
-            'risk_status' => $assessment['risk_status'],
-            'wqs' => $assessment['wqs'],
-        ];
-        if (count($history) > 40) {
-            $history = array_slice($history, -40);
-        }
-        Cache::put($historyKey, $history, 3600);
-
-
-        // Save into log_sensor database table if available
         try {
-            DB::table('log_sensor')->insert([
+            $payload = $request->isJson() ? $request->json()->all() : $request->all();
+            if (empty($payload)) {
+                $raw = json_decode($request->getContent(), true);
+                if (is_array($raw)) $payload = $raw;
+            }
+
+            $kolamId = (int) $request->input('kolam_id', $payload['kolam_id'] ?? 1);
+            $userId = (int) $request->input('user_id', $payload['user_id'] ?? ($request->user()?->id ?? 1));
+            $suhu = (float) $request->input('suhu', $payload['suhu'] ?? 27.5);
+            $ph = (float) $request->input('ph', $payload['ph'] ?? 7.2);
+            $kekeruhan = (float) $request->input('kekeruhan', $payload['kekeruhan'] ?? 18.0);
+            $tds = (float) $request->input('tds', $payload['tds'] ?? 420.0);
+            $tinggiAir = (float) $request->input('tinggi_air', $payload['tinggi_air'] ?? 25.0);
+
+            // Get latest SFR from Cache (sent by Raspberry Pi)
+            $sfrCache = Cache::get("kolam_{$kolamId}_sfr", 0.05);
+            $sfr = $request->has('sfr') ? (float) $request->input('sfr') : (isset($payload['sfr']) ? (float) $payload['sfr'] : (float) $sfrCache);
+
+            $levelDev = abs(25.0 - $tinggiAir);
+            $assessment = self::computeRiskScore($ph, $suhu, $kekeruhan, $tds, $levelDev, $sfr, $kolamId);
+
+            $telemetryData = [
+                'user_id' => $userId,
                 'kolam_id' => $kolamId,
                 'suhu' => $suhu,
                 'ph' => $ph,
                 'kekeruhan' => $kekeruhan,
+                'tds' => $tds,
                 'tinggi_air' => $tinggiAir,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                'sfr' => $sfr,
+                'risk_score' => $assessment['risk_score'],
+                'risk_status' => $assessment['risk_status'],
+                'wqs' => $assessment['wqs'],
+                'exchange_target_percent' => $assessment['exchange_target_percent'],
+                'drain_pump' => (bool) $request->input('drain_pump', $payload['drain_pump'] ?? false),
+                'fill_pump' => (bool) $request->input('fill_pump', $payload['fill_pump'] ?? false),
+                'aerator' => (bool) $request->input('aerator', $payload['aerator'] ?? false),
+                'updated_at' => Carbon::now()->toIso8601String(),
+            ];
+
+            // Store latest telemetry in Cache for fast web reads (6 hours)
+            Cache::put("kolam_{$kolamId}_latest_telemetry", $telemetryData, now()->addHours(6));
+
+            // Append to rolling time-series history cache for dynamic web charts
+            $historyKey = "kolam_{$kolamId}_telemetry_history";
+            $history = Cache::get($historyKey, []);
+            $history[] = [
+                'created_at' => Carbon::now()->toIso8601String(),
+                'entry_id' => 'live-' . $kolamId . '-' . time(),
+                'TEMPERATURE' => $suhu,
+                'TURBIDITY' => $kekeruhan,
+                'pH' => $ph,
+                'NITRATE' => $tds,
+                'Population' => 1000,
+                'Length' => $tinggiAir,
+                'Weight' => $sfr,
+                'risk_score' => $assessment['risk_score'],
+                'risk_status' => $assessment['risk_status'],
+                'wqs' => $assessment['wqs'],
+            ];
+            if (count($history) > 40) {
+                $history = array_slice($history, -40);
+            }
+            Cache::put($historyKey, $history, 3600);
+
+            // Save into log_sensor database table if available
+            try {
+                DB::table('log_sensor')->insert([
+                    'kolam_id' => $kolamId,
+                    'suhu' => $suhu,
+                    'ph' => $ph,
+                    'kekeruhan' => $kekeruhan,
+                    'tinggi_air' => $tinggiAir,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                // Non-blocking log if DB schema is in-memory or not seeded
+            }
+
+            // Save 24/7 telemetry history into Google Cloud Firestore (throttled 1x per minute per pond)
+            try {
+                $firestore = new \App\Services\FirestoreService();
+                $firestore->logTelemetryHistory($telemetryData);
+            } catch (\Throwable $e) {
+                // Non-blocking catch to ensure hardware responsiveness
+            }
+
+            // Check if there is a pending actuator action commanded from the web
+            $pendingAction = Cache::pull("kolam_{$kolamId}_pending_action");
+
+            $response = [
+                'status' => 'success',
+                'assessment' => $assessment,
+            ];
+
+            if ($pendingAction) {
+                $response['action'] = $pendingAction['action'];
+                $response['amount'] = $pendingAction['amount'] ?? 100;
+            } elseif ($assessment['risk_status'] === 'High' || $assessment['risk_status'] === 'Critical') {
+                $response['action'] = 'water_exchange';
+                $response['target_percent'] = $assessment['exchange_target_percent'];
+            }
+
+            return response()->json($response);
         } catch (\Throwable $e) {
-            // Non-blocking log if DB schema is in-memory or not seeded
+            \Illuminate\Support\Facades\Log::error("[TelemetryController] receiveTelemetry error: " . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'file' => basename($e->getFile()),
+                'line' => $e->getLine(),
+            ], 500);
         }
-
-        // Save 24/7 telemetry history into Google Cloud Firestore (throttled 1x per minute per pond)
-        try {
-            $firestore = new \App\Services\FirestoreService();
-            $firestore->logTelemetryHistory($telemetryData);
-        } catch (\Throwable $e) {
-            // Non-blocking catch to ensure hardware responsiveness
-        }
-
-        // Check if there is a pending actuator action commanded from the web
-        $pendingAction = Cache::pull("kolam_{$kolamId}_pending_action");
-
-        $response = [
-            'status' => 'success',
-            'assessment' => $assessment,
-        ];
-
-        if ($pendingAction) {
-            $response['action'] = $pendingAction['action'];
-            $response['amount'] = $pendingAction['amount'] ?? 100;
-        } elseif ($assessment['risk_status'] === 'High' || $assessment['risk_status'] === 'Critical') {
-            $response['action'] = 'water_exchange';
-            $response['target_percent'] = $assessment['exchange_target_percent'];
-        }
-
-        return response()->json($response);
-    }
+    }}
 
     /**
      * Receive Surface Fish Ratio (SFR) from Raspberry Pi Vision Service.

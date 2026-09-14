@@ -46,7 +46,7 @@ $_SERVER['DB_DATABASE'] = '/tmp/database.sqlite';
 $dbSource = __DIR__ . '/../database/database.sqlite';
 $dbTarget = '/tmp/database.sqlite';
 
-if (!file_exists($dbTarget) || filesize($dbTarget) === 0) {
+if (!file_exists($dbTarget) || filesize($dbTarget) < (file_exists($dbSource) ? filesize($dbSource) : 1000)) {
     if (file_exists($dbSource) && filesize($dbSource) > 0) {
         copy($dbSource, $dbTarget);
     } else {
