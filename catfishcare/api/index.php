@@ -34,6 +34,13 @@ putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
 putenv('APP_ROUTES_CACHE=/tmp/routes.php');
 putenv('APP_SERVICES_CACHE=/tmp/services.php');
 
+putenv('CACHE_STORE=file');
+putenv('CACHE_DRIVER=file');
+$_ENV['CACHE_STORE'] = 'file';
+$_ENV['CACHE_DRIVER'] = 'file';
+$_SERVER['CACHE_STORE'] = 'file';
+$_SERVER['CACHE_DRIVER'] = 'file';
+
 putenv('SESSION_DRIVER=cookie');
 putenv('SESSION_FILE_PATH=/tmp/storage/framework/sessions');
 $_ENV['SESSION_DRIVER'] = 'cookie';
