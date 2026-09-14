@@ -58,19 +58,29 @@ export default function NotificationsTab({
         if (selectedPondId) setActivePondId(selectedPondId);
     }, [selectedPondId]);
 
-    // Fetch genuine telemetry history directly from Firestore/Backend API
+    // Fetch genuine telemetry history directly from Firestore/Backend API with 3s realtime polling
     useEffect(() => {
         let isMounted = true;
-        fetch(`/api/telemetry/history/${activePondId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (isMounted && data.history && Array.isArray(data.history)) {
-                    setHistoryData(data.history);
-                }
-            })
-            .catch(() => {});
-        return () => { isMounted = false; };
+        const fetchHistoryData = () => {
+            fetch(`/api/telemetry/history/${activePondId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (isMounted && data.history && Array.isArray(data.history)) {
+                        setHistoryData(data.history);
+                    }
+                })
+                .catch(() => {});
+        };
+
+        fetchHistoryData();
+        const pollInterval = setInterval(fetchHistoryData, 3000);
+
+        return () => {
+            isMounted = false;
+            clearInterval(pollInterval);
+        };
     }, [activePondId]);
+
 
     // Table Monitoring Filter & Pagination States
     const [tableSearch, setTableSearch] = useState("");
@@ -657,6 +667,10 @@ export default function NotificationsTab({
                             <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#0f172a", margin: 0 }}>
                                 Tabel Monitoring Output Sensor
                             </h3>
+                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.12)", padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(16, 185, 129, 0.3)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981" }}></span>
+                                Realtime Terbaru
+                            </span>
                         </div>
                         <p style={{ fontSize: "13px", color: "#64748b", margin: "4px 0 0 0" }}>
                             Riwayat data sensor real-time dari Firebase Firestore & Node Sensor IoT (Total: {filteredTableRows.length} entri)
