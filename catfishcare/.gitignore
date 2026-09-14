@@ -27,5 +27,5 @@ Homestead.yaml
 Thumbs.db
 .agents
 .kiro
-.github
-.vercel
+firebase-credentials.json
+storage/app/firebase-credentials.json

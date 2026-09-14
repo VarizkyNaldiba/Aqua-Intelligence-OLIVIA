@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import Sidebar from "@/Components/Sidebar";
-import type { TabName, TodoItem, SensorRow } from "@/Types";
-import { Bell, Menu, RotateCcw, Play, Pause, SkipForward } from "lucide-react";
+import type { TabName, TodoItem, SensorRow, AppUser } from "@/Types";
+import { Bell } from "lucide-react";
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -17,20 +17,22 @@ interface DashboardLayoutProps {
     setIsPlaying: (playing: boolean) => void;
     todos: TodoItem[];
     toggleTodo: (id: number) => void;
+    currentUser?: AppUser | null;
 }
 
 export default function DashboardLayout({
     children,
     activeTab,
     setActiveTab,
-    currentData,
-    rawData,
-    selectedPondId,
-    setSelectedPondId,
-    currentIndex,
-    setCurrentIndex,
-    isPlaying,
-    setIsPlaying,
+    currentData: _currentData,
+    rawData: _rawData,
+    selectedPondId: _selectedPondId,
+    setSelectedPondId: _setSelectedPondId,
+    currentIndex: _currentIndex,
+    setCurrentIndex: _setCurrentIndex,
+    isPlaying: _isPlaying,
+    setIsPlaying: _setIsPlaying,
+    currentUser,
 }: DashboardLayoutProps) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -91,16 +93,13 @@ export default function DashboardLayout({
                             {/* Profile Info */}
                             <div className="db-profile-block">
                                 <img
-                                    src="/avatar_ade_bassey.png"
-                                    alt="Adé Bassey avatar"
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || currentUser?.username || "Admin")}&background=0284c7&color=fff&size=80`}
+                                    alt="User avatar"
                                     className="db-avatar"
-                                    onError={(e) => {
-                                        e.currentTarget.src = "https://ui-avatars.com/api/?name=Ade+Bassey&background=0ea5e9&color=fff";
-                                    }}
                                 />
                                 <div className="db-profile-info">
-                                    <div className="db-profile-name">Adé Bassey</div>
-                                    <div className="db-profile-role">Farm Manager</div>
+                                    <div className="db-profile-name">{currentUser?.name || currentUser?.username || "Operator Farm"}</div>
+                                    <div className="db-profile-role">Pengelola Akuakultur</div>
                                 </div>
                             </div>
                         </div>

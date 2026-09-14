@@ -96,7 +96,7 @@ const Auth = ({ onLoginSuccess }: AuthProps) => {
 
             {/* Back Button */}
             <Link href="/" className="auth-back-btn">
-                ← Back
+                Kembali ke Beranda
             </Link>
 
             {/* Login Card */}
@@ -206,7 +206,7 @@ const Auth = ({ onLoginSuccess }: AuthProps) => {
             {/* Security Compliance Footer */}
             <div className="auth-security-footer">
                 <span>🔒</span>
-                <span>256-bit SSL encryption • SOC 2 compliant • Data hosted in Indonesia</span>
+                <span>Gerbang IoT Terenkripsi CatfishCare — Server Lokal Indonesia</span>
             </div>
         </div>
     );

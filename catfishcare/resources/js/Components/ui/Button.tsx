@@ -50,7 +50,9 @@ const Button = ({
         >
             {isLoading ? (
                 <>
-                    <Loader2 size={14} className="animate-spin" />
+                    <span className="inline-flex animate-spin" aria-hidden="true">
+                        <Loader2 size={14} />
+                    </span>
                     <span>{loadingText || "Memproses..."}</span>
                 </>
             ) : (

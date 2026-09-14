@@ -3,6 +3,14 @@
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
 
+// Force SQLite database configuration on Vercel serverless environment
+putenv('DB_CONNECTION=sqlite');
+putenv('DB_DATABASE=/tmp/database.sqlite');
+$_ENV['DB_CONNECTION'] = 'sqlite';
+$_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
+$_SERVER['DB_CONNECTION'] = 'sqlite';
+$_SERVER['DB_DATABASE'] = '/tmp/database.sqlite';
+
 // Copy initial SQLite database to /tmp so it is writable on Vercel
 $dbSource = __DIR__ . '/../database/database.sqlite';
 $dbTarget = '/tmp/database.sqlite';

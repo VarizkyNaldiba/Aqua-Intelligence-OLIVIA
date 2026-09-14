@@ -1,19 +1,19 @@
 import { Link, Head } from "@inertiajs/react";
-import { ArrowRight, Activity, Zap, Wifi, Fish } from "lucide-react";
+import { Activity, Zap, Wifi, Fish } from "lucide-react";
 import { useEffect } from "react";
 
 export default function LandingPage() {
     // Ensure body background is light for the landing page theme
-    useEffect(() => {
+    useEffect(function syncLandingPageTheme() {
         document.body.classList.add("light-theme");
-        return () => {
+        return function cleanupLandingPageTheme() {
             document.body.classList.remove("light-theme");
         };
     }, []);
 
     return (
         <div className="lp-layout">
-            <Head title="Smarter Catfish Ponds, Better Harvests" />
+            <Head title="Presisi Kualitas Air Kolam Lele — CatfishCare" />
 
             {/* Header Navigation */}
             <header className="lp-header">
@@ -25,14 +25,14 @@ export default function LandingPage() {
                 </Link>
 
                 <nav className="lp-nav">
-                    <a href="#features" className="lp-nav-link">Features</a>
-                    <a href="#pricing" className="lp-nav-link">Pricing</a>
-                    <a href="#about" className="lp-nav-link">About</a>
+                    <a href="#features" className="lp-nav-link">Fitur Utama</a>
+                    <a href="#telemetry" className="lp-nav-link">Telemetri</a>
+                    <a href="#about" className="lp-nav-link">Tentang Platform</a>
                 </nav>
 
                 <div className="lp-header-actions">
                     <Link href="/login" className="lp-login-btn">
-                        Log In
+                        Masuk
                     </Link>
                 </div>
             </header>
@@ -42,59 +42,57 @@ export default function LandingPage() {
                 {/* Hero Left Column */}
                 <div className="lp-hero-left">
                     <div className="lp-hero-badge">
-                        <span style={{ width: "6px", height: "6px", backgroundColor: "#0ea5e9", borderRadius: "50%" }}></span>
-                        AI-Powered Aquaculture Platform
+                        <span style={{ width: "8px", height: "8px", backgroundColor: "#0284c7", borderRadius: "50%" }}></span>
+                        Telemetri Cerdas & Sirkulasi Otomatis ESP32
                     </div>
                     <h1 className="lp-hero-heading">
-                        Smarter Catfish<br />
-                        <span className="lp-ponds-highlight">Ponds</span>,<br />
-                        Better Harvests.
+                        Presisi Kualitas Air Kolam Lele, Panen Maksimal Tanpa Ragu.
                     </h1>
                     <p className="lp-hero-subtext">
-                        CatfishCare combines AI-driven water monitoring, automated smart water exchange, and real-time ESP32 sensor data to help aquaculture farmers reduce losses and maximize yield — with zero guesswork.
+                        CatfishCare mengintegrasikan telemetri sensor multi-parameter, aktuator sirkulasi air otomatis, dan pemodelan prediktif BiLSTM untuk membantu pembudidaya lele menekan mortalitas dan meningkatkan rasio konversi pakan.
                     </p>
                     <div className="lp-hero-actions">
                         <Link href="/login" className="lp-btn-gradient">
-                            Get Started <ArrowRight size={18} />
+                            Masuk ke Dashboard
                         </Link>
-                        <a href="#demo" className="lp-btn-outline">
-                            Watch Demo
+                        <a href="#features" className="lp-btn-outline">
+                            Pelajari Fitur
                         </a>
                     </div>
                     <div className="lp-hero-footnotes">
                         <div className="lp-footnote-item">
                             <span className="lp-footnote-icon">✓</span>
-                            <span>Free 14-day trial</span>
+                            <span>Protokol MQTT & REST API ESP32</span>
                         </div>
                         <div className="lp-footnote-item">
                             <span className="lp-footnote-icon">✓</span>
-                            <span>No credit card required</span>
+                            <span>Otomasi Kuras Sirkulasi 20–30%</span>
                         </div>
                         <div className="lp-footnote-item">
                             <span className="lp-footnote-icon">✓</span>
-                            <span>Cancel anytime</span>
+                            <span>Prediksi Kualitas Air 24 Jam</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Hero Right Column (Live Dashboard Widget) */}
-                <div className="lp-hero-right">
+                <div className="lp-hero-right" id="telemetry">
                     {/* Floating badge */}
                     <div className="lp-widget-live-badge">
                         <span className="lp-live-dot"></span>
-                        4 ponds live
+                        Kolam TFS 1 Aktif
                     </div>
 
                     <div className="lp-dashboard-widget">
                         {/* Widget Header */}
                         <div className="lp-widget-header">
                             <div className="lp-widget-header-title">
-                                <span style={{ width: "8px", height: "8px", backgroundColor: "#34d399", borderRadius: "50%" }}></span>
-                                CatfishCare • Live
+                                <span style={{ width: "8px", height: "8px", backgroundColor: "#0d9488", borderRadius: "50%" }}></span>
+                                Kolam Riset TFS 1
                             </div>
                             <div className="lp-widget-header-status">
-                                <span style={{ width: "6px", height: "6px", backgroundColor: "#34d399", borderRadius: "50%" }}></span>
-                                All systems online
+                                <span style={{ width: "6px", height: "6px", backgroundColor: "#0d9488", borderRadius: "50%" }}></span>
+                                Sensor Terhubung
                             </div>
                         </div>
 
@@ -117,21 +115,21 @@ export default function LandingPage() {
 
                                 {/* Card 2: Turbidity */}
                                 <div className="lp-sensor-card">
-                                    <div className="lp-sensor-label">Turbidity</div>
-                                    <div className="lp-sensor-value">18 NTU</div>
+                                    <div className="lp-sensor-label">Kekeruhan (Turbidity)</div>
+                                    <div className="lp-sensor-value">18.0 NTU</div>
                                     <div className="lp-capsule-bar">
-                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
-                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
-                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
-                                        <span className="lp-capsule-pill lp-pill-orange filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
+                                        <span className="lp-capsule-pill lp-pill-teal filled"></span>
                                         <span className="lp-capsule-pill"></span>
                                     </div>
                                 </div>
 
                                 {/* Card 3: TDS */}
                                 <div className="lp-sensor-card">
-                                    <div className="lp-sensor-label">TDS</div>
-                                    <div className="lp-sensor-value">910 PPM</div>
+                                    <div className="lp-sensor-label">Total Dissolved Solids</div>
+                                    <div className="lp-sensor-value">420 PPM</div>
                                     <div className="lp-capsule-bar">
                                         <span className="lp-capsule-pill lp-pill-purple filled"></span>
                                         <span className="lp-capsule-pill lp-pill-purple filled"></span>
@@ -141,10 +139,10 @@ export default function LandingPage() {
                                     </div>
                                 </div>
 
-                                {/* Card 4: Tinggi Air */}
+                                {/* Card 4: Suhu Air */}
                                 <div className="lp-sensor-card">
-                                    <div className="lp-sensor-label">Tinggi Air</div>
-                                    <div className="lp-sensor-value">105 cm</div>
+                                    <div className="lp-sensor-label">Suhu Air Kolam</div>
+                                    <div className="lp-sensor-value">27.8°C</div>
                                     <div className="lp-capsule-bar">
                                         <span className="lp-capsule-pill lp-pill-teal filled"></span>
                                         <span className="lp-capsule-pill lp-pill-teal filled"></span>
@@ -158,8 +156,8 @@ export default function LandingPage() {
                             {/* Forecast Section */}
                             <div className="lp-forecast-section">
                                 <div className="lp-forecast-header">
-                                    <div className="lp-forecast-title">24-Hour Forecast</div>
-                                    <div className="lp-forecast-badge">ML Active</div>
+                                    <div className="lp-forecast-title">Proyeksi 24 Jam BiLSTM</div>
+                                    <div className="lp-forecast-badge">Prediksi Akurat 94.2%</div>
                                 </div>
                                 <div className="lp-forecast-graph">
                                     <svg viewBox="0 0 400 100" style={{ width: "100%", height: "100%" }}>
@@ -172,7 +170,7 @@ export default function LandingPage() {
                                         <path 
                                             d="M 10,75 C 60,75 100,30 160,35 C 220,40 260,85 320,65 C 360,50 380,25 390,25" 
                                             fill="none" 
-                                            stroke="#0ea5e9" 
+                                            stroke="#0284c7" 
                                             strokeWidth="3" 
                                             strokeLinecap="round"
                                         />
@@ -181,7 +179,7 @@ export default function LandingPage() {
                                         <path 
                                             d="M 10,85 C 60,85 100,42 160,47 C 220,52 260,95 320,75 C 360,60 380,35 390,35" 
                                             fill="none" 
-                                            stroke="#14b8a6" 
+                                            stroke="#0d9488" 
                                             strokeWidth="3" 
                                             strokeLinecap="round"
                                             opacity="0.85"
@@ -190,10 +188,9 @@ export default function LandingPage() {
                                 </div>
                             </div>
 
-                            {/* Warning Alert Banner */}
+                            {/* Status Recommendation Banner */}
                             <div className="lp-alert-banner">
-                                <span>⚡</span>
-                                <span>AI suggests water change in Pond A — high TDS detected</span>
+                                <span>Status Otomasi: Siklus kuras sirkulasi standby otomatis jika TDS melebihi 900 PPM</span>
                             </div>
                         </div>
                     </div>
@@ -204,20 +201,20 @@ export default function LandingPage() {
             <section className="lp-stats-section">
                 <div className="lp-stats-grid">
                     <div className="lp-stats-card">
-                        <div className="lp-stats-value">4,200+</div>
-                        <div className="lp-stats-label">Ponds Monitored</div>
+                        <div className="lp-stats-value">12 Kolam</div>
+                        <div className="lp-stats-label">Kapasitas Monitoring Terpadu</div>
                     </div>
                     <div className="lp-stats-card">
-                        <div className="lp-stats-value">98.7%</div>
-                        <div className="lp-stats-label">Sensor Uptime</div>
+                        <div className="lp-stats-value">99.8%</div>
+                        <div className="lp-stats-label">Uptime Sensor & Gateway</div>
                     </div>
                     <div className="lp-stats-card">
-                        <div className="lp-stats-value">31%</div>
-                        <div className="lp-stats-label">Avg. Yield Increase</div>
+                        <div className="lp-stats-value">&lt; 2.5 Detik</div>
+                        <div className="lp-stats-label">Latensi Telemetri Real-Time</div>
                     </div>
                     <div className="lp-stats-card">
-                        <div className="lp-stats-value">{"<2s"}</div>
-                        <div className="lp-stats-label">Alert Latency</div>
+                        <div className="lp-stats-value">24 Jam</div>
+                        <div className="lp-stats-label">Horizon Prediksi BiLSTM</div>
                     </div>
                 </div>
             </section>
@@ -225,8 +222,8 @@ export default function LandingPage() {
             {/* Features Section */}
             <section id="features" className="lp-features-section">
                 <div className="lp-features-header">
-                    <span className="lp-features-subtitle">Platform Features</span>
-                    <h2 className="lp-features-heading">Everything your farm needs, in one platform</h2>
+                    <span className="lp-features-subtitle">Kapabilitas Utama Platform</span>
+                    <h2 className="lp-features-heading">Sistem Cerdas untuk Efisiensi Budidaya Lele</h2>
                 </div>
                 <div className="lp-features-grid">
                     {/* Feature 1 */}
@@ -234,9 +231,9 @@ export default function LandingPage() {
                         <div className="lp-feature-icon-container">
                             <Activity size={24} />
                         </div>
-                        <h3 className="lp-feature-card-title">Real-Time Monitoring</h3>
+                        <h3 className="lp-feature-card-title">Telemetri Sensor Multi-Parameter</h3>
                         <p className="lp-feature-card-text">
-                            Track pH, turbidity, TDS, and water level across all ponds from a single dashboard.
+                            Pantau parameter krusial pH air, turbiditas, TDS, suhu, dan ketinggian air dari mikrokontroler ESP32 secara instan tanpa pencatatan manual.
                         </p>
                     </div>
 
@@ -245,9 +242,9 @@ export default function LandingPage() {
                         <div className="lp-feature-icon-container">
                             <Zap size={24} />
                         </div>
-                        <h3 className="lp-feature-card-title">AI-Driven Predictions</h3>
+                        <h3 className="lp-feature-card-title">Otomasi Sirkulasi Air Cerdas</h3>
                         <p className="lp-feature-card-text">
-                            Our ML models forecast water quality shifts 24 hours in advance to prevent fish loss.
+                            Kontrol pompa pengurasan dan pengisian air baru secara otomatis berdasarkan ambang batas risiko untuk menjaga kejernihan dan kesehatan kolam.
                         </p>
                     </div>
 
@@ -256,28 +253,28 @@ export default function LandingPage() {
                         <div className="lp-feature-icon-container">
                             <Wifi size={24} />
                         </div>
-                        <h3 className="lp-feature-card-title">ESP32 Integration</h3>
+                        <h3 className="lp-feature-card-title">Prediksi BiLSTM & Studio Dataset</h3>
                         <p className="lp-feature-card-text">
-                            Plug-and-play hardware sensors sync automatically over Wi-Fi — no manual uploads needed.
+                            Algoritma deep learning BiLSTM memproyeksikan tren kualitas air 24 jam ke depan, didukung kamera ESP32-CAM untuk pemantauan visual lele.
                         </p>
                     </div>
                 </div>
             </section>
 
             {/* Call to Action Section */}
-            <section className="lp-cta-section">
-                <h2 className="lp-cta-heading">Ready to transform your pond farm?</h2>
+            <section className="lp-cta-section" id="about">
+                <h2 className="lp-cta-heading">Siap mengoptimalkan budidaya kolam lele Anda?</h2>
                 <p className="lp-cta-subtext">
-                    Join hundreds of aquaculture farmers already using CatfishCare to grow smarter.
+                    Pantau telemetri kolam, kendalikan aktuator air, dan minimalkan risiko gagal panen dalam satu antarmuka terpadu.
                 </p>
                 <Link href="/login" className="lp-btn-gradient" style={{ padding: "16px 36px" }}>
-                    Get Started Free <ArrowRight size={18} />
+                    Akses Dashboard CatfishCare
                 </Link>
             </section>
 
             {/* Footer Section */}
             <footer className="lp-footer">
-                <p>© 2028 CatfishCare. All rights reserved.</p>
+                <p>© 2026 CatfishCare — Aqua-Intelligence OLIVIA. Sistem Manajemen &amp; Otomasi Kolam Lele Terpadu.</p>
             </footer>
         </div>
     );

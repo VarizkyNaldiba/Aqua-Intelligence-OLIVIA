@@ -27,10 +27,12 @@ export default function Actuators({ selectedPondId }: ActuatorsProps) {
         }
     };
 
-    useEffect(() => {
+    useEffect(function pollActuatorStatus() {
         fetchStatus();
         const interval = setInterval(fetchStatus, 5000);
-        return () => clearInterval(interval);
+        return function cleanupActuatorPoll() {
+            clearInterval(interval);
+        };
     }, [selectedPondId]);
 
     const showAlert = (message: string, type: string = "success") => {

@@ -108,7 +108,7 @@ const AnalyticsTab = ({ currentData }: AnalyticsTabProps) => {
         }
     };
 
-    useEffect(() => {
+    useEffect(function syncAiDataOnPhChange() {
         fetchAiData(false);
     }, [currentData?.pH]);
 

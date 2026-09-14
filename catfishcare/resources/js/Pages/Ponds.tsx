@@ -48,7 +48,7 @@ const PondsTab = ({
     ]);
 
     // Live Telemetry Sync for Pond list
-    useEffect(() => {
+    useEffect(function syncPondTelemetry() {
         const syncTelemetry = async () => {
             try {
                 const res = await fetch("/api/telemetry/latest/1");
@@ -83,7 +83,9 @@ const PondsTab = ({
 
         syncTelemetry();
         const interval = setInterval(syncTelemetry, 3000);
-        return () => clearInterval(interval);
+        return function cleanupPondTelemetry() {
+            clearInterval(interval);
+        };
     }, []);
 
     // Currently active selected pond for popup modal

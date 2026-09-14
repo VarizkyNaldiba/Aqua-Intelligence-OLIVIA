@@ -2024,6 +2024,7 @@ export default function Dashboard() {
             setIsPlaying={setIsPlaying}
             todos={todos}
             toggleTodo={toggleTodo}
+            currentUser={currentUser}
         >
             <Head title={getTabTitle()} />
             {renderTabContent()}

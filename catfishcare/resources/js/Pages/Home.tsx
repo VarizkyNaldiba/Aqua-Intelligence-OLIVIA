@@ -21,6 +21,45 @@ interface HomeTabProps {
     setSelectedPondId: (id: number) => void;
 }
 
+const ACTIVE_PONDS_LIST = [
+    {
+        id: 12,
+        name: "Kolam 12",
+        type: "Bioflok Bulat D3",
+        population: "10.000 Ekor",
+        defaultTemp: 28.2,
+        defaultPh: 7.1,
+        defaultTurbidity: 35,
+    },
+    {
+        id: 11,
+        name: "Kolam 11",
+        type: "Tanah Tradisional",
+        population: "15.000 Ekor",
+        defaultTemp: 28.5,
+        defaultPh: 7.2,
+        defaultTurbidity: 42,
+    },
+    {
+        id: 10,
+        name: "Kolam 10",
+        type: "Terpal Kotak",
+        population: "8.000 Ekor",
+        defaultTemp: 29.0,
+        defaultPh: 7.4,
+        defaultTurbidity: 30,
+    },
+    {
+        id: 9,
+        name: "Kolam 09",
+        type: "Bioflok Bulat D3",
+        population: "10.000 Ekor",
+        defaultTemp: 26.9,
+        defaultPh: 6.4,
+        defaultTurbidity: 55,
+    },
+] as const;
+
 const HomeTab = ({
     currentData,
     setActiveTab,
@@ -39,13 +78,13 @@ const HomeTab = ({
             label: "Total Kolam",
             value: "12 Kolam",
             icon: Fish,
-            color: "#38BDF8",
+            color: "#0284c7",
         },
         {
             label: "Total Populasi",
             value: "120.000 Ekor",
             icon: Fish,
-            color: "#14B8A6",
+            color: "#0d9488",
         },
         {
             label: "Status Kritis",
@@ -53,13 +92,13 @@ const HomeTab = ({
                 ? `1 Kolam (Kolam ${selectedPondId})`
                 : "0 Kolam Kritis",
             icon: ShieldAlert,
-            color: isPondCritical ? "#EF4444" : "#14B8A6",
+            color: isPondCritical ? "#dc2626" : "#0d9488",
         },
         {
             label: `Suhu Kolam ${selectedPondId}`,
             value: `${currentData?.TEMPERATURE.toFixed(1) || "28.5"}°C`,
             icon: Thermometer,
-            color: "#F59E0B",
+            color: "#d97706",
         },
     ];
 
@@ -78,45 +117,6 @@ const HomeTab = ({
             label: "Kelola Seluruh Kolam",
             icon: Plus,
             action: () => setActiveTab("ponds"),
-        },
-    ];
-
-    const activePondsList = [
-        {
-            id: 12,
-            name: "Kolam 12",
-            type: "Bioflok Bulat D3",
-            population: "10.000 Ekor",
-            defaultTemp: 28.2,
-            defaultPh: 7.1,
-            defaultTurbidity: 35,
-        },
-        {
-            id: 11,
-            name: "Kolam 11",
-            type: "Tanah Tradisional",
-            population: "15.000 Ekor",
-            defaultTemp: 28.5,
-            defaultPh: 7.2,
-            defaultTurbidity: 42,
-        },
-        {
-            id: 10,
-            name: "Kolam 10",
-            type: "Terpal Kotak",
-            population: "8.000 Ekor",
-            defaultTemp: 29.0,
-            defaultPh: 7.4,
-            defaultTurbidity: 30,
-        },
-        {
-            id: 9,
-            name: "Kolam 09",
-            type: "Bioflok Bulat D3",
-            population: "10.000 Ekor",
-            defaultTemp: 26.9,
-            defaultPh: 6.4,
-            defaultTurbidity: 55,
         },
     ];
 
@@ -215,7 +215,6 @@ const HomeTab = ({
                                         <Icon size={18} />
                                         <span>{action.label}</span>
                                     </div>
-                                    <span className="arrow">→</span>
                                 </Button>
                             );
                         })}
@@ -262,7 +261,7 @@ const HomeTab = ({
                             </tr>
                         </thead>
                         <tbody>
-                            {activePondsList.map((pond) => {
+                            {ACTIVE_PONDS_LIST.map((pond) => {
                                 const isSelected = pond.id === selectedPondId;
                                 const temp =
                                     isSelected && currentData

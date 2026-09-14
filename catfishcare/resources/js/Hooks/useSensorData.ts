@@ -11,7 +11,7 @@ export const useSensorData = (selectedPondId: number = 1) => {
     const lastTimestampRef = useRef<number>(0);
 
     // Load initial time-series telemetry history from backend
-    useEffect(() => {
+    useEffect(function syncTelemetryHistory() {
         let isMounted = true;
         setCurrentIndex(0);
         setIsPlaying(false);
@@ -34,14 +34,13 @@ export const useSensorData = (selectedPondId: number = 1) => {
                 }
             });
 
-
-        return () => {
+        return function cleanupTelemetryHistory() {
             isMounted = false;
         };
     }, [selectedPondId]);
 
     // Live Telemetry Polling (Every 2.5s)
-    useEffect(() => {
+    useEffect(function pollLiveTelemetry() {
         let isMounted = true;
         const fetchLiveTelemetry = async () => {
             try {
@@ -91,7 +90,7 @@ export const useSensorData = (selectedPondId: number = 1) => {
         fetchLiveTelemetry();
         const pollInterval = setInterval(fetchLiveTelemetry, 2500);
 
-        return () => {
+        return function cleanupLiveTelemetry() {
             isMounted = false;
             clearInterval(pollInterval);
         };
