@@ -150,6 +150,56 @@ class FirestoreService
     }
 
     /**
+     * Save/sync user document to Firestore collection "users".
+     */
+    public function syncUserToFirestore(array $user): bool
+    {
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) {
+            return false;
+        }
+
+        $userId = $user['id'] ?? 1;
+        $nowIso = Carbon::now()->toIso8601String();
+
+        $fields = [
+            'id'         => ['integerValue' => (int)$userId],
+            'name'       => ['stringValue'  => (string)($user['name'] ?? 'Pak Fii')],
+            'email'      => ['stringValue'  => (string)($user['email'] ?? 'pakfii@catfishcare.app')],
+            'role'       => ['stringValue'  => (string)($user['role'] ?? 'admin')],
+            'avatar'     => ['stringValue'  => (string)($user['avatar'] ?? '')],
+            'created_at' => ['timestampValue' => $nowIso],
+            'updated_at' => ['timestampValue' => $nowIso],
+        ];
+
+        $documentUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/users?documentId=user_{$userId}";
+
+        try {
+            $response = Http::withToken($accessToken)
+                ->post($documentUrl, [
+                    'fields' => $fields,
+                ]);
+
+            if ($response->successful()) {
+                Log::info("[FirestoreService] User document successfully synced to Firestore collection 'users' for user {$userId}.");
+                return true;
+            } elseif ($response->status() === 409) {
+                // If 409 conflict, patch existing user document
+                $patchUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/users/user_{$userId}";
+                Http::withToken($accessToken)->patch($patchUrl, ['fields' => $fields]);
+                Log::info("[FirestoreService] User document successfully patched in Firestore collection 'users' for user {$userId}.");
+                return true;
+            }
+
+            Log::error("[FirestoreService] Failed writing user to Firestore: " . $response->body());
+        } catch (\Throwable $e) {
+            Log::error("[FirestoreService] Exception writing user to Firestore: " . $e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
      * Retrieve sensor history logs from Firestore for a given pond.
      */
     public function getHistoryFromFirestore(int $kolamId = 1, int $limit = 50): array
