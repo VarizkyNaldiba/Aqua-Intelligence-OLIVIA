@@ -45,9 +45,15 @@ Route::post('/actuators/manual', [ActuatorController::class, 'manualControl'])->
 
 // Dynamic Pond Thresholds API
 use App\Http\Controllers\PondThresholdController;
+use App\Http\Controllers\PondCalibrationController;
 Route::get('/thresholds/{kolam_id?}', [PondThresholdController::class, 'getThresholds'])->name('api.thresholds.get');
 Route::post('/thresholds/update', [PondThresholdController::class, 'updateThresholds'])->name('api.thresholds.update');
 Route::post('/thresholds/reset', [PondThresholdController::class, 'resetThresholds'])->name('api.thresholds.reset');
+
+// Hardware Sensor Calibration API (Buffer 7.0/4.01, V_clear, TDS, Height, Temp Offset)
+Route::get('/calibration/{kolam_id?}', [PondCalibrationController::class, 'getCalibration'])->name('api.calibration.get');
+Route::post('/calibration/update', [PondCalibrationController::class, 'updateCalibration'])->name('api.calibration.update');
+Route::post('/calibration/reset', [PondCalibrationController::class, 'resetCalibration'])->name('api.calibration.reset');
 
 // AI Predictions (BiLSTM) & AI Insight (DeepSeek LLM)
 Route::get('/predictions/{kolam_id?}', [AiInsightController::class, 'getForecast'])->name('api.predictions.forecast');

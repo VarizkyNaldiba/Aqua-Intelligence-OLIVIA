@@ -115,8 +115,20 @@ const PondsTab = ({
     // Threshold Settings state
     const [thresholdData, setThresholdData] = useState<any>(null);
     const [isCustomThreshold, setIsCustomThreshold] = useState(false);
-    const [activeModalTab, setActiveModalTab] = useState<"info" | "thresholds">("info");
+    const [activeModalTab, setActiveModalTab] = useState<"info" | "thresholds" | "calibration">("info");
     const [thresholdSaving, setThresholdSaving] = useState(false);
+
+    // Hardware Calibration state (Buffer 7.0/4.01, V_clear, TDS, Height, Temp Offset)
+    const [calibrationData, setCalibrationData] = useState<any>({
+        ph_v7: 2.50,
+        ph_v4: 3.05,
+        turbidity_v_clear: 4.20,
+        tds_factor: 0.50,
+        pond_height: 100.0,
+        temp_offset: 0.0,
+    });
+    const [isCustomCalibration, setIsCustomCalibration] = useState(false);
+    const [calibrationSaving, setCalibrationSaving] = useState(false);
 
     // Load active pond details into form when selection changes
     const activePond = ponds.find((p) => p.id === activePondId) || ponds[0];
@@ -134,7 +146,7 @@ const PondsTab = ({
         }
     }, [activePondId, ponds]);
 
-    // Fetch pond thresholds when modal opens
+    // Fetch pond thresholds & hardware calibration when modal opens
     useEffect(() => {
         if (isModalOpen && activePondId) {
             fetch(`/api/thresholds/${activePondId}`)
@@ -143,6 +155,16 @@ const PondsTab = ({
                     if (data.thresholds) {
                         setThresholdData(data.thresholds);
                         setIsCustomThreshold(Boolean(data.is_custom));
+                    }
+                })
+                .catch(() => {});
+
+            fetch(`/api/calibration/${activePondId}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.calibration) {
+                        setCalibrationData(data.calibration);
+                        setIsCustomCalibration(Boolean(data.is_custom));
                     }
                 })
                 .catch(() => {});
@@ -197,6 +219,62 @@ const PondsTab = ({
             setAlertMessage("Gagal reset threshold.");
         } finally {
             setThresholdSaving(false);
+        }
+    };
+
+    const handleSaveCalibration = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!calibrationData) return;
+        setCalibrationSaving(true);
+        try {
+            const res = await fetch("/api/calibration/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    kolam_id: activePondId,
+                    calibration: calibrationData,
+                }),
+            });
+            if (res.ok) {
+                const json = await res.json();
+                setAlertMessage(json.message || "Hardware calibration updated successfully!");
+                setIsCustomCalibration(true);
+                setTimeout(() => setAlertMessage(""), 4000);
+            }
+        } catch {
+            setAlertMessage("Gagal menyimpan kalibrasi hardware.");
+        } finally {
+            setCalibrationSaving(false);
+        }
+    };
+
+    const handleResetCalibration = async () => {
+        if (!confirm("Kembalikan kalibrasi hardware ke nilai standar pengujian (pH 7=2.50V, pH 4=3.05V, V_clear=4.20V, TDS=0.50, Height=100cm, Temp=0°C)?")) return;
+        setCalibrationSaving(true);
+        try {
+            const res = await fetch("/api/calibration/reset", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ kolam_id: activePondId }),
+            });
+            if (res.ok) {
+                const json = await res.json();
+                setAlertMessage(json.message || "Hardware calibration reset to tested defaults!");
+                setIsCustomCalibration(false);
+                setCalibrationData({
+                    ph_v7: 2.50,
+                    ph_v4: 3.05,
+                    turbidity_v_clear: 4.20,
+                    tds_factor: 0.50,
+                    pond_height: 100.0,
+                    temp_offset: 0.0,
+                });
+                setTimeout(() => setAlertMessage(""), 4000);
+            }
+        } catch {
+            setAlertMessage("Gagal reset kalibrasi hardware.");
+        } finally {
+            setCalibrationSaving(false);
         }
     };
 
@@ -612,6 +690,23 @@ const PondsTab = ({
                                     >
                                         Ambang Batas (Thresholds)
                                     </button>
+                                    <button
+                                        type="button"
+                                        style={{
+                                            padding: "6px 14px",
+                                            borderRadius: "6px",
+                                            fontSize: "13px",
+                                            fontWeight: 600,
+                                            border: "none",
+                                            cursor: "pointer",
+                                            backgroundColor: activeModalTab === "calibration" ? "#0ea5e9" : "transparent",
+                                            color: activeModalTab === "calibration" ? "#ffffff" : "#94a3b8",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                        onClick={() => setActiveModalTab("calibration")}
+                                    >
+                                        Kalibrasi Hardware
+                                    </button>
                                 </div>
 
                                 {activeModalTab === "info" ? (
@@ -905,6 +1000,123 @@ const PondsTab = ({
                                                 disabled={thresholdSaving}
                                             >
                                                 Reset to Paper Default
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <form onSubmit={handleSaveCalibration}>
+                                        <div style={{ marginBottom: "16px", padding: "12px", borderRadius: "8px", backgroundColor: "rgba(14, 165, 233, 0.1)", border: "1px solid rgba(14, 165, 233, 0.3)" }}>
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8" }}>
+                                                    {isCustomCalibration ? "Custom Hardware Calibration Active" : "Tested Default Calibration (CatfishCare 2026)"}
+                                                </span>
+                                                <span style={{ fontSize: "11px", backgroundColor: "#0284c7", color: "#ffffff", padding: "2px 8px", borderRadius: "10px" }}>
+                                                    v{calibrationData?.version ?? 1}
+                                                </span>
+                                            </div>
+                                            <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
+                                                Atur nilai tegangan ADC mentah saat probe dikalibrasi dalam larutan standar (Buffer pH 7.00, pH 4.01, Air Jernih 0 NTU, dan Larutan 1413 µS/cm).
+                                            </p>
+                                        </div>
+
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                                            {/* pH Buffer 7.00 */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">pH Buffer 7.00 Voltage (V)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    className="pm-input"
+                                                    value={calibrationData.ph_v7 ?? 2.50}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, ph_v7: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage saat probe di larutan pH 7.00</span>
+                                            </div>
+
+                                            {/* pH Buffer 4.01 */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">pH Buffer 4.01 Voltage (V)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    className="pm-input"
+                                                    value={calibrationData.ph_v4 ?? 3.05}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, ph_v4: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage saat probe di larutan pH 4.01</span>
+                                            </div>
+
+                                            {/* Turbidity Clear Voltage */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">Turbidity Clear Voltage (V)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    className="pm-input"
+                                                    value={calibrationData.turbidity_v_clear ?? 4.20}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, turbidity_v_clear: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage pada Air Suling (0 NTU)</span>
+                                            </div>
+
+                                            {/* TDS Factor */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">TDS Multiplier Factor (k)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    className="pm-input"
+                                                    value={calibrationData.tds_factor ?? 0.50}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, tds_factor: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Faktor larutan standar 1413 µS/cm</span>
+                                            </div>
+
+                                            {/* Pond Height */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">Pond Vessel Height (cm)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    className="pm-input"
+                                                    value={calibrationData.pond_height ?? 100.0}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, pond_height: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Tinggi sensor ke dasar kolam kosong</span>
+                                            </div>
+
+                                            {/* Temp Offset */}
+                                            <div className="pm-details-field">
+                                                <label className="pm-details-label">Temperature Offset (°C)</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    className="pm-input"
+                                                    value={calibrationData.temp_offset ?? 0.0}
+                                                    onChange={(e) => setCalibrationData({ ...calibrationData, temp_offset: Number(e.target.value) })}
+                                                    required
+                                                />
+                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Koreksi offset termometer standar</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Action buttons for Calibration */}
+                                        <div className="pm-btn-block" style={{ marginTop: "16px" }}>
+                                            <button type="submit" className="pm-btn-full" disabled={calibrationSaving}>
+                                                {calibrationSaving ? "Saving..." : "Save Hardware Calibration"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="pm-btn-cancel"
+                                                onClick={handleResetCalibration}
+                                                disabled={calibrationSaving}
+                                            >
+                                                Reset to Tested Defaults
                                             </button>
                                         </div>
                                     </form>
