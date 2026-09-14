@@ -3,9 +3,33 @@
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
 
-// Force SQLite database configuration on Vercel serverless environment
+// Ensure all temporary storage directories exist on Vercel serverless environment
+$tmpDirs = [
+    '/tmp',
+    '/tmp/storage',
+    '/tmp/storage/framework',
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/cache',
+    '/tmp/storage/logs',
+];
+
+foreach ($tmpDirs as $dir) {
+    if (!file_exists($dir)) {
+        @mkdir($dir, 0777, true);
+    }
+}
+
+// Force SQLite database and storage configuration for Vercel
 putenv('DB_CONNECTION=sqlite');
 putenv('DB_DATABASE=/tmp/database.sqlite');
+putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
+putenv('APP_CONFIG_CACHE=/tmp/config.php');
+putenv('APP_EVENTS_CACHE=/tmp/events.php');
+putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
+putenv('APP_ROUTES_CACHE=/tmp/routes.php');
+putenv('APP_SERVICES_CACHE=/tmp/services.php');
+
 $_ENV['DB_CONNECTION'] = 'sqlite';
 $_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
 $_SERVER['DB_CONNECTION'] = 'sqlite';
@@ -16,15 +40,9 @@ $dbSource = __DIR__ . '/../database/database.sqlite';
 $dbTarget = '/tmp/database.sqlite';
 
 if (!file_exists($dbTarget)) {
-    // Ensure the folder exists
-    if (!file_exists('/tmp')) {
-        mkdir('/tmp', 0777, true);
-    }
-    // Copy the database file if it exists in the source
     if (file_exists($dbSource)) {
         copy($dbSource, $dbTarget);
     } else {
-        // Create an empty sqlite database if source doesn't exist
         touch($dbTarget);
     }
 }
