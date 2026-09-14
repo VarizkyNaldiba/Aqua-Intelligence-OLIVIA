@@ -30,6 +30,13 @@ putenv('APP_PACKAGES_CACHE=/tmp/packages.php');
 putenv('APP_ROUTES_CACHE=/tmp/routes.php');
 putenv('APP_SERVICES_CACHE=/tmp/services.php');
 
+putenv('SESSION_DRIVER=cookie');
+putenv('SESSION_FILE_PATH=/tmp/storage/framework/sessions');
+$_ENV['SESSION_DRIVER'] = 'cookie';
+$_ENV['SESSION_FILE_PATH'] = '/tmp/storage/framework/sessions';
+$_SERVER['SESSION_DRIVER'] = 'cookie';
+$_SERVER['SESSION_FILE_PATH'] = '/tmp/storage/framework/sessions';
+
 $_ENV['DB_CONNECTION'] = 'sqlite';
 $_ENV['DB_DATABASE'] = '/tmp/database.sqlite';
 $_SERVER['DB_CONNECTION'] = 'sqlite';
