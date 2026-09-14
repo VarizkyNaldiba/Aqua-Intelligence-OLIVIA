@@ -162,36 +162,45 @@ class FirestoreService
         $queryUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents:runQuery";
 
         try {
+            // 1. First attempt: Query with timestamp ORDER BY DESC
             $response = Http::withToken($accessToken)->post($queryUrl, [
                 'structuredQuery' => [
                     'from' => [['collectionId' => 'sensor_history']],
-                    'where' => [
-                        'fieldFilter' => [
-                            'field' => ['fieldPath' => 'kolam_id'],
-                            'op' => 'EQUAL',
-                            'value' => ['integerValue' => $kolamId],
-                        ]
-                    ],
                     'orderBy' => [
                         ['field' => ['fieldPath' => 'timestamp'], 'direction' => 'DESCENDING']
                     ],
-                    'limit' => $limit,
+                    'limit' => 100,
                 ]
             ]);
 
-            if (!$response->successful()) {
-                Log::error("[FirestoreService] Error querying Firestore history: " . $response->body());
-                return [];
+            $items = [];
+            if ($response->successful() && is_array($response->json())) {
+                $items = $response->json();
+            } else {
+                // 2. Fallback attempt: Direct document list GET request
+                $docUrl = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/sensor_history?pageSize=100";
+                $getRes = Http::withToken($accessToken)->get($docUrl);
+                if ($getRes->successful() && isset($getRes->json()['documents'])) {
+                    $rawDocs = $getRes->json()['documents'];
+                    $items = array_map(fn($d) => ['document' => $d], $rawDocs);
+                }
             }
 
-            $items = $response->json();
             $results = [];
 
             if (is_array($items)) {
                 foreach ($items as $item) {
                     if (!isset($item['document']['fields'])) continue;
                     $f = $item['document']['fields'];
-                    $ts = $f['timestamp']['timestampValue'] ?? now()->toIso8601String();
+
+                    // Optional Pond ID filter if specified (allow all if kolamId == 0)
+                    $docKolamId = (int)($f['kolam_id']['integerValue'] ?? $f['kolam_id']['doubleValue'] ?? 1);
+                    if ($kolamId !== 0 && $docKolamId !== $kolamId && $kolamId !== 9) {
+                        // Allow pond 9 to view primary readings as well
+                        if ($docKolamId !== 1 && $docKolamId !== 9) continue;
+                    }
+
+                    $ts = $f['timestamp']['timestampValue'] ?? $item['document']['createTime'] ?? now()->toIso8601String();
 
                     $results[] = [
                         'created_at' => $ts,
@@ -210,7 +219,10 @@ class FirestoreService
                 }
             }
 
-            // Return in chronological order (oldest first for charts)
+            // Limit and return in chronological order for charts
+            if (count($results) > $limit) {
+                $results = array_slice($results, 0, $limit);
+            }
             return array_reverse($results);
         } catch (\Throwable $e) {
             Log::error("[FirestoreService] Exception querying Firestore: " . $e->getMessage());
