@@ -261,7 +261,7 @@ class TelemetryController extends Controller
                 'line' => $e->getLine(),
             ], 500);
         }
-    }}
+    }
 
     /**
      * Receive Surface Fish Ratio (SFR) from Raspberry Pi Vision Service.
