@@ -84,6 +84,19 @@ export default function Dashboard() {
     } = useSensorData(selectedPondId);
 
     const [alert, setAlert] = useState({ message: "", type: "" });
+    const [pondHeight, setPondHeight] = useState<number>(40);
+
+    useEffect(() => {
+        fetch(`/api/calibration/${selectedPondId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.calibration?.pond_height) {
+                    setPondHeight(data.calibration.pond_height);
+                }
+            })
+            .catch(() => {});
+    }, [selectedPondId]);
+
     const [todos, setTodos] = useState<TodoItem[]>([
         { id: 1, text: "Kuras air kolam A", checked: false },
         { id: 2, text: "Cek filter & sirkulasi air", checked: false },
@@ -660,7 +673,7 @@ export default function Dashboard() {
                                 />
                             </svg>
                         </div>
-                        <div className="db-metric-footer">Kedalaman Kolam: 40 cm</div>
+                        <div className="db-metric-footer">Kedalaman Kolam: {pondHeight} cm</div>
                     </div>
                 </div>
 

@@ -4768,3 +4768,23 @@ body.light-theme .dt-wrapper {
 .tab-entry-fade {
     animation: tab-fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Split Page Container Layout (60% Catfish Ponds, 30% Static Edit/Create Panel) */
+.pm-split-container {
+    display: grid;
+    grid-template-columns: 66.66% calc(33.34% - 24px);
+    gap: 24px;
+    align-items: start;
+    width: 100%;
+}
+
+.pm-table-row-selected {
+    background-color: rgba(14, 165, 233, 0.08) !important;
+    border-left: 3px solid #0ea5e9 !important;
+}
+
+@media (max-width: 1100px) {
+    .pm-split-container {
+        grid-template-columns: 1fr;
+    }
+}

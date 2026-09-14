@@ -52,16 +52,7 @@ const PondsTab = ({
     useEffect(function syncPondTelemetry() {
         const syncTelemetry = async () => {
             try {
-                // 1. Fetch registered ESP devices
-                let espList: any[] = [];
-                try {
-                    const espRes = await fetch("/api/esp");
-                    if (espRes.ok) {
-                        espList = await espRes.json();
-                    }
-                } catch {}
-
-                // 2. Fetch latest telemetry for Kolam 1
+                // 1. Fetch latest telemetry for Kolam 1
                 const telemRes = await fetch("/api/telemetry/latest/1");
                 let telem: any = null;
                 if (telemRes.ok) {
@@ -70,44 +61,25 @@ const PondsTab = ({
                 }
 
                 const isPrimaryOnline = telem && !telem.is_simulated;
+                const statusVal = telem
+                    ? (telem.risk_status === "High" || telem.risk_status === "Critical" ? "Bahaya" : telem.risk_status === "Medium" ? "Waspada" : "Aman")
+                    : "Aman";
 
-                if (Array.isArray(espList) && espList.length > 0) {
-                    const updatedPonds: PondItem[] = espList.map((esp: any, idx: number) => {
-                        const pId = esp.id || (idx + 1);
-                        const isOnline = pId === 1 ? isPrimaryOnline : (esp.status === "Connected");
-                        const statusVal = (pId === 1 && telem)
-                            ? (telem.risk_status === "High" || telem.risk_status === "Critical" ? "Bahaya" : telem.risk_status === "Medium" ? "Waspada" : "Aman")
-                            : "Aman";
-
-                        return {
-                            id: pId,
-                            name: esp.name || `Kolam TFS ${pId}`,
-                            location: `Sektor Utama (ESP: ${esp.uuid || 'ESP32-00' + pId})`,
-                            status: statusVal,
-                            iot: isOnline ? "Aktif" : "Tidak Aktif",
-                            capacity: 1000,
-                            lastMaintained: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
-                            temp: pId === 1 && telem ? Number(telem.suhu ?? 27.5) : 27.5,
-                            ph: pId === 1 && telem ? Number(telem.ph ?? 7.2) : 7.2,
-                            turbidity: pId === 1 && telem ? Number(telem.kekeruhan ?? 18.0) : 18.0,
-                        };
-                    });
-                    setPonds(updatedPonds);
-                } else {
-                    // Default single active pond if ESP API not populated
-                    setPonds([{
-                        id: 1,
-                        name: "Kolam TFS 1",
-                        location: "Kolam Riset IoT TFS (ESP32-CATFISHCARE-001)",
-                        status: telem ? (telem.risk_status === "High" || telem.risk_status === "Critical" ? "Bahaya" : telem.risk_status === "Medium" ? "Waspada" : "Aman") : "Aman",
-                        iot: isPrimaryOnline ? "Aktif" : "Tidak Aktif",
-                        capacity: 1000,
-                        lastMaintained: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
-                        temp: telem ? Number(telem.suhu ?? 27.5) : 27.5,
-                        ph: telem ? Number(telem.ph ?? 7.2) : 7.2,
-                        turbidity: telem ? Number(telem.kekeruhan ?? 18.0) : 18.0,
-                    }]);
-                }
+                setPonds((prevPonds) =>
+                    prevPonds.map((p) => {
+                        if (p.id === 1) {
+                            return {
+                                ...p,
+                                status: telem ? statusVal : p.status,
+                                iot: isPrimaryOnline ? "Aktif" : "Tidak Aktif",
+                                temp: telem ? Number(telem.suhu ?? p.temp) : p.temp,
+                                ph: telem ? Number(telem.ph ?? p.ph) : p.ph,
+                                turbidity: telem ? Number(telem.kekeruhan ?? p.turbidity) : p.turbidity,
+                            };
+                        }
+                        return p;
+                    })
+                );
             } catch {
                 // Ignore
             }
@@ -120,12 +92,15 @@ const PondsTab = ({
         };
     }, []);
 
-    // Currently active selected pond for popup modal
+    // Currently active selected pond
     const [activePondId, setActivePondId] = useState<number>(1);
     
-    // Popup modal state
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
+    // Panel mode: "edit" for active pond, "create" for adding new pond
+    const [panelMode, setPanelMode] = useState<"edit" | "create">("edit");
+    const [createName, setCreateName] = useState("");
+    const [createLocation, setCreateLocation] = useState("");
+    const [createCapacity, setCreateCapacity] = useState<number>(1000);
+    const [createPondHeight, setCreatePondHeight] = useState<number>(40.0);
 
     // Form fields state for editing
     const [editName, setEditName] = useState("");
@@ -162,25 +137,26 @@ const PondsTab = ({
     const [isCustomCalibration, setIsCustomCalibration] = useState(false);
     const [calibrationSaving, setCalibrationSaving] = useState(false);
 
-    // Load active pond details into form when selection changes
     const activePond = ponds.find((p) => p.id === activePondId) || ponds[0];
 
+    // Load active pond details into form ONLY when activePondId changes
     useEffect(() => {
-        if (activePond) {
-            setEditName(activePond.name);
-            setEditLocation(activePond.location);
-            setEditCapacity(activePond.capacity);
-            setEditStatus(activePond.status);
-            setEditIot(activePond.iot);
-            setEditTemp(activePond.temp);
-            setEditPh(activePond.ph);
-            setEditTurbidity(activePond.turbidity);
+        const found = ponds.find((p) => p.id === activePondId) || ponds[0];
+        if (found) {
+            setEditName(found.name);
+            setEditLocation(found.location);
+            setEditCapacity(found.capacity);
+            setEditStatus(found.status);
+            setEditIot(found.iot);
+            setEditTemp(found.temp);
+            setEditPh(found.ph);
+            setEditTurbidity(found.turbidity);
         }
-    }, [activePondId, ponds]);
+    }, [activePondId]);
 
-    // Fetch pond thresholds & hardware calibration when modal opens
+    // Fetch pond thresholds & hardware calibration when selected pond changes
     useEffect(() => {
-        if (isModalOpen && activePondId) {
+        if (activePondId) {
             fetch(`/api/thresholds/${activePondId}`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -201,7 +177,7 @@ const PondsTab = ({
                 })
                 .catch(() => {});
         }
-    }, [isModalOpen, activePondId]);
+    }, [activePondId]);
 
     const handleSaveThresholds = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -310,7 +286,7 @@ const PondsTab = ({
         }
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setPonds((prev) =>
             prev.map((p) =>
@@ -330,40 +306,74 @@ const PondsTab = ({
             )
         );
 
+        try {
+            await fetch("/api/calibration/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    kolam_id: activePondId,
+                    calibration: calibrationData,
+                }),
+            });
+            setIsCustomCalibration(true);
+        } catch (err) {
+            console.error("Gagal menyimpan tinggi kolam ke API:", err);
+        }
+
         setAlertMessage(`Pond ${editName} updated successfully.`);
-        setIsModalOpen(false);
-        setIsEditing(false);
         setTimeout(() => setAlertMessage(""), 4000);
     };
 
     const handleAddNewPond = () => {
         const nextNum = ponds.length + 1;
+        setCreateName(`Kolam TFS ${nextNum}`);
+        setCreateLocation(`Sektor Utama (ESP32-00${nextNum})`);
+        setCreateCapacity(1000);
+        setCreatePondHeight(40.0);
+        setPanelMode("create");
+    };
+
+    const handleCreateSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const newId = Date.now();
         const newPond: PondItem = {
-            id: Date.now(),
-            name: `Pond ${nextNum < 10 ? "0" : ""}${nextNum}`,
-            location: `Sektor Selatan, Blok ${nextNum}`,
+            id: newId,
+            name: createName || `Kolam TFS ${ponds.length + 1}`,
+            location: createLocation || "Sektor Utama",
             status: "Aman",
-            iot: "Aktif",
-            capacity: 1000,
+            iot: "Tidak Aktif",
+            capacity: createCapacity || 1000,
             lastMaintained: new Date().toLocaleDateString("id-ID", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
             }),
-            temp: 28.0,
+            temp: 27.5,
             ph: 7.2,
-            turbidity: 30,
+            turbidity: 18.0,
         };
         setPonds((prev) => [...prev, newPond]);
-        setActivePondId(newPond.id);
-        setIsEditing(true);
-        setIsModalOpen(true);
-        setAlertMessage(`New pond "${newPond.name}" added successfully!`);
+        setActivePondId(newId);
+
+        try {
+            await fetch("/api/calibration/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    kolam_id: newId,
+                    calibration: { ...calibrationData, pond_height: createPondHeight },
+                }),
+            });
+        } catch {}
+
+        setPanelMode("edit");
+        setActiveModalTab("info");
+        setAlertMessage(`Kolam baru "${newPond.name}" berhasil ditambahkan!`);
         setTimeout(() => setAlertMessage(""), 4000);
     };
 
     const handleDeletePond = (id: number, name: string, e: React.MouseEvent) => {
-        e.stopPropagation(); // Avoid triggering row click details popup
+        e.stopPropagation();
         if (confirm(`Are you sure you want to delete ${name}?`)) {
             setPonds((prev) => prev.filter((p) => p.id !== id));
             setAlertMessage(`Pond ${name} deleted.`);
@@ -372,10 +382,9 @@ const PondsTab = ({
     };
 
     const handleEditClick = (pond: PondItem, e: React.MouseEvent) => {
-        e.stopPropagation(); // Avoid triggering details popup
+        e.stopPropagation();
         setActivePondId(pond.id);
-        setIsEditing(true);
-        setIsModalOpen(true);
+        setPanelMode("edit");
     };
 
     const getStatusClass = (status: "Aman" | "Waspada" | "Bahaya") => {
@@ -386,8 +395,7 @@ const PondsTab = ({
 
     const handleRowClick = (id: number) => {
         setActivePondId(id);
-        setIsEditing(false);
-        setIsModalOpen(true);
+        setPanelMode("edit");
     };
 
     return (
@@ -419,745 +427,271 @@ const PondsTab = ({
                 </div>
             )}
 
-            {/* Full-width Registered Ponds Table */}
-            <div className="pm-table-card" style={{ width: "100%", boxSizing: "border-box" }}>
-                <div className="pm-table-card-header">
-                    <Database size={16} />
-                    <span>{ponds.length} ponds registered</span>
+            {/* Split Page Container Layout */}
+            <div className="pm-split-container">
+                {/* Left Column: Registered Ponds Table */}
+                <div className="pm-table-card" style={{ width: "100%", boxSizing: "border-box" }}>
+                    <div className="pm-table-card-header">
+                        <Database size={16} />
+                        <span>{ponds.length} ponds registered</span>
+                    </div>
+
+                    <div style={{ overflowX: "auto" }}>
+                        <table className="pm-table">
+                            <thead>
+                                <tr>
+                                    <th>Pond Name</th>
+                                    <th>Status</th>
+                                    <th>IoT</th>
+                                    <th>Capacity (Fish)</th>
+                                    <th>Last Maintained</th>
+                                    <th style={{ textAlign: "right" }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ponds.map((pond) => {
+                                    const isSelected = pond.id === activePondId;
+                                    return (
+                                        <tr
+                                            key={pond.id}
+                                            onClick={() => handleRowClick(pond.id)}
+                                            className={isSelected ? "pm-table-row-selected" : ""}
+                                            style={{ cursor: "pointer" }}
+                                            onMouseEnter={() => {
+                                                setHoveredRowId(pond.id);
+                                                setTooltipVisible(true);
+                                            }}
+                                            onMouseMove={(e) => {
+                                                setTooltipCoords({ x: e.clientX + 15, y: e.clientY + 15 });
+                                            }}
+                                            onMouseLeave={() => {
+                                                setHoveredRowId(null);
+                                                setTooltipVisible(false);
+                                            }}
+                                        >
+                                            <td>
+                                                <div className="pm-pond-name-cell">
+                                                    <div className="pm-pond-icon-circle" style={{ backgroundColor: isSelected ? "rgba(14, 165, 233, 0.2)" : undefined }}>
+                                                        <Waves size={16} color={isSelected ? "#0ea5e9" : undefined} />
+                                                    </div>
+                                                    <div style={{ textAlign: "left" }}>
+                                                        <div className="pm-pond-title" style={{ fontWeight: isSelected ? 700 : 600 }}>{pond.name}</div>
+                                                        <div className="pm-pond-location">{pond.location}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`pm-status-pill ${getStatusClass(pond.status)}`}>
+                                                    <span
+                                                        style={{
+                                                            width: "6px",
+                                                            height: "6px",
+                                                            backgroundColor: 
+                                                                pond.status === "Aman" ? "#10b981" : 
+                                                                pond.status === "Waspada" ? "#d97706" : "#ef4444",
+                                                            borderRadius: "50%",
+                                                            display: "inline-block",
+                                                        }}
+                                                    ></span>
+                                                    {pond.status}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className={`pm-iot-pill ${pond.iot === "Aktif" ? "active" : "inactive"}`}>
+                                                    <span
+                                                        style={{
+                                                            width: "6px",
+                                                            height: "6px",
+                                                            backgroundColor: pond.iot === "Aktif" ? "#0ea5e9" : "#64748b",
+                                                            borderRadius: "50%",
+                                                            display: "inline-block",
+                                                        }}
+                                                    ></span>
+                                                    {pond.iot}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className="pm-capacity-text">
+                                                    {pond.capacity.toLocaleString("id-ID")} ekor
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="pm-maintained-text">{pond.lastMaintained}</div>
+                                            </td>
+                                            <td>
+                                                <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                                                    <button
+                                                        className="pm-action-btn"
+                                                        title="Edit configuration"
+                                                        onClick={(e) => handleEditClick(pond, e)}
+                                                    >
+                                                        <Pencil size={14} />
+                                                    </button>
+                                                    <button
+                                                        className="pm-action-btn delete"
+                                                        title="Delete pond"
+                                                        onClick={(e) => handleDeletePond(pond.id, pond.name, e)}
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div style={{ overflowX: "auto" }}>
-                    <table className="pm-table">
-                        <thead>
-                            <tr>
-                                <th>Pond Name</th>
-                                <th>Status</th>
-                                <th>IoT</th>
-                                <th>Capacity (Fish)</th>
-                                <th>Last Maintained</th>
-                                <th style={{ textAlign: "right" }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ponds.map((pond) => {
-                                return (
-                                    <tr
-                                        key={pond.id}
-                                        onClick={() => handleRowClick(pond.id)}
-                                        onMouseEnter={() => {
-                                            setHoveredRowId(pond.id);
-                                            setTooltipVisible(true);
-                                        }}
-                                        onMouseMove={(e) => {
-                                            setTooltipCoords({ x: e.clientX + 15, y: e.clientY + 15 });
-                                        }}
-                                        onMouseLeave={() => {
-                                            setHoveredRowId(null);
-                                            setTooltipVisible(false);
-                                        }}
-                                    >
-                                        <td>
-                                            <div className="pm-pond-name-cell">
-                                                <div className="pm-pond-icon-circle">
-                                                    <Waves size={16} />
-                                                </div>
-                                                <div style={{ textAlign: "left" }}>
-                                                    <div className="pm-pond-title">{pond.name}</div>
-                                                    <div className="pm-pond-location">{pond.location}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span className={`pm-status-pill ${getStatusClass(pond.status)}`}>
-                                                <span
-                                                    style={{
-                                                        width: "6px",
-                                                        height: "6px",
-                                                        backgroundColor: 
-                                                            pond.status === "Aman" ? "#10b981" : 
-                                                            pond.status === "Waspada" ? "#d97706" : "#ef4444",
-                                                        borderRadius: "50%",
-                                                        display: "inline-block",
-                                                    }}
-                                                ></span>
-                                                {pond.status}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span className={`pm-iot-pill ${pond.iot === "Aktif" ? "active" : "inactive"}`}>
-                                                <span
-                                                    style={{
-                                                        width: "6px",
-                                                        height: "6px",
-                                                        backgroundColor: pond.iot === "Aktif" ? "#0ea5e9" : "#64748b",
-                                                        borderRadius: "50%",
-                                                        display: "inline-block",
-                                                    }}
-                                                ></span>
-                                                {pond.iot}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className="pm-capacity-text">
-                                                {pond.capacity.toLocaleString("id-ID")} ekor
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="pm-maintained-text">{pond.lastMaintained}</div>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-                                                <button
-                                                    className="pm-action-btn"
-                                                    title="Edit configuration"
-                                                    onClick={(e) => handleEditClick(pond, e)}
-                                                >
-                                                    <Pencil size={14} />
-                                                </button>
-                                                <button
-                                                    className="pm-action-btn delete"
-                                                    title="Delete pond"
-                                                    onClick={(e) => handleDeletePond(pond.id, pond.name, e)}
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* Popup Modal Dialog with Blurred Backdrop */}
-            {isModalOpen && activePond && (
-                <div className="pm-modal-overlay" onClick={() => setIsModalOpen(false)}>
-                    <div className="pm-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="pm-details-header">
-                            <div>
-                                <div className="pm-details-title">{activePond.name}</div>
-                                <div className="pm-details-subtitle">
-                                    {isEditing ? "Edit pond configuration" : "Real-time catfish pond overview"}
-                                </div>
+                {/* Right Column: Active Pond Configuration (Split View Panel 30% Landscape) */}
+                <div className="pm-table-card" style={{ width: "100%", boxSizing: "border-box", padding: "20px" }}>
+                    <div className="pm-details-header" style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                            <div className="pm-details-title" style={{ fontSize: "18px", fontWeight: 700 }}>
+                                {panelMode === "create" ? "Tambah Kolam Baru" : activePond?.name}
                             </div>
-                            <button
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                    color: "#94a3b8",
-                                    cursor: "pointer",
-                                    padding: "4px",
-                                    display: "flex"
-                                }}
-                                onClick={() => setIsModalOpen(false)}
-                            >
-                                <X size={18} />
-                            </button>
+                            <div className="pm-details-subtitle" style={{ fontSize: "12px", color: "#64748b" }}>
+                                {panelMode === "create" ? "Form pendaftaran kolam lele baru" : activePond?.location}
+                            </div>
                         </div>
-
-                        {!isEditing ? (
-                            /* READER MODE VIEWING ALL DETAILS */
-                            <div className="pm-details-body">
-                                {/* Subtitle location */}
-                                <div style={{ fontSize: "14px", fontWeight: 600, color: "#64748b", marginTop: "-8px", marginBottom: "8px" }}>
-                                    {activePond.location}
-                                </div>
-
-                                {/* 1. Parameter Sekarang (Current Parameters) */}
-                                <div>
-                                    <div className="pm-details-label" style={{ marginBottom: "12px", display: "block" }}>
-                                        Parameter Sekarang
-                                    </div>
-                                    <div className="pm-details-param-grid">
-                                        {/* Temp */}
-                                        <div className="pm-details-param-card">
-                                            <span className="pm-details-param-label">Suhu Air</span>
-                                            <span className="pm-details-param-value" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px", color: "#0ea5e9" }}>
-                                                <Thermometer size={14} />
-                                                {activePond.temp.toFixed(1)}°C
-                                            </span>
-                                        </div>
-                                        {/* pH */}
-                                        <div className="pm-details-param-card">
-                                            <span className="pm-details-param-label">pH Air</span>
-                                            <span className="pm-details-param-value" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px", color: "#14b8a6" }}>
-                                                <Droplet size={14} />
-                                                {activePond.ph.toFixed(1)}
-                                            </span>
-                                        </div>
-                                        {/* Turbidity */}
-                                        <div className="pm-details-param-card">
-                                            <span className="pm-details-param-label">Kekeruhan</span>
-                                            <span className="pm-details-param-value" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px", color: "#8b5cf6" }}>
-                                                <Waves size={14} />
-                                                {activePond.turbidity} NTU
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pm-details-divider" />
-
-                                {/* 2. Detail Informasi List */}
-                                <div>
-                                    <div className="pm-details-label" style={{ marginBottom: "12px", display: "block" }}>
-                                        Detail Informasi
-                                    </div>
-
-                                    {/* Jumlah Ikan */}
-                                    <div className="pm-details-item-row">
-                                        <span className="pm-details-item-label">
-                                            <Fish size={15} color="#0ea5e9" />
-                                            Jumlah Ikan
-                                        </span>
-                                        <span className="pm-details-item-value">
-                                            {activePond.capacity.toLocaleString("id-ID")} ekor
-                                        </span>
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="pm-details-item-row">
-                                        <span className="pm-details-item-label">
-                                            <ShieldCheck size={15} color="#10b981" />
-                                            Status Kolam
-                                        </span>
-                                        <span className={`pm-status-pill ${getStatusClass(activePond.status)}`}>
-                                            <span
-                                                style={{
-                                                    width: "6px",
-                                                    height: "6px",
-                                                    backgroundColor: 
-                                                        activePond.status === "Aman" ? "#10b981" : 
-                                                        activePond.status === "Waspada" ? "#d97706" : "#ef4444",
-                                                    borderRadius: "50%",
-                                                    display: "inline-block",
-                                                }}
-                                            ></span>
-                                            {activePond.status}
-                                        </span>
-                                    </div>
-
-                                    {/* IoT */}
-                                    <div className="pm-details-item-row">
-                                        <span className="pm-details-item-label">
-                                            <Wifi size={15} color="#0ea5e9" />
-                                            IoT Connection
-                                        </span>
-                                        <span className={`pm-iot-pill ${activePond.iot === "Aktif" ? "active" : "inactive"}`}>
-                                            <span
-                                                style={{
-                                                    width: "6px",
-                                                    height: "6px",
-                                                    backgroundColor: activePond.iot === "Aktif" ? "#0ea5e9" : "#64748b",
-                                                    borderRadius: "50%",
-                                                    display: "inline-block",
-                                                }}
-                                            ></span>
-                                            {activePond.iot}
-                                        </span>
-                                    </div>
-
-                                    {/* Last Maintenance */}
-                                    <div className="pm-details-item-row" style={{ borderBottom: "none" }}>
-                                        <span className="pm-details-item-label">
-                                            <Calendar size={15} color="#8b5cf6" />
-                                            Terakhir Diperbarui
-                                        </span>
-                                        <span className="pm-details-item-value" style={{ color: "#64748b" }}>
-                                            {activePond.lastMaintained}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Button Block to switch to edit mode */}
-                                <div style={{ marginTop: "12px" }}>
-                                    <button 
-                                        className="pm-btn-full" 
-                                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
-                                        onClick={() => setIsEditing(true)}
-                                    >
-                                        <Pencil size={15} />
-                                        <span>Edit Pond Configuration</span>
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            /* EDIT MODE FORM WITH THRESHOLD SETTINGS TAB */
-                            <div className="pm-details-body">
-                                {/* Tab selector inside Edit Modal */}
-                                <div style={{ display: "flex", gap: "8px", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "8px" }}>
-                                    <button
-                                        type="button"
-                                        style={{
-                                            padding: "6px 14px",
-                                            borderRadius: "6px",
-                                            fontSize: "13px",
-                                            fontWeight: 600,
-                                            border: "none",
-                                            cursor: "pointer",
-                                            backgroundColor: activeModalTab === "info" ? "#0ea5e9" : "transparent",
-                                            color: activeModalTab === "info" ? "#ffffff" : "#94a3b8",
-                                            transition: "all 0.2s ease"
-                                        }}
-                                        onClick={() => setActiveModalTab("info")}
-                                    >
-                                        Informasi Kolam
-                                    </button>
-                                    <button
-                                        type="button"
-                                        style={{
-                                            padding: "6px 14px",
-                                            borderRadius: "6px",
-                                            fontSize: "13px",
-                                            fontWeight: 600,
-                                            border: "none",
-                                            cursor: "pointer",
-                                            backgroundColor: activeModalTab === "thresholds" ? "#0ea5e9" : "transparent",
-                                            color: activeModalTab === "thresholds" ? "#ffffff" : "#94a3b8",
-                                            transition: "all 0.2s ease"
-                                        }}
-                                        onClick={() => setActiveModalTab("thresholds")}
-                                    >
-                                        Ambang Batas (Thresholds)
-                                    </button>
-                                    <button
-                                        type="button"
-                                        style={{
-                                            padding: "6px 14px",
-                                            borderRadius: "6px",
-                                            fontSize: "13px",
-                                            fontWeight: 600,
-                                            border: "none",
-                                            cursor: "pointer",
-                                            backgroundColor: activeModalTab === "calibration" ? "#0ea5e9" : "transparent",
-                                            color: activeModalTab === "calibration" ? "#ffffff" : "#94a3b8",
-                                            transition: "all 0.2s ease"
-                                        }}
-                                        onClick={() => setActiveModalTab("calibration")}
-                                    >
-                                        Kalibrasi Hardware
-                                    </button>
-                                </div>
-
-                                {activeModalTab === "info" ? (
-                                    <form onSubmit={handleSave}>
-                                        {/* Pond Name Input */}
-                                        <div className="pm-details-field">
-                                            <label className="pm-details-label">Pond Name</label>
-                                            <input
-                                                type="text"
-                                                className="pm-input"
-                                                value={editName}
-                                                onChange={(e) => setEditName(e.target.value)}
-                                                placeholder="Enter pond name"
-                                                required
-                                            />
-                                        </div>
-
-                                        {/* Location Input */}
-                                        <div className="pm-details-field">
-                                            <label className="pm-details-label">Location</label>
-                                            <input
-                                                type="text"
-                                                className="pm-input"
-                                                value={editLocation}
-                                                onChange={(e) => setEditLocation(e.target.value)}
-                                                placeholder="Enter sector and block location"
-                                                required
-                                            />
-                                        </div>
-
-                                        {/* Fish Capacity Input */}
-                                        <div className="pm-details-field">
-                                            <label className="pm-details-label">Fish Capacity (ekor)</label>
-                                            <input
-                                                type="number"
-                                                className="pm-input"
-                                                value={editCapacity}
-                                                onChange={(e) => setEditCapacity(Number(e.target.value))}
-                                                placeholder="Enter capacity limit"
-                                                required
-                                            />
-                                        </div>
-
-                                        {/* Warning Status Select */}
-                                        <div className="pm-details-field">
-                                            <label className="pm-details-label">Pond Status</label>
-                                            <select
-                                                className="pm-input"
-                                                value={editStatus}
-                                                onChange={(e) => setEditStatus(e.target.value as "Aman" | "Waspada" | "Bahaya")}
-                                            >
-                                                <option value="Aman">Aman</option>
-                                                <option value="Waspada">Waspada</option>
-                                                <option value="Bahaya">Bahaya</option>
-                                            </select>
-                                        </div>
-
-                                        {/* IoT Connection Select */}
-                                        <div className="pm-details-field">
-                                            <label className="pm-details-label">IoT Connection State</label>
-                                            <select
-                                                className="pm-input"
-                                                value={editIot}
-                                                onChange={(e) => setEditIot(e.target.value as "Aktif" | "Tidak Aktif")}
-                                            >
-                                                <option value="Aktif">Aktif</option>
-                                                <option value="Tidak Aktif">Tidak Aktif</option>
-                                            </select>
-                                        </div>
-
-                                        {/* Action buttons */}
-                                        <div className="pm-btn-block">
-                                            <button type="submit" className="pm-btn-full">
-                                                Save Changes
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="pm-btn-cancel"
-                                                onClick={() => setIsEditing(false)}
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : activeModalTab === "thresholds" ? (
-                                    /* THRESHOLD CONFIGURATION TAB FORM */
-                                    <form onSubmit={handleSaveThresholds}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                                            <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-                                                Threshold Source:
-                                            </span>
-                                            <span 
-                                                style={{ 
-                                                    fontSize: "11px", 
-                                                    fontWeight: 700, 
-                                                    padding: "2px 8px", 
-                                                    borderRadius: "12px",
-                                                    backgroundColor: isCustomThreshold ? "rgba(168, 85, 247, 0.15)" : "rgba(16, 185, 129, 0.15)",
-                                                    color: isCustomThreshold ? "#c084fc" : "#34d399",
-                                                    border: `1px solid ${isCustomThreshold ? "rgba(168, 85, 247, 0.3)" : "rgba(16, 185, 129, 0.3)"}`
-                                                }}
-                                            >
-                                                {isCustomThreshold ? "Custom Configuration" : "Using Paper Default (CatfishCare 2026)"}
-                                            </span>
-                                        </div>
-
-                                        {thresholdData && (
-                                            <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "320px", overflowY: "auto", paddingRight: "4px" }}>
-                                                {/* pH Thresholds */}
-                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
-                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#14b8a6" }}>
-                                                        pH Air (pH)
-                                                    </span>
-                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Min - Max</label>
-                                                            <div style={{ display: "flex", gap: "4px" }}>
-                                                                <input
-                                                                    type="number"
-                                                                    step="0.1"
-                                                                    className="pm-input"
-                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                    value={thresholdData.ph?.normal_min ?? 6.5}
-                                                                    onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, normal_min: Number(e.target.value) } })}
-                                                                />
-                                                                <input
-                                                                    type="number"
-                                                                    step="0.1"
-                                                                    className="pm-input"
-                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                    value={thresholdData.ph?.normal_max ?? 8.2}
-                                                                    onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, normal_max: Number(e.target.value) } })}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
-                                                            <input
-                                                                type="number"
-                                                                step="0.1"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.ph?.warning_max ?? 9.0}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, ph: { ...thresholdData.ph, warning_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Suhu Thresholds */}
-                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
-                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#0ea5e9" }}>
-                                                        Suhu Air (°C)
-                                                    </span>
-                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Min - Max</label>
-                                                            <div style={{ display: "flex", gap: "4px" }}>
-                                                                <input
-                                                                    type="number"
-                                                                    step="0.5"
-                                                                    className="pm-input"
-                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                    value={thresholdData.suhu?.normal_min ?? 25.0}
-                                                                    onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, normal_min: Number(e.target.value) } })}
-                                                                />
-                                                                <input
-                                                                    type="number"
-                                                                    step="0.5"
-                                                                    className="pm-input"
-                                                                    style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                    value={thresholdData.suhu?.normal_max ?? 30.0}
-                                                                    onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, normal_max: Number(e.target.value) } })}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
-                                                            <input
-                                                                type="number"
-                                                                step="0.5"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.suhu?.warning_max ?? 32.0}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, suhu: { ...thresholdData.suhu, warning_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Turbidity Thresholds */}
-                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
-                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#8b5cf6" }}>
-                                                        Kekeruhan (NTU)
-                                                    </span>
-                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max</label>
-                                                            <input
-                                                                type="number"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.turbidity?.normal_max ?? 25}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, turbidity: { ...thresholdData.turbidity, normal_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
-                                                            <input
-                                                                type="number"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.turbidity?.warning_max ?? 50}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, turbidity: { ...thresholdData.turbidity, warning_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* TDS Thresholds */}
-                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
-                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#f59e0b" }}>
-                                                        TDS (ppm)
-                                                    </span>
-                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max</label>
-                                                            <input
-                                                                type="number"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.tds?.normal_max ?? 500}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, tds: { ...thresholdData.tds, normal_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max</label>
-                                                            <input
-                                                                type="number"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.tds?.warning_max ?? 800}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, tds: { ...thresholdData.tds, warning_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* SFR Thresholds */}
-                                                <div className="pm-details-param-card" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
-                                                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#ec4899" }}>
-                                                        SFR (Surface Fish Ratio %)
-                                                    </span>
-                                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Normal Max (%)</label>
-                                                            <input
-                                                                type="number"
-                                                                step="0.01"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.sfr?.normal_max ?? 0.10}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, sfr: { ...thresholdData.sfr, normal_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label style={{ fontSize: "10px", color: "#94a3b8" }}>Warning Max (%)</label>
-                                                            <input
-                                                                type="number"
-                                                                step="0.01"
-                                                                className="pm-input"
-                                                                style={{ padding: "4px 8px", fontSize: "12px" }}
-                                                                value={thresholdData.sfr?.warning_max ?? 0.20}
-                                                                onChange={(e) => setThresholdData({ ...thresholdData, sfr: { ...thresholdData.sfr, warning_max: Number(e.target.value) } })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Action buttons for Thresholds */}
-                                        <div className="pm-btn-block" style={{ marginTop: "16px" }}>
-                                            <button type="submit" className="pm-btn-full" disabled={thresholdSaving}>
-                                                {thresholdSaving ? "Saving..." : "Save Threshold Configuration"}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="pm-btn-cancel"
-                                                onClick={handleResetThresholds}
-                                                disabled={thresholdSaving}
-                                            >
-                                                Reset to Paper Default
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <form onSubmit={handleSaveCalibration}>
-                                        <div style={{ marginBottom: "16px", padding: "12px", borderRadius: "8px", backgroundColor: "rgba(14, 165, 233, 0.1)", border: "1px solid rgba(14, 165, 233, 0.3)" }}>
-                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                <span style={{ fontSize: "13px", fontWeight: 700, color: "#38bdf8" }}>
-                                                    {isCustomCalibration ? "Custom Hardware Calibration Active" : "Tested Default Calibration (CatfishCare 2026)"}
-                                                </span>
-                                                <span style={{ fontSize: "11px", backgroundColor: "#0284c7", color: "#ffffff", padding: "2px 8px", borderRadius: "10px" }}>
-                                                    v{calibrationData?.version ?? 1}
-                                                </span>
-                                            </div>
-                                            <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
-                                                Atur nilai tegangan ADC mentah saat probe dikalibrasi dalam larutan standar (Buffer pH 7.00, pH 4.01, Air Jernih 0 NTU, dan Larutan 1413 µS/cm).
-                                            </p>
-                                        </div>
-
-                                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                                            {/* pH Buffer 7.00 */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">pH Buffer 7.00 Voltage (V)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="pm-input"
-                                                    value={calibrationData.ph_v7 ?? 2.50}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, ph_v7: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage saat probe di larutan pH 7.00</span>
-                                            </div>
-
-                                            {/* pH Buffer 4.01 */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">pH Buffer 4.01 Voltage (V)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="pm-input"
-                                                    value={calibrationData.ph_v4 ?? 3.05}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, ph_v4: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage saat probe di larutan pH 4.01</span>
-                                            </div>
-
-                                            {/* Turbidity Clear Voltage */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">Turbidity Clear Voltage (V)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="pm-input"
-                                                    value={calibrationData.turbidity_v_clear ?? 4.20}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, turbidity_v_clear: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>ADC Voltage pada Air Suling (0 NTU)</span>
-                                            </div>
-
-                                            {/* TDS Factor */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">TDS Multiplier Factor (k)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="pm-input"
-                                                    value={calibrationData.tds_factor ?? 0.50}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, tds_factor: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Faktor larutan standar 1413 µS/cm</span>
-                                            </div>
-
-                                            {/* Pond Height */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">Pond Vessel Height (cm)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.1"
-                                                    className="pm-input"
-                                                    value={calibrationData.pond_height ?? 100.0}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, pond_height: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Tinggi sensor ke dasar kolam kosong</span>
-                                            </div>
-
-                                            {/* Temp Offset */}
-                                            <div className="pm-details-field">
-                                                <label className="pm-details-label">Temperature Offset (°C)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.1"
-                                                    className="pm-input"
-                                                    value={calibrationData.temp_offset ?? 0.0}
-                                                    onChange={(e) => setCalibrationData({ ...calibrationData, temp_offset: Number(e.target.value) })}
-                                                    required
-                                                />
-                                                <span style={{ fontSize: "11px", color: "#64748b" }}>Koreksi offset termometer standar</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Action buttons for Calibration */}
-                                        <div className="pm-btn-block" style={{ marginTop: "16px" }}>
-                                            <button type="submit" className="pm-btn-full" disabled={calibrationSaving}>
-                                                {calibrationSaving ? "Saving..." : "Save Hardware Calibration"}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="pm-btn-cancel"
-                                                onClick={handleResetCalibration}
-                                                disabled={calibrationSaving}
-                                            >
-                                                Reset to Tested Defaults
-                                            </button>
-                                        </div>
-                                    </form>
-                                )}
+                        {panelMode === "create" && (
+                            <div>
+                                <button
+                                    type="button"
+                                    className="pm-btn-cancel"
+                                    style={{ padding: "4px 10px", fontSize: "11px" }}
+                                    onClick={() => setPanelMode("edit")}
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         )}
                     </div>
+
+                    {panelMode === "create" ? (
+                        /* CREATE FORM IN STATIC PANEL */
+                        <form onSubmit={handleCreateSubmit}>
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Pond Name</label>
+                                <input
+                                    type="text"
+                                    className="pm-input"
+                                    value={createName}
+                                    onChange={(e) => setCreateName(e.target.value)}
+                                    placeholder="Contoh: Kolam TFS 2"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Location</label>
+                                <input
+                                    type="text"
+                                    className="pm-input"
+                                    value={createLocation}
+                                    onChange={(e) => setCreateLocation(e.target.value)}
+                                    placeholder="Contoh: Sektor Utama, Blok 2"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Fish Capacity (ekor)</label>
+                                <input
+                                    type="number"
+                                    className="pm-input"
+                                    value={createCapacity}
+                                    onChange={(e) => setCreateCapacity(Number(e.target.value))}
+                                    placeholder="1000"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Tinggi Kolam (cm)</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    className="pm-input"
+                                    value={createPondHeight}
+                                    onChange={(e) => setCreatePondHeight(Number(e.target.value))}
+                                    placeholder="40.0"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-btn-block" style={{ marginTop: "20px" }}>
+                                <button type="submit" className="pm-btn-full">
+                                    + Create Pond
+                                </button>
+                            </div>
+                        </form>                    ) : (
+                        /* EDIT FORM IN STATIC PANEL (ONLY 4 FIELDS, NO EXTRA TABS) */
+                        <form onSubmit={handleSave}>
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Pond Name</label>
+                                <input
+                                    type="text"
+                                    className="pm-input"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    placeholder="Enter pond name"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Location</label>
+                                <input
+                                    type="text"
+                                    className="pm-input"
+                                    value={editLocation}
+                                    onChange={(e) => setEditLocation(e.target.value)}
+                                    placeholder="Enter sector and block location"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Fish Capacity (ekor)</label>
+                                <input
+                                    type="number"
+                                    className="pm-input"
+                                    value={editCapacity}
+                                    onChange={(e) => setEditCapacity(Number(e.target.value))}
+                                    placeholder="Enter capacity limit"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-details-field">
+                                <label className="pm-details-label">Tinggi Kolam (cm)</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    className="pm-input"
+                                    value={calibrationData?.pond_height ?? 100.0}
+                                    onChange={(e) =>
+                                        setCalibrationData({
+                                            ...calibrationData,
+                                            pond_height: Number(e.target.value),
+                                        })
+                                    }
+                                    placeholder="Contoh: 40.0"
+                                    required
+                                />
+                            </div>
+
+                            <div className="pm-btn-block" style={{ marginTop: "20px" }}>
+                                <button type="submit" className="pm-btn-full">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </div>
-            )}
+            </div>
 
             {/* Custom cursor-following tooltip */}
             {tooltipVisible && hoveredRowId !== null && (
