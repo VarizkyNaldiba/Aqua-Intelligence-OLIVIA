@@ -91,10 +91,13 @@ class GoogleDriveService
         }
 
         try {
+            $folderId = env('GOOGLE_DRIVE_FOLDER_ID', '1vLtZgdbAC-KYVoksBQ2cMq8x7Pg6GudW');
+
             // Multipart upload endpoint for Google Drive API v3
             $metadata = [
                 'name' => $fileName,
                 'mimeType' => 'text/csv',
+                'parents' => [$folderId],
             ];
 
             $boundary = '-------314159265358979323846';
